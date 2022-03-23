@@ -1,4 +1,4 @@
-package Tetris.model;
+package Tetris.src.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
