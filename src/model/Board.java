@@ -1,4 +1,4 @@
-package src.model;
+package Tetris.src.model;
 
 public class Board {
   private String font;

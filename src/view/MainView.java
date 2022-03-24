@@ -5,31 +5,21 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainView extends JFrame{
+public class MainView extends JPanel {
 
     //private JTextArea textArea;
     private JPanel buttonPanel;
 
-    private JButton StartButton;
-    private JButton SettingButton;
-    private JButton ScoreBoardButton;
-    private JButton ExitButton;
+    /* 기능 구현을 위해 private->public 변경 수정 필요*/
+    public JButton StartButton;
+    public JButton SettingButton;
+    public JButton ScoreBoardButton;
+    public JButton ExitButton;
 
     public MainView() {
-
-        super.setTitle("Team 19 Tetris");
-        super.setSize(400, 800);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   // 창을 닫으면 더 이상 실행(run)되지 않는다
-        super.setLocationRelativeTo(null); // 어떤 위치에 창이 나타날 것인가를 결정. 현재는 화면 정 중앙
-
-        super.setVisible(true);
-
-        GameView gameView = new GameView();
-        ScoreView scoreView = new ScoreView();
-        SettingView settingView = new SettingView();
         //ExitView exitView = new ExitView();
 
+        super.setBounds(0,0,400, 400);   // mainView panel의 크기 설정
         buttonPanel = new JPanel();
         StartButton = new JButton("Game Start");
         SettingButton = new JButton("Settings");
@@ -43,32 +33,6 @@ public class MainView extends JFrame{
 
         super.add(buttonPanel);
 
-
-
-        StartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gameView.setVisible(true);
-
-            }
-        });
-
-        SettingButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settingView.setVisible(true);
-
-            }
-        });
-
-        ScoreBoardButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                scoreView.setVisible(true);
-
-            }
-        });
-
 //        ExitButton.addActionListener(new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent e) {
@@ -76,9 +40,5 @@ public class MainView extends JFrame{
 //
 //            }
 //        });
-
-
     }
-
-
 }
