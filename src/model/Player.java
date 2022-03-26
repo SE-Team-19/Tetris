@@ -9,10 +9,10 @@ public class Player implements Serializable {
 
     public HashMap<String, Integer> hashMap = new HashMap<>();
 
-//    public Player(String name, int score) {
-//        this.name = name;
-//        this.score = score;
-//    }
+    // public Player(String name, int score) {
+    // this.name = name;
+    // this.score = score;
+    // }
 
     public String getName() {
         return name;
@@ -27,9 +27,8 @@ public class Player implements Serializable {
         return score;
     }
 
-//    public void setScore(int score) {
-//        this.score = score;
-//    }
-
+    // public void setScore(int score) {
+    // this.score = score;
+    // }
 
 }

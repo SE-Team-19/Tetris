@@ -1,10 +1,10 @@
-package model;
+package Tetris.src.model;
 
 import java.awt.Color;
 
-class ZBlock extends Block {
+public class ZBlock extends Block {
     public ZBlock() {
-        block = new int[][] {
+        shape = new int[][] {
                 { 1, 1, 0 },
                 { 0, 1, 1 }
         };
