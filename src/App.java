@@ -1,6 +1,6 @@
-package Tetris.src;
+package tetris.src;
 
-import Tetris.src.controller.ViewController;
+import tetris.src.controller.ViewController;
 
 public class App {
     public static void main(String[] args) throws Exception {

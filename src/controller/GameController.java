@@ -1,4 +1,4 @@
-package Tetris.src.controller;
+package tetris.src.controller;
 
 public class GameController {
     

@@ -1,4 +1,4 @@
-package Tetris.src.view;
+package tetris.src.view;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
