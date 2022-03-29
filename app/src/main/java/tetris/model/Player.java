@@ -1,13 +1,14 @@
-package Tetris.src.model;
+package tetris.src.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Player implements Serializable {
     private String name;
     private int score;
 
-    public HashMap<String, Integer> hashMap = new HashMap<>();
+    public Map<String, Integer> hashMap = new HashMap<>();
 
     // public Player(String name, int score) {
     // this.name = name;
