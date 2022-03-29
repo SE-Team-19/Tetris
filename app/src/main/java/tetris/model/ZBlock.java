@@ -1,4 +1,4 @@
-package tetris.src.model;
+package tetris.model;
 
 import java.awt.Color;
 

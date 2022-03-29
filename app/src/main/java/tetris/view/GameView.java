@@ -1,4 +1,4 @@
-package tetris.src.view;
+package tetris.view;
 
 import javax.swing.border.CompoundBorder;
 import javax.swing.JPanel;

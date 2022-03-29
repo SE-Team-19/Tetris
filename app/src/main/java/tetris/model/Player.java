@@ -1,4 +1,4 @@
-package tetris.src.model;
+package tetris.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,6 +30,5 @@ public class Player implements Serializable {
     // public void setScore(int score) {
     // this.score = score;
     // }
-
 
 }

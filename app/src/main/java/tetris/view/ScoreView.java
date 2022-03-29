@@ -1,11 +1,10 @@
-package tetris.src.view;
+package tetris.view;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.BoxLayout;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 

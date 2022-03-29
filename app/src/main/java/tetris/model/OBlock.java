@@ -1,10 +1,10 @@
-package tetris.src.model;
+package tetris.model;
 
 import java.awt.Color;
 
 class OBlock extends Block {
     public OBlock() {
-        block = new int[][] {{1, 1}, {1, 1},};
+        block = new int[][] { { 1, 1 }, { 1, 1 }, };
         color = Color.YELLOW;
     }
 }

@@ -1,4 +1,4 @@
-package tetris.src.view;
+package tetris.view;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 public class MainView extends JPanel {
 
-    // private JTextArea textArea;
     private JPanel buttonPanel;
     private JLabel appName;
 
@@ -31,25 +30,13 @@ public class MainView extends JPanel {
     }
 
     public MainView() {
-        // ExitView exitView = new ExitView();
         initMainView();
-
-        // ExitButton.addActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent e) {
-        // exitView.setVisible(true);
-        //
-        // }
-        // });
     }
 
     private void initMainView() {
-
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout으로 세로정렬
-
         buttonList = new ArrayList<>(); // ArrayList<JButton> 생성
-
         startButton = new JButton("Game Start");
         settingButton = new JButton("Settings");
         scoreBoardButton = new JButton("Scoreboard");
@@ -61,11 +48,6 @@ public class MainView extends JPanel {
         buttonList.add(exitButton);
 
         addAButton(buttonList, buttonPanel);
-
-        /*
-         * addAButton(startButton,buttonPanel); addAButton(settingButton,buttonPanel);
-         * addAButton(scoreBoardButton,buttonPanel); addAButton(exitButton,buttonPanel);
-         */
 
         appName = new JLabel("Tetris");
         appName.setHorizontalAlignment(JLabel.CENTER);

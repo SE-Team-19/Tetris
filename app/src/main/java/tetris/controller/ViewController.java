@@ -1,4 +1,4 @@
-package tetris.src.controller;
+package tetris.controller;
 
 import java.util.HashMap;
 
@@ -14,7 +14,7 @@ import java.awt.event.ContainerEvent;
 import java.awt.Rectangle;
 import java.awt.GridLayout;
 
-import tetris.src.view.*;
+import tetris.view.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
