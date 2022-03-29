@@ -4,9 +4,9 @@ import javax.swing.Timer;
 
 public class Game {
     float currentScore;
-    //Block nextBlock;
+    // Block nextBlock;
     int[][] currentBlock;
     int[][] currentboard;
-    //private int initInterval = 1000;
+    // private int initInterval = 1000;
     Timer frame;
 }

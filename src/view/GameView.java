@@ -30,7 +30,7 @@ public class GameView extends JPanel {
         this.returnButton = returnButton;
     }
 
-    public GameView(){
+    public GameView() {
         initGameView();
     }
 
@@ -47,16 +47,17 @@ public class GameView extends JPanel {
         gamePane.setBackground(Color.BLACK);
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
-        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
-				BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        CompoundBorder border =
+                BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+                        BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gamePane.setBorder(border);
         nextBlockPane.setBorder(border);
-        
+
         gameInfoPane.setLayout(new GridLayout(3, 0, 0, 0));
         gameInfoPane.add(nextBlockPane);
         gameInfoPane.add(this.score);
         gameInfoPane.add(returnButton);
-        
+
         super.add(gamePane);
         super.add(gameInfoPane);
     }

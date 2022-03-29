@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 
 public class SettingView extends JPanel {
-    
+
     private JButton returnButton;
 
     public JButton getReturnButton() {
@@ -20,28 +20,27 @@ public class SettingView extends JPanel {
         this.returnButton = returnButton;
     }
 
-    public SettingView(){
-        InitView();    
+    public SettingView() {
+        initView();
     }
 
-    private void InitView() {
+    private void initView() {
+        String[] selections = {"360X230", "700X800", "900X1000"};
+        JComboBox<String> comboBox = new JComboBox<>(selections);
 
-        String[] selections = {"360X230","700X800","900X1000"};
-        JComboBox<String> comboBox = new JComboBox<>(selections);	
-		
-		JButton btnNewButton = new JButton("키보드 입력");
-		
-		JButton btnScoreInit = new JButton("점수초기화");
-		
-		JCheckBox checkBox = new JCheckBox("색맹모드");
-		
-		returnButton = new JButton("Return");
+        JButton btnNewButton = new JButton("키보드 입력");
 
-        super.setLayout(new GridLayout(5,0,0,0));
+        JButton btnScoreInit = new JButton("점수초기화");
+
+        JCheckBox checkBox = new JCheckBox("색맹모드");
+
+        returnButton = new JButton("Return");
+
+        super.setLayout(new GridLayout(5, 0, 0, 0));
         super.add(comboBox);
         super.add(btnNewButton);
         super.add(btnScoreInit);
         super.add(checkBox);
-		super.add(returnButton);
+        super.add(returnButton);
     }
 }

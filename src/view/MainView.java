@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MainView extends JPanel {
 
-    //private JTextArea textArea;
+    // private JTextArea textArea;
     private JPanel buttonPanel;
     private JLabel appName;
 
@@ -31,23 +31,23 @@ public class MainView extends JPanel {
     }
 
     public MainView() {
-        //ExitView exitView = new ExitView();
+        // ExitView exitView = new ExitView();
         initMainView();
 
-//        ExitButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                exitView.setVisible(true);
-//
-//            }
-//        });
+        // ExitButton.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // exitView.setVisible(true);
+        //
+        // }
+        // });
     }
 
     private void initMainView() {
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout으로 세로정렬
-        
+
         buttonList = new ArrayList<>(); // ArrayList<JButton> 생성
 
         startButton = new JButton("Game Start");
@@ -60,17 +60,17 @@ public class MainView extends JPanel {
         buttonList.add(scoreBoardButton);
         buttonList.add(exitButton);
 
-        addAButton(buttonList,buttonPanel);
+        addAButton(buttonList, buttonPanel);
 
-        /* addAButton(startButton,buttonPanel);
-        addAButton(settingButton,buttonPanel);
-        addAButton(scoreBoardButton,buttonPanel);
-        addAButton(exitButton,buttonPanel); */
+        /*
+         * addAButton(startButton,buttonPanel); addAButton(settingButton,buttonPanel);
+         * addAButton(scoreBoardButton,buttonPanel); addAButton(exitButton,buttonPanel);
+         */
 
         appName = new JLabel("Tetris");
         appName.setHorizontalAlignment(JLabel.CENTER);
 
-        super.setLayout(new GridLayout(2,0,0,0));   // row 2, colmn 0
+        super.setLayout(new GridLayout(2, 0, 0, 0)); // row 2, colmn 0
         super.add(appName);
         super.add(buttonPanel);
     }
@@ -125,5 +125,5 @@ public class MainView extends JPanel {
         }
     }
 
-    
+
 }

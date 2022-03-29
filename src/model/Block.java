@@ -7,9 +7,7 @@ public abstract class Block {
     protected Color color;
 
     public Block() {
-        block = new int[][] {
-                { 0 },
-        };
+        block = new int[][] {{0},};
         color = Color.YELLOW;
     }
 

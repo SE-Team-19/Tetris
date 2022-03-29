@@ -21,9 +21,9 @@ public class ScoreView extends JPanel {
     public void setReturnButton(JButton returnButton) {
         this.returnButton = returnButton;
     }
-    
+
     public ScoreView() {
-        super.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         returnButton = new JButton("Return");
         names = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class ScoreView extends JPanel {
     }
 
     private void addLabel(ArrayList<JLabel> players) {
-        for(JLabel player : players)
+        for (JLabel player : players)
             super.add(player);
     }
 }
