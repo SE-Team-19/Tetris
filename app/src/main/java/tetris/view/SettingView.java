@@ -19,12 +19,23 @@ public class SettingView extends JPanel {
         this.returnButton = returnButton;
     }
 
-    public SettingView() {
+    /* singleton Instance (LazyHolder) */
+    private SettingView() {
         initView();
     }
 
+    private static class LazyHolder {
+        private static final SettingView INSTANCE = new SettingView();
+    }
+
+    public static SettingView getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    /***************************************/
+
     private void initView() {
-        String[] selections = {"360X230", "700X800", "900X1000"};
+        String[] selections = { "360X230", "700X800", "900X1000" };
         JComboBox<String> comboBox = new JComboBox<>(selections);
         JButton btnNewButton = new JButton("키보드 입력");
         JButton btnScoreInit = new JButton("점수초기화");
