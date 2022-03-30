@@ -1,8 +1,6 @@
 package tetris.view;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.SwingConstants;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -12,26 +10,30 @@ import java.util.ArrayList;
 
 public class MainView extends JPanel {
 
+    private static final MainView mainView = new MainView();
+
     private JPanel buttonPanel;
     private JLabel appName;
-
     private JButton startButton;
     private JButton settingButton;
     private JButton scoreBoardButton;
     private JButton exitButton;
     private ArrayList<JButton> buttonList;
 
-    public ArrayList<JButton> getButtonList() {
-        return this.buttonList;
-    }
-
-    public void setButtonList(ArrayList<JButton> buttonList) {
-        this.buttonList = buttonList;
-    }
-
-    public MainView() {
+    /* singleton Instance (LazyHolder) */
+    private MainView() {
         initMainView();
     }
+
+    private static class LazyHolder {
+        private static final MainView INSTANCE = new MainView();
+    }
+
+    public static MainView getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    /***************************************/
 
     private void initMainView() {
         buttonPanel = new JPanel();
@@ -55,6 +57,14 @@ public class MainView extends JPanel {
         super.setLayout(new GridLayout(2, 0, 0, 0)); // row 2, colmn 0
         super.add(appName);
         super.add(buttonPanel);
+    }
+
+    public ArrayList<JButton> getButtonList() {
+        return this.buttonList;
+    }
+
+    public void setButtonList(ArrayList<JButton> buttonList) {
+        this.buttonList = buttonList;
     }
 
     public JPanel getButtonPanel() {
@@ -97,7 +107,6 @@ public class MainView extends JPanel {
         this.exitButton = exitButton;
     }
 
-
     // 언제든지 Button객체를 추가할 수 있는 method
     private void addAButton(ArrayList<JButton> buttons, Container container) {
         for (JButton button : buttons) {
@@ -106,6 +115,5 @@ public class MainView extends JPanel {
             container.add(button);
         }
     }
-
 
 }
