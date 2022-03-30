@@ -1,13 +1,13 @@
-package Tetris.src.view;
+package tetris.view;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainView extends JFrame{
+public class MainView extends JFrame {
 
-    //private JTextArea textArea;
+    // private JTextArea textArea;
     private JPanel buttonPanel;
 
     private JButton StartButton;
@@ -20,7 +20,7 @@ public class MainView extends JFrame{
         super.setTitle("Team 19 Tetris");
         super.setSize(400, 800);
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   // 창을 닫으면 더 이상 실행(run)되지 않는다
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 창을 닫으면 더 이상 실행(run)되지 않는다
         super.setLocationRelativeTo(null); // 어떤 위치에 창이 나타날 것인가를 결정. 현재는 화면 정 중앙
 
         super.setVisible(true);
@@ -28,7 +28,7 @@ public class MainView extends JFrame{
         GameView gameView = new GameView();
         ScoreView scoreView = new ScoreView();
         SettingView settingView = new SettingView();
-        //ExitView exitView = new ExitView();
+        // ExitView exitView = new ExitView();
 
         buttonPanel = new JPanel();
         StartButton = new JButton("Game Start");
@@ -69,13 +69,13 @@ public class MainView extends JFrame{
             }
         });
 
-//        ExitButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                exitView.setVisible(true);
-//
-//            }
-//        });
+        // ExitButton.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // exitView.setVisible(true);
+        //
+        // }
+        // });
 
 
     }

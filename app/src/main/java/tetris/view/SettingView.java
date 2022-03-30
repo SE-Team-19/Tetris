@@ -1,4 +1,4 @@
-package Tetris.src.view;
+package tetris.view;
 
 import javax.swing.JFrame;
 

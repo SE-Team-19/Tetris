@@ -1,4 +1,4 @@
-package Tetris.src.model;
+package tetris.model;
 
 public class Setting {
     private int displayMode;
@@ -8,8 +8,8 @@ public class Setting {
     private String rotateKey;
     private String stackKey;
 
-    public Setting(int dispalyMode, boolean colorBlindMode, String moveLeftKey, String moveRightKey, String rotateKey,
-            String stackKey) {
+    public Setting(int dispalyMode, boolean colorBlindMode, String moveLeftKey, String moveRightKey,
+            String rotateKey, String stackKey) {
         this.displayMode = dispalyMode;
         this.moveLeftKey = moveLeftKey;
         this.moveRightKey = moveRightKey;

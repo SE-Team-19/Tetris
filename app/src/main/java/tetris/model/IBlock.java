@@ -1,12 +1,10 @@
-package Tetris.src.model;
+package tetris.model;
 
 import java.awt.Color;
 
 public class IBlock extends Block {
     public IBlock() {
-        shape = new int[][] {
-                { 1, 1, 1, 1 },
-        };
+        shape = new int[][] {{1, 1, 1, 1},};
         color = Color.RED;
     }
 }

@@ -1,4 +1,4 @@
-package Tetris.src.model;
+package tetris.model;
 
 import java.awt.Color;
 
@@ -7,9 +7,7 @@ class Block {
     protected Color color;
 
     public Block() {
-        shape = new int[][] {
-                { 0 },
-        };
+        shape = new int[][] {{0},};
         color = Color.YELLOW;
     }
 
