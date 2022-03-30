@@ -12,8 +12,6 @@ import javax.swing.BorderFactory;
 import java.awt.Color;
 import java.awt.GridLayout;
 
-
-
 public class GameView extends JPanel {
 
     private JTextPane gamePane;
@@ -30,9 +28,20 @@ public class GameView extends JPanel {
         this.returnButton = returnButton;
     }
 
-    public GameView() {
+    /* singleton Instance (LazyHolder) */
+    private GameView() {
         initGameView();
     }
+
+    private static class LazyHolder {
+        private static final GameView INSTANCE = new GameView();
+    }
+
+    public static GameView getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    /***************************************/
 
     private void initGameView() {
         super.setLayout(new GridLayout(0, 2, 0, 0));
@@ -47,9 +56,8 @@ public class GameView extends JPanel {
         gamePane.setBackground(Color.BLACK);
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
-        CompoundBorder border =
-                BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
-                        BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+                BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gamePane.setBorder(border);
         nextBlockPane.setBorder(border);
 
@@ -60,5 +68,13 @@ public class GameView extends JPanel {
 
         super.add(gamePane);
         super.add(gameInfoPane);
+    }
+
+    public JTextPane getGamePane() {
+        return this.gamePane;
+    }
+
+    public void setGamePane(JTextPane gamePane) {
+        this.gamePane = gamePane;
     }
 }
