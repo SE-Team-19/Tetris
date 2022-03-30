@@ -2,30 +2,24 @@ package tetris.controller;
 
 import java.util.HashMap;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JButton;
-import javax.swing.WindowConstants;
 
 import java.awt.Container;
-import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.ContainerEvent;
 import java.awt.Rectangle;
 import java.awt.GridLayout;
 
 import tetris.view.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 
 public class ViewController extends JFrame {
 
     private Container contentPane;
-    private MainView mainView;
-    private GameView gameView;
-    private ScoreView scoreView;
-    private SettingView settingView;
+    MainView mainView = MainView.getInstance();
+    GameView gameView = GameView.getInstance();
+    ScoreView scoreView = ScoreView.getInstance();
+    SettingView settingView = SettingView.getInstance();
     private HashMap<JButton, Container> viewMap;
     private Rectangle screenSize;
 
@@ -70,11 +64,6 @@ public class ViewController extends JFrame {
 
         contentPane = super.getContentPane(); // contentPane 부르기
 
-        mainView = new MainView();
-        gameView = new GameView();
-        scoreView = new ScoreView();
-        settingView = new SettingView();
-
         // View Mapping
         viewMap = new HashMap<>();
         viewMap.put(mainView.getStartButton(), gameView);
@@ -112,25 +101,4 @@ public class ViewController extends JFrame {
             }
         }
     }
-
-    private class gameKeyEvent extends KeyAdapter {
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    e.getComponent().transferFocusBackward();
-                    break;
-                case KeyEvent.VK_DOWN:
-                    e.getComponent().transferFocus();
-                    break;
-                case KeyEvent.VK_ENTER:
-                    viewTransion(contentPane, viewMap.get(e.getComponent()), mainView);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
 }
