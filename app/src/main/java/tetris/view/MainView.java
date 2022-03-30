@@ -112,5 +112,4 @@ public class MainView extends JPanel {
             container.add(button);
         }
     }
-
 }
