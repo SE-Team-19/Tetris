@@ -7,7 +7,6 @@ import javax.swing.BoxLayout;
 
 import java.util.ArrayList;
 
-
 public class ScoreView extends JPanel {
 
     private JButton returnButton;
@@ -21,7 +20,7 @@ public class ScoreView extends JPanel {
         this.returnButton = returnButton;
     }
 
-    public ScoreView() {
+    private ScoreView() {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         returnButton = new JButton("Return");
         names = new ArrayList<>();
@@ -36,6 +35,16 @@ public class ScoreView extends JPanel {
 
         addLabel(names);
     }
+
+    private static class LazyHolder {
+        private static final ScoreView INSTANCE = new ScoreView();
+    }
+
+    public static ScoreView getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    /***************************************/
 
     private void addLabel(ArrayList<JLabel> players) {
         for (JLabel player : players)
