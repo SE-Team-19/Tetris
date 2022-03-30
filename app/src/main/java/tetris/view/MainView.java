@@ -6,19 +6,16 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Component;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class MainView extends JPanel {
 
-    private static final MainView mainView = new MainView();
-
     private JPanel buttonPanel;
-    private JLabel appName;
     private JButton startButton;
     private JButton settingButton;
     private JButton scoreBoardButton;
     private JButton exitButton;
-    private ArrayList<JButton> buttonList;
+    private List<JButton> buttonList;
 
     /* singleton Instance (LazyHolder) */
     private MainView() {
@@ -51,19 +48,19 @@ public class MainView extends JPanel {
 
         addAButton(buttonList, buttonPanel);
 
-        appName = new JLabel("Tetris");
-        appName.setHorizontalAlignment(JLabel.CENTER);
+        JLabel appName = new JLabel("Tetris");
+        appName.setHorizontalAlignment(SwingConstants.CENTER);
 
         super.setLayout(new GridLayout(2, 0, 0, 0)); // row 2, colmn 0
         super.add(appName);
         super.add(buttonPanel);
     }
 
-    public ArrayList<JButton> getButtonList() {
+    public List<JButton> getButtonList() {
         return this.buttonList;
     }
 
-    public void setButtonList(ArrayList<JButton> buttonList) {
+    public void setButtonList(List<JButton> buttonList) {
         this.buttonList = buttonList;
     }
 
@@ -108,7 +105,7 @@ public class MainView extends JPanel {
     }
 
     // 언제든지 Button객체를 추가할 수 있는 method
-    private void addAButton(ArrayList<JButton> buttons, Container container) {
+    private void addAButton(List<JButton> buttons, Container container) {
         for (JButton button : buttons) {
             button.setName(button.getText());
             button.setAlignmentX(Component.CENTER_ALIGNMENT);

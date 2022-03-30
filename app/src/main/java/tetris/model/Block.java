@@ -2,17 +2,18 @@ package tetris.model;
 
 import java.awt.Color;
 
-public abstract class Block {
-    protected int[][] block;
+abstract class Block {
+
+    protected int[][] shape;
     protected Color color;
 
-    public Block() {
-        block = new int[][] {{0},};
+    protected Block() {
+        shape = new int[][] {{0}};
         color = Color.YELLOW;
     }
 
     public int getShape(int x, int y) {
-        return block[y][x];
+        return shape[y][x];
     }
 
     public Color getColor() {

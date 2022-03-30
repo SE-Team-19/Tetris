@@ -31,11 +31,11 @@ public class ViewController extends JFrame {
 
         /* Key Event와 혼재되어있음 정리 필요 */
         mainView.getStartButton()
-                .addActionListener(e -> viewTransion(contentPane, gameView, mainView));
+                .addActionListener(e -> viewTransiton(contentPane, gameView, mainView));
         mainView.getSettingButton()
-                .addActionListener(e -> viewTransion(contentPane, settingView, mainView));
+                .addActionListener(e -> viewTransiton(contentPane, settingView, mainView));
         mainView.getScoreBoardButton()
-                .addActionListener(e -> viewTransion(contentPane, scoreView, mainView));
+                .addActionListener(e -> viewTransiton(contentPane, scoreView, mainView));
 
         mainView.getStartButton().requestFocus();
         mainView.getStartButton().addKeyListener(mainKeyListener);
@@ -44,11 +44,11 @@ public class ViewController extends JFrame {
         mainView.getExitButton().addKeyListener(mainKeyListener);
 
         gameView.getReturnButton()
-                .addActionListener(e -> viewTransion(contentPane, mainView, gameView));
+                .addActionListener(e -> viewTransiton(contentPane, mainView, gameView));
         scoreView.getReturnButton()
-                .addActionListener(e -> viewTransion(contentPane, mainView, scoreView));
+                .addActionListener(e -> viewTransiton(contentPane, mainView, scoreView));
         settingView.getReturnButton()
-                .addActionListener(e -> viewTransion(contentPane, mainView, settingView));
+                .addActionListener(e -> viewTransiton(contentPane, mainView, settingView));
     }
 
     private void initView() {
@@ -75,7 +75,7 @@ public class ViewController extends JFrame {
     }
 
     // 전환함수
-    private void viewTransion(Container pane, Container to, Container from) {
+    private void viewTransiton(Container pane, Container to, Container from) {
         pane.add(to);
         pane.remove(from);
         revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
@@ -94,7 +94,7 @@ public class ViewController extends JFrame {
                     e.getComponent().transferFocus();
                     break;
                 case KeyEvent.VK_ENTER:
-                    viewTransion(contentPane, viewMap.get(e.getComponent()), mainView);
+                    viewTransiton(contentPane, viewMap.get(e.getComponent()), mainView);
                     break;
                 default:
                     break;

@@ -5,8 +5,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.CompoundBorder;
-import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
 
 import java.awt.Color;
@@ -18,7 +16,7 @@ public class GameView extends JPanel {
     private JTextPane nextBlockPane;
     private JButton returnButton;
     private JPanel gameInfoPane;
-    private JLabel score;
+    private JLabel scoreLabel;
 
     public JButton getReturnButton() {
         return this.returnButton;
@@ -49,21 +47,22 @@ public class GameView extends JPanel {
         gamePane = new JTextPane();
         gameInfoPane = new JPanel();
         nextBlockPane = new JTextPane();
-        score = new JLabel("점수표기");
+        scoreLabel = new JLabel("점수표기");
         returnButton = new JButton("Return");
 
         gamePane.setEditable(false);
         gamePane.setBackground(Color.BLACK);
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
-        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
-                BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        CompoundBorder border =
+                BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+                        BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gamePane.setBorder(border);
         nextBlockPane.setBorder(border);
 
         gameInfoPane.setLayout(new GridLayout(3, 0, 0, 0));
         gameInfoPane.add(nextBlockPane);
-        gameInfoPane.add(this.score);
+        gameInfoPane.add(this.scoreLabel);
         gameInfoPane.add(returnButton);
 
         super.add(gamePane);
