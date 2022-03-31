@@ -1,6 +1,7 @@
 package tetris.model;
 
 public class Setting {
+
     private int displayMode;
     private boolean colorBlindMode;
     private String moveLeftKey;

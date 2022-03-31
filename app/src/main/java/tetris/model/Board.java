@@ -1,6 +1,7 @@
 package tetris.model;
 
 public class Board {
+
     private String font;
     private int fontSize;
     private String size;
