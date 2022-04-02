@@ -62,17 +62,20 @@ public class Block {
         x += 1;
     }
 
-    // 바닥에 닿았는지 확인할 수 있도록
+    // 바닥에 닿았는지 확인할 수 있는 메소드
     public int getBottomLocation() {    
         return y + getHeight();
     }
     
-    // 오른족에 닿았는지 확인할 수 있도록
+    // 오른족에 닿았는지 확인할 수 있는 메소드
     public int getRightLocation() {
         return x + getWidth();
     }
-    // 왼쪽은 getX() 가 있으므로 굳이 구현하지 않았음
-    
+
+    // 왼쪽에 닿았는지 확인할 수 있는 메소드 : getX와 동일
+    public int getLeftLocation() {
+        return x;
+    }
     
 
     // 블록을 회전시키는 메소드: 90도, 시계반대방향
