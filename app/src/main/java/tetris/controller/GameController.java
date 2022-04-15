@@ -11,7 +11,7 @@ import tetris.view.*;
 
 public class GameController extends JPanel {
 
-    GameView gameView = GameView.getInstance();
+    GameView gameView = GameView.getInstance();    // instance를 한 번 호출한다.
     BlockController blockController;
 
     GameBoard gameBoard;
@@ -25,7 +25,8 @@ public class GameController extends JPanel {
     }
 
     public void initBoard() {
-        gameBoard = new GameBoard();    // gameBoard 에서 gameView 로 대체될 예정임
+        // gameView.initGameView() 이 부분을 굳이 선언할 필요가 없다. 어차피 위에서 instance를 한 번 호출해옴.
+        // 이렇게 되면 instance를 두번 호출, 즉 중복해서 호출한다.
     }
 
     public void drawNextBlockBoard(JPanel jPanel) {

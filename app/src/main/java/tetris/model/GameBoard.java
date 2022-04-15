@@ -1,21 +1,22 @@
 package tetris.model;
 
+import java.awt.Font;
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.util.Random;
 
-import tetris.controller.GameController;
-import tetris.controller.ViewController;
+import tetris.controller.*;
 import tetris.model.*;
+import tetris.view.*;
 
-
-import tetris.model.*;
-
-
-public class GameBoard extends JPanel {
+public class GameBoard extends JFrame {
     /*
     게임화면 구성. JPanel 안에 JPanel 삽입이 불가능하므로, GameView 가 아닌
     Controller 에서 관리하도록 해야 할듯
@@ -27,40 +28,174 @@ public class GameBoard extends JPanel {
     public static int GAME_WIDTH = 10;
     public static final char BORDER_CHAR = 'X';
 
-    private SimpleAttributeSet styleSet;
-    private JTextPane gamePane;
-    private JTextPane nextBlockPane;
     private Block currentBlock;
     private Block nextBlock;
-    private int [][] board;
 
     private int x = 3;
     private int y = 0;
 
-    public GameBoard(JPanel placeholder) {
+    private String font;
+    private int fontSize;
+    private String size;
+    private Color color;
+    private char a;
+    private char b;
+    private int width;
+    private int height;
+
+
+    private SimpleAttributeSet styleSet;
+    private JTextPane tetrisGameArea;
+    private JTextPane nextBlockArea;
+    GameView gameView = GameView.getInstance();
+
+    private SimpleAttributeSet styleSetGameBoard;
+
+    private int [][] board;
+    private int [][] nextBoard;
+
+    public GameBoard() {
+        super("Seoultech");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // gameBoard display
+        tetrisGameArea = new JTextPane();
+        tetrisGameArea.setEditable(false);
+        tetrisGameArea.setBackground(Color.BLACK);
+        CompoundBorder border = BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.GRAY, 10),
+            BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        tetrisGameArea.setBorder(border);
+
+        nextBlockArea = new JTextPane();
+        nextBlockArea.setEditable(false);
+        nextBlockArea.setBackground(Color.BLACK);
+        nextBlockArea.setBorder(border);
+
+        styleSetGameBoard = new SimpleAttributeSet();
+        StyleConstants.setFontSize(styleSetGameBoard, 20);
+        StyleConstants.setFontFamily(styleSetGameBoard, "Courier New"); // font에 따라 다름
+        // Font.MONOSPACED, "Courier", "Courier New"
+        StyleConstants.setBold(styleSetGameBoard, true);
+        StyleConstants.setForeground(styleSetGameBoard, Color.WHITE);
+        StyleConstants.setAlignment(styleSetGameBoard, StyleConstants.ALIGN_CENTER);
+
+
+        JPanel leftPanel;
+        JPanel rightPanel;
+        leftPanel = new JPanel();
+        leftPanel.add(tetrisGameArea);
+        rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.add(nextBlockArea);
+        rightPanel.add(Box.createVerticalStrut(20));
+        rightPanel.add(Box.createVerticalStrut(20));
+
+        JPanel panel = new JPanel();
+        panel.add(leftPanel);
+        panel.add(rightPanel);
+
+        add(panel);
+
+        //setStyleSet();
+
+
+
+        board = new int[GAME_HEIGHT][GAME_WIDTH];    // 세로 x 가로: 순서 주의하기
+        nextBoard = new int[5][3];
+
+        drawGameBoard();
+    }
+
+    public void setStyleSet() {
+        styleSet = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(styleSet, Font.SANS_SERIF);
+        StyleConstants.setFontSize(styleSet, 20);
+        StyleConstants.setBold(styleSet, true);
+        StyleConstants.setForeground(styleSet, Color.WHITE);
+        StyleConstants.setAlignment(styleSet, StyleConstants.ALIGN_CENTER);
+    }
+
+    public void setStyleSetGameBoard() {
+        styleSetGameBoard = new SimpleAttributeSet();
+        StyleConstants.setFontSize(styleSetGameBoard, 20);
+        StyleConstants.setFontFamily(styleSetGameBoard, "Courier");
+        StyleConstants.setBold(styleSetGameBoard, true);
+        StyleConstants.setForeground(styleSetGameBoard, Color.WHITE);
+        StyleConstants.setAlignment(styleSetGameBoard, StyleConstants.ALIGN_CENTER);
+    }
+
+    public void drawGameBoard() {
+        StringBuilder sb = new StringBuilder();
+        for (int t = 0; t < GAME_WIDTH + 2; t++) {
+            sb.append(BORDER_CHAR);
+        }
+        sb.append("\n");
+        for (int i = 0; i < board.length; i++) {
+            sb.append(BORDER_CHAR);
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == 1) {
+                    sb.append(BORDER_CHAR);
+                } else {
+                    sb.append(" ");
+                }
+            }
+            sb.append(BORDER_CHAR);
+            sb.append("\n");
+        }
+        for (int t = 0; t < GAME_WIDTH + 2; t++) {
+            sb.append(BORDER_CHAR);
+        }
+        tetrisGameArea.setText(sb.toString());
+        StyledDocument doc = tetrisGameArea.getStyledDocument();
+        doc.setParagraphAttributes(0, doc.getLength(), styleSetGameBoard, false);
+
+        StyledDocument boardDoc = tetrisGameArea.getStyledDocument();
+
+
+        gameView.getGamePane().setStyledDocument(doc);
+        gameView.getGamePane().add(tetrisGameArea);
+
+    }
+
+    public AttributeSet getStyleSet() {
+        return styleSet;
+    }
+
+
+    /*
+    public GameBoard(jPanel placeholder) {
         //reset();
-        this.setBounds(placeholder.getBounds());
-        this.setBackground(placeholder.getBackground());
-        this.setBorder(placeholder.getBorder());
-
-
-
+//        this.setBounds(placeholder.getBounds());
+//        this.setBackground(placeholder.getBackground());
+//        this.setBorder(placeholder.getBorder());
 
         board = new int[GAME_HEIGHT][GAME_WIDTH]; // 세로 x 가로: 순서 주의하기
 
-        currentBlock = getRandomBlock();
-        nextBlock = getRandomBlock();
+        //currentBlock = getRandomBlock();
+        //nextBlock = getRandomBlock();
         placeBlock();
         drawGameBoard();
         drawBlockBoard();
+    } */
+    
+    public int [][] getBoard() {
+        return board;
+    }
+    public int getHeight() {
+        return board.length;
+    }
+    public int getWidth() {
+        return board[0].length;
     }
 
     // 직사각형의 화면을 만든다
+    /*
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, 150, 300);
-    }
+    }*/
 
     /*
     // 이 메소드는 나중에 GameView 클래스로 대체될 여지가 있다
@@ -73,14 +208,7 @@ public class GameBoard extends JPanel {
     }
     */
 
-    // 블록의 시작 위치를 초기화하는 메소드
-    public void eraseCurr() {
-        for(int i = x; i < x + currentBlock.getWidth(); i++){
-            for(int j = y; j < y + currentBlock.getHeight(); j++){
-                board[j][i] = 0;
-            }
-        }
-    }
+
 
     // 블록의 현재 색상을 받아오는 메소드
    public Color getColor() {
@@ -88,41 +216,7 @@ public class GameBoard extends JPanel {
     }
 
 
-    // 랜덤으로 블록을 받아오는 메소드
-    public Block getRandomBlock() {
-        long seed = System.currentTimeMillis();
-        Random random = new Random(seed);
 
-        int block = random.nextInt(7);        // 7개의 블럭을 동일한 확률로 불러온다: 0이상 6이하
-        //count++;    // 개수를 하나 증가시킨다.
-
-        switch(block) {
-            case 0:
-                currentBlock = new IBlock();
-                return currentBlock;
-            case 1:
-                currentBlock = new JBlock();
-                return currentBlock;
-            case 2:
-                currentBlock = new LBlock();
-                return currentBlock;
-            case 3:
-                currentBlock = new ZBlock();
-                return currentBlock;
-            case 4:
-                currentBlock = new SBlock();
-                return currentBlock;
-            case 5:
-                currentBlock = new TBlock();
-                return currentBlock;
-            case 6:
-                currentBlock = new OBlock();
-                return currentBlock;
-            //default:   아래에서 return을 해줘야 하므로 굳이 필요가 없다
-            // return new IBlock;
-        }
-        return new IBlock();
-    }
 
     /*
     // 블록의 움직임에 관한 메소드 정리
@@ -180,7 +274,7 @@ public class GameBoard extends JPanel {
     }
 
     public void blockMoveDown() {
-        currentBlock.moveDown();
+        //currentBlock.moveDown();
         placeBlock();
     }
 
@@ -193,35 +287,37 @@ public class GameBoard extends JPanel {
             return;
         }
 
-        currentBlock.moveLeft();
+        //currentBlock.moveLeft();
         placeBlock();
     }
 
     public void blockMoveRight() {
 
-        currentBlock.moveRight();
+        //currentBlock.moveRight();
         placeBlock();
     }
-
+    /*
     public Block blockDrop() {
         if (currentBlock == null) {
             return currentBlock;
         }
         while (checkBottomLocation() != false) {
-            currentBlock.moveDown();
+            //currentBlock.moveDown();
         }
 
         return currentBlock;
     }
+    */
 
     public boolean checkLeftLocation() {
-        if (currentBlock.getLeftLocation() <= 0) {
-            return false;
-        }
+       // if (currentBlock.getLeftLocation() <= 0) {
+       //     return false;
+       // }
         // 아래부분 수정해야함
-        else {
-            return true;
-        }
+//        else {
+//            return true;
+//        }
+        return false;
     }
 
 
@@ -229,6 +325,7 @@ public class GameBoard extends JPanel {
         return false;
     }
 
+    /*
     public void drawGameBoard() {
         StringBuffer sb = new StringBuffer();
         for(int t = 0; t < WIDTH + 2; t++) {
@@ -255,7 +352,7 @@ public class GameBoard extends JPanel {
         StyledDocument doc = gamePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSet, false);
         gamePane.setStyledDocument(doc);
-    }
+    } */
 
     // 다음 블록이 보여지는 화면
     public void drawBlockBoard() {
@@ -269,11 +366,12 @@ public class GameBoard extends JPanel {
                 // 이부분은 합친 뒤 다시 구현해보기
             }
         }
-        nextBlockPane.setText(sb.toString());
-        StyledDocument doc = nextBlockPane.getStyledDocument();
+        nextBlockArea.setText(sb.toString());
+        StyledDocument doc = nextBlockArea.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSet, false);
-        nextBlockPane.setStyledDocument(doc);
+        nextBlockArea.setStyledDocument(doc);
     }
+
 
 
 }

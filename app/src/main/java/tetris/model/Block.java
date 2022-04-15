@@ -7,10 +7,10 @@ public class Block {
     protected int[][] shape;
     protected Color color;
 
-    private int x;  // block의 x, y 위치를 받는 변수를 따로 선언
-    private int y;
+    public int x;  // block의 x, y 위치를 받는 변수를 따로 선언
+    public int y;
 
-    protected Block() {
+    public Block() {
         shape = new int[][] {{0}};
         color = Color.YELLOW;
     }
@@ -50,50 +50,20 @@ public class Block {
         this.y = y;
     }
 
-    public void moveDown() {
-        y += 1;
-    }
-
-    public void moveLeft() {
-        x -= 1;
-    }
-
-    public void moveRight() {
-        x += 1;
-    }
-
-    // 바닥에 닿았는지 확인할 수 있는 메소드
-    public int getBottomLocation() {    
-        return y + getHeight();
-    }
-    
-    // 오른족에 닿았는지 확인할 수 있는 메소드
-    public int getRightLocation() {
-        return x + getWidth();
-    }
-
-    // 왼쪽에 닿았는지 확인할 수 있는 메소드 : getX와 동일
-    public int getLeftLocation() {
-        return x;
-    }
-    
-
     // 블록을 회전시키는 메소드: 90도, 시계반대방향
     // 정상작동 여부 test 해봐야함(확실하지 않음)
-    public int[][] rotate() {
-        int height = shape.length;
-        int width = shape[0].length;
+        public int[][] rotate() {
+            int height = shape.length;
+            int width = shape[0].length;
 
-        int [][] current2 = new int[width][height];
+            int [][] current2 = new int[width][height];
 
-        int [][] rotateBlock = new int[width][height];
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                rotateBlock[j][height - 1 - i ] = current2[i][j];
+            int [][] rotateBlock = new int[width][height];
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    rotateBlock[j][height - 1 - i ] = current2[i][j];
+                }
             }
+            return rotateBlock;
         }
-        return rotateBlock;
-    }
-
-
 }

@@ -1,17 +1,16 @@
 package tetris.controller;
 
 import java.util.HashMap;
-
 import javax.swing.JFrame;
 import javax.swing.JButton;
-
 import java.awt.Container;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.Rectangle;
 import java.awt.GridLayout;
 
 import tetris.view.*;
-import java.awt.event.KeyAdapter;
+import tetris.controller.*;
 
 public class ViewController extends JFrame {
 
@@ -31,11 +30,11 @@ public class ViewController extends JFrame {
 
         /* Key Event와 혼재되어있음 정리 필요 */
         mainView.getStartButton()
-                .addActionListener(e -> viewTransiton(contentPane, gameView, mainView));
+                .addActionListener(e -> viewTransition(contentPane, gameView, mainView));
         mainView.getSettingButton()
-                .addActionListener(e -> viewTransiton(contentPane, settingView, mainView));
+                .addActionListener(e -> viewTransition(contentPane, settingView, mainView));
         mainView.getScoreBoardButton()
-                .addActionListener(e -> viewTransiton(contentPane, scoreView, mainView));
+                .addActionListener(e -> viewTransition(contentPane, scoreView, mainView));
 
         mainView.getStartButton().requestFocus();
         mainView.getStartButton().addKeyListener(mainKeyListener);
@@ -44,15 +43,16 @@ public class ViewController extends JFrame {
         mainView.getExitButton().addKeyListener(mainKeyListener);
 
         gameView.getReturnButton()
-                .addActionListener(e -> viewTransiton(contentPane, mainView, gameView));
+                .addActionListener(e -> viewTransition(contentPane, mainView, gameView));
         scoreView.getReturnButton()
-                .addActionListener(e -> viewTransiton(contentPane, mainView, scoreView));
+                .addActionListener(e -> viewTransition(contentPane, mainView, scoreView));
         settingView.getReturnButton()
-                .addActionListener(e -> viewTransiton(contentPane, mainView, settingView));
+                .addActionListener(e -> viewTransition(contentPane, mainView, settingView));
     }
 
     private void initView() {
         screenSize = new Rectangle(0, 0, 1000, 600); // 화면크기(이후 Setting파일에 연결할 필요 있음)
+
         super.setTitle("Team 19 Tetris");
         super.setBounds(screenSize);
 
@@ -75,7 +75,7 @@ public class ViewController extends JFrame {
     }
 
     // 전환함수
-    private void viewTransiton(Container pane, Container to, Container from) {
+    private void viewTransition(Container pane, Container to, Container from) {
         pane.add(to);
         pane.remove(from);
         revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
@@ -94,7 +94,7 @@ public class ViewController extends JFrame {
                     e.getComponent().transferFocus();
                     break;
                 case KeyEvent.VK_ENTER:
-                    viewTransiton(contentPane, viewMap.get(e.getComponent()), mainView);
+                    viewTransition(contentPane, viewMap.get(e.getComponent()), mainView);
                     break;
                 default:
                     break;
