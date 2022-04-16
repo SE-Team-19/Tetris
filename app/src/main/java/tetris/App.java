@@ -1,8 +1,7 @@
 package tetris;
 
-import tetris.controller.GameController;
 import tetris.controller.ViewController;
-import tetris.model.Game;
+import tetris.controller.GameController;
 
 public class App {
   
