@@ -11,6 +11,7 @@ import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.awt.Rectangle;
 import java.awt.GridLayout;
+import java.awt.Component;
 
 import tetris.model.Setting;
 import tetris.view.*;
@@ -52,9 +53,9 @@ public class ViewController extends JFrame {
 
         // View Mapping
         viewMap = new HashMap<>();
-        viewMap.put(mainView.getStartButton(), gameView);
-        viewMap.put(mainView.getScoreBoardButton(), scoreView);
-        viewMap.put(mainView.getSettingButton(), settingView);
+        viewMap.put(mainView.getStartBtn(), gameView);
+        viewMap.put(mainView.getScoreBoardBtn(), scoreView);
+        viewMap.put(mainView.getSettingBtn(), settingView);
 
         contentPane.setLayout(new GridLayout(1, 0, 0, 0)); // Frame의 레이아웃 방식을 설정, row 1
         contentPane.add(mainView);
@@ -72,37 +73,38 @@ public class ViewController extends JFrame {
     private void addMainViewEvent() {
         MainKeyEvent mainKeyListener = new MainKeyEvent();
 
-        mainView.getStartButton()
+        mainView.getStartBtn()
                 .addActionListener(e -> viewTransion(contentPane, gameView, mainView));
-        mainView.getSettingButton()
+        mainView.getSettingBtn()
                 .addActionListener(e -> viewTransion(contentPane, settingView, mainView));
-        mainView.getScoreBoardButton()
+        mainView.getScoreBoardBtn()
                 .addActionListener(e -> viewTransion(contentPane, scoreView, mainView));
+        mainView.getExitBtn().addActionListener(e -> System.exit(0));
 
-        mainView.getStartButton().requestFocus();
+        mainView.getStartBtn().requestFocus();
 
-        mainView.getStartButton().addKeyListener(mainKeyListener);
-        mainView.getSettingButton().addKeyListener(mainKeyListener);
-        mainView.getScoreBoardButton().addKeyListener(mainKeyListener);
-        mainView.getExitButton().addKeyListener(mainKeyListener);
+        mainView.getStartBtn().addKeyListener(mainKeyListener);
+        mainView.getSettingBtn().addKeyListener(mainKeyListener);
+        mainView.getScoreBoardBtn().addKeyListener(mainKeyListener);
+        mainView.getExitBtn().addKeyListener(mainKeyListener);
     }
 
     private void addGameViewEvent() {
-        gameView.getReturnButton()
+        gameView.getReturnGameToMainBtn()
                 .addActionListener(e -> viewTransion(contentPane, mainView, gameView));
     }
 
     private void addSettingViewEvent() {
         SettingKeyEvent settingKeyEvent = new SettingKeyEvent();
-        settingView.getReturnMenuBtn()
+        settingView.getReturnSettingToMainBtn()
                 .addActionListener(e -> viewTransion(contentPane, mainView, settingView));
-        settingView.getReturnMenuBtn().addKeyListener(settingKeyEvent);
+        settingView.getReturnSettingToMainBtn().addKeyListener(settingKeyEvent);
         settingView.getDisplayComboBox().addKeyListener(settingKeyEvent);
         settingView.getIsColorBlindBtn().addKeyListener(settingKeyEvent);
-        settingView.getInitKeyButton().addKeyListener(settingKeyEvent);
+        settingView.getInitKeyBtn().addKeyListener(settingKeyEvent);
         settingView.getInitMenuBtn().addKeyListener(settingKeyEvent);
         settingView.getSetDisplayBtn().addKeyListener(settingKeyEvent);
-        settingView.getSetUpkeyBtn().addKeyListener(settingKeyEvent);
+        settingView.getSetUpKeyBtn().addKeyListener(settingKeyEvent);
         settingView.getSetDownKeyBtn().addKeyListener(settingKeyEvent);
         settingView.getSetLeftKeyBtn().addKeyListener(settingKeyEvent);
         settingView.getSetRightKeyBtn().addKeyListener(settingKeyEvent);
@@ -114,7 +116,7 @@ public class ViewController extends JFrame {
     }
 
     private void addScoreViewEvent() {
-        scoreView.getReturnButton()
+        scoreView.getReturnScoreToMainBtn()
                 .addActionListener(e -> viewTransion(contentPane, mainView, scoreView));
     }
 
@@ -129,11 +131,11 @@ public class ViewController extends JFrame {
 
     private void focusing(Container to) {
         if (to.equals(mainView)) {
-            mainView.getStartButton().requestFocus();
+            mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
-            gameView.getReturnButton().requestFocus();
+            gameView.getReturnGameToMainBtn().requestFocus();
         } else if (to.equals(settingView)) {
-            settingView.getReturnMenuBtn().requestFocus();
+            settingView.getReturnSettingToMainBtn().requestFocus();
         }
     }
 
@@ -185,7 +187,7 @@ public class ViewController extends JFrame {
                         e.getComponent().transferFocus();
                     break;
                 case KeyEvent.VK_SPACE:
-                    if (e.getComponent().equals(settingView.getReturnMenuBtn())) {
+                    if (e.getComponent().equals(settingView.getReturnSettingToMainBtn())) {
                         viewTransion(contentPane, mainView, settingView);
                         settingView.setInitKeyBtnsFocusable(false);
                         settingView.setSettingBtnsFocusable(true);
@@ -209,16 +211,16 @@ public class ViewController extends JFrame {
                         settingView.getDisplayComboBox().setFocusable(false);
                         settingView.getSetDisplayBtn().requestFocus();
                     }
-                    if (e.getComponent().equals(settingView.getInitKeyButton())) {
+                    if (e.getComponent().equals(settingView.getInitKeyBtn())) {
                         settingView.setInitKeyBtnsFocusable(true);
                         settingView.setSettingBtnsFocusable(false);
-                        settingView.getSetUpkeyBtn().requestFocus();
-                        settingView.getInitKeyButton().doClick(100);
+                        settingView.getSetUpKeyBtn().requestFocus();
+                        settingView.getInitKeyBtn().doClick(100);
                     }
                     if (e.getComponent().equals(settingView.getInitKeyGridReturnBtn())) {
                         settingView.setInitKeyBtnsFocusable(false);
                         settingView.setSettingBtnsFocusable(true);
-                        settingView.getInitKeyButton().requestFocus();
+                        settingView.getInitKeyBtn().requestFocus();
                     }
                     if (e.getComponent().equals(settingView.getInitMenuBtn())) {
                         settingView.setInitSettingBtnsFocusable(true);
