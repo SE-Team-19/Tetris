@@ -8,8 +8,8 @@ public class SettingView extends JPanel {
 
     private String[] displayList;
     private JComboBox<String> displayComboBox;
-    private JButton returnMenuBtn;
-    private JButton initKeyButton;
+    private JButton returnSettingToMainBtn;
+    private JButton initKeyBtn;
     private JButton initMenuBtn;
     private JButton setDisplayBtn;
     private JButton initKeyGridReturnBtn;
@@ -22,7 +22,7 @@ public class SettingView extends JPanel {
     private JLabel rightKeyLabel;
     private JLabel staticKeyLabel;
     private JLabel isColorBlindLabel;
-    private JToggleButton setUpkeyBtn;
+    private JToggleButton setUpKeyBtn;
     private JToggleButton setDownKeyBtn;
     private JToggleButton setLeftKeyBtn;
     private JToggleButton setRightKeyBtn;
@@ -33,176 +33,88 @@ public class SettingView extends JPanel {
         return this.displayList;
     }
 
-    public void setDisplayList(String[] displayList) {
-        this.displayList = displayList;
-    }
-
     public JComboBox<String> getDisplayComboBox() {
         return this.displayComboBox;
     }
 
-    public void setDisplayComboBox(JComboBox<String> displayComboBox) {
-        this.displayComboBox = displayComboBox;
+    public JButton getReturnSettingToMainBtn() {
+        return this.returnSettingToMainBtn;
     }
 
-    public JButton getReturnMenuBtn() {
-        return this.returnMenuBtn;
-    }
-
-    public void setReturnMenuBtn(JButton returnMenuBtn) {
-        this.returnMenuBtn = returnMenuBtn;
-    }
-
-    public JButton getInitKeyButton() {
-        return this.initKeyButton;
-    }
-
-    public void setInitKeyButton(JButton initKeyButton) {
-        this.initKeyButton = initKeyButton;
+    public JButton getInitKeyBtn() {
+        return this.initKeyBtn;
     }
 
     public JButton getInitMenuBtn() {
         return this.initMenuBtn;
     }
 
-    public void setInitMenuBtn(JButton initMenuBtn) {
-        this.initMenuBtn = initMenuBtn;
-    }
-
     public JButton getSetDisplayBtn() {
         return this.setDisplayBtn;
-    }
-
-    public void setSetDisplayBtn(JButton setDisplayBtn) {
-        this.setDisplayBtn = setDisplayBtn;
     }
 
     public JButton getInitKeyGridReturnBtn() {
         return this.initKeyGridReturnBtn;
     }
 
-    public void setInitKeyGridReturnBtn(JButton initKeyGridReturnBtn) {
-        this.initKeyGridReturnBtn = initKeyGridReturnBtn;
-    }
-
     public JButton getInitScoreBtn() {
         return this.initScoreBtn;
-    }
-
-    public void setInitScoreBtn(JButton initScoreBtn) {
-        this.initScoreBtn = initScoreBtn;
     }
 
     public JButton getInitSettingBtn() {
         return this.initSettingBtn;
     }
 
-    public void setInitSettingBtn(JButton initSettingBtn) {
-        this.initSettingBtn = initSettingBtn;
-    }
-
     public JButton getInitReturnBtn() {
         return this.initReturnBtn;
-    }
-
-    public void setInitReturnBtn(JButton initReturnBtn) {
-        this.initReturnBtn = initReturnBtn;
     }
 
     public JLabel getUpKeyLabel() {
         return this.upKeyLabel;
     }
 
-    public void setUpKeyLabel(JLabel upKeyLabel) {
-        this.upKeyLabel = upKeyLabel;
-    }
-
     public JLabel getDownKeyLabel() {
         return this.downKeyLabel;
-    }
-
-    public void setDownKeyLabel(JLabel downKeyLabel) {
-        this.downKeyLabel = downKeyLabel;
     }
 
     public JLabel getLeftKeyLabel() {
         return this.leftKeyLabel;
     }
 
-    public void setLeftKeyLabel(JLabel leftKeyLabel) {
-        this.leftKeyLabel = leftKeyLabel;
-    }
-
     public JLabel getRightKeyLabel() {
         return this.rightKeyLabel;
-    }
-
-    public void setRightKeyLabel(JLabel rightKeyLabel) {
-        this.rightKeyLabel = rightKeyLabel;
     }
 
     public JLabel getStaticKeyLabel() {
         return this.staticKeyLabel;
     }
 
-    public void setStaticKeyLabel(JLabel staticKeyLabel) {
-        this.staticKeyLabel = staticKeyLabel;
-    }
-
     public JLabel getIsColorBlindLabel() {
         return this.isColorBlindLabel;
     }
 
-    public void setIsColorBlindLabel(JLabel isColorBlindLabel) {
-        this.isColorBlindLabel = isColorBlindLabel;
-    }
-
-    public JToggleButton getSetUpkeyBtn() {
-        return this.setUpkeyBtn;
-    }
-
-    public void setSetUpkeyBtn(JToggleButton setUpkeyBtn) {
-        this.setUpkeyBtn = setUpkeyBtn;
+    public JToggleButton getSetUpKeyBtn() {
+        return this.setUpKeyBtn;
     }
 
     public JToggleButton getSetDownKeyBtn() {
         return this.setDownKeyBtn;
     }
 
-    public void setSetDownKeyBtn(JToggleButton setDownKeyBtn) {
-        this.setDownKeyBtn = setDownKeyBtn;
-    }
-
     public JToggleButton getSetLeftKeyBtn() {
         return this.setLeftKeyBtn;
-    }
-
-    public void setSetLeftKeyBtn(JToggleButton setLeftKeyBtn) {
-        this.setLeftKeyBtn = setLeftKeyBtn;
     }
 
     public JToggleButton getSetRightKeyBtn() {
         return this.setRightKeyBtn;
     }
 
-    public void setSetRightKeyBtn(JToggleButton setRightKeyBtn) {
-        this.setRightKeyBtn = setRightKeyBtn;
-    }
-
     public JToggleButton getSetStaticKeyBtn() {
         return this.setStaticKeyBtn;
     }
 
-    public void setSetStaticKeyBtn(JToggleButton setStaticKeyBtn) {
-        this.setStaticKeyBtn = setStaticKeyBtn;
-    }
-
     public JToggleButton getIsColorBlindBtn() {
         return this.isColorBlindBtn;
-    }
-
-    public void setIsColorBlindBtn(JToggleButton isColorBlindBtn) {
-        this.isColorBlindBtn = isColorBlindBtn;
     }
 
     private JPanel initSettingPane;
@@ -235,7 +147,7 @@ public class SettingView extends JPanel {
         gridBag.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
         super.setLayout(gridBag);
         super.add(setDisplayBtn, addGridBagComponents(1, 0));
-        super.add(initKeyButton, addGridBagComponents(1, 1));
+        super.add(initKeyBtn, addGridBagComponents(1, 1));
         super.add(initMenuBtn, addGridBagComponents(1, 2));
         super.add(isColorBlindBtn, addGridBagComponents(1, 3));
         super.add(displayComboBox, addGridBagComponents(0, 0));
@@ -245,33 +157,33 @@ public class SettingView extends JPanel {
 
         GridBagConstraints gblReturnMenuBtn = addGridBagComponents(0, 4);
         gblReturnMenuBtn.gridwidth = 2;
-        super.add(returnMenuBtn, gblReturnMenuBtn);
+        super.add(returnSettingToMainBtn, gblReturnMenuBtn);
     }
 
     private void initComponents() {
         /* 메뉴키 */
-        setDisplayBtn = new JButton("해상도 설정");
-        initKeyButton = new JButton("키보드 입력");
-        initMenuBtn = new JButton("점수초기화");
-        isColorBlindBtn = new JToggleButton("OFF");
-        returnMenuBtn = new JButton("메인메뉴로");
+        setDisplayBtn = initAndSetName("setDisplayBtn", new JButton("해상도 설정"));
+        initKeyBtn = initAndSetName("initKeyBtn", new JButton("키보드 입력"));
+        initMenuBtn = initAndSetName("initMenuBtn", new JButton("점수초기화"));
+        isColorBlindBtn = initAndSetName("isColorBlindBtn", new JToggleButton("OFF"));
+        returnSettingToMainBtn = initAndSetName("returnSettingToMainBtn", new JButton("메인메뉴로"));
 
         /* 키 초기화 버튼과 라벨 */
-        setUpkeyBtn = new JToggleButton("UP");
-        setDownKeyBtn = new JToggleButton("DOWN");
-        setLeftKeyBtn = new JToggleButton("LEFT");
-        setRightKeyBtn = new JToggleButton("RIGHT");
-        setStaticKeyBtn = new JToggleButton("STATIC");
-        initKeyGridReturnBtn = new JButton("Return");
-        upKeyLabel = new JLabel("방향키:위");
-        downKeyLabel = new JLabel("방향키:아래");
-        leftKeyLabel = new JLabel("방향키:왼쪽");
-        rightKeyLabel = new JLabel("방향키:오른쪽");
-        staticKeyLabel = new JLabel("스페이스");
+        setUpKeyBtn = initAndSetName("setUpKeyBtn", new JToggleButton("UP"));
+        setDownKeyBtn = initAndSetName("setDownKeyBtn", new JToggleButton("DOWN"));
+        setLeftKeyBtn = initAndSetName("setLeftKeyBtn", new JToggleButton("LEFT"));
+        setRightKeyBtn = initAndSetName("setRightKeyBtn", new JToggleButton("RIGHT"));
+        setStaticKeyBtn = initAndSetName("setStaticKeyBtn", new JToggleButton("STATIC"));
+        initKeyGridReturnBtn = initAndSetName("initKeyGridReturnBtn", new JButton("Return"));
+        upKeyLabel = initAndSetName("upKeyLabel", new JLabel("방향키:위"));
+        downKeyLabel = initAndSetName("downKeyLabel", new JLabel("방향키:아래"));
+        leftKeyLabel = initAndSetName("leftKeyLabel", new JLabel("방향키:왼쪽"));
+        rightKeyLabel = initAndSetName("rightKeyLabel", new JLabel("방향키:오른쪽"));
+        staticKeyLabel = initAndSetName("staticKeyLabel", new JLabel("스페이스"));
 
         /* 해상도 관련 Combobox */
         displayList = new String[] { "360X230", "700X800", "900X1000" };
-        displayComboBox = new JComboBox<>(displayList);
+        displayComboBox = initAndSetName("displayComboBox", new JComboBox<>(displayList));
         displayComboBox.setFocusable(false);
         displayComboBox.setPopupVisible(false);
         /* JcomboBox의 기본 키 바인딩(아래키)을 삭제하는 메소드 */
@@ -279,13 +191,18 @@ public class SettingView extends JPanel {
         im.put(KeyStroke.getKeyStroke("DOWN"), "none");
 
         /* 초기화버튼 관련 */
-        initScoreBtn = new JButton("점수 초기화");
-        initSettingBtn = new JButton("설정 초기화");
-        initReturnBtn = new JButton("Return");
+        initScoreBtn = initAndSetName("initScoreBtn", new JButton("점수 초기화"));
+        initSettingBtn = initAndSetName("initSettingBtn", new JButton("설정 초기화"));
+        initReturnBtn = initAndSetName("initReturnBtn", new JButton("Return"));
 
         /* 색맹모드 관련 */
-        isColorBlindLabel = new JLabel("색맹모드");
+        isColorBlindLabel = initAndSetName("isColorBlindLabel", new JLabel("색맹모드"));
 
+    }
+
+    private <T extends JComponent> T initAndSetName(String name, T comp) {
+        comp.setName(name);
+        return comp;
     }
 
     private void setFocusableComponents(boolean bool, JComponent... comp) {
@@ -295,12 +212,12 @@ public class SettingView extends JPanel {
     }
 
     public void setInitKeyBtnsFocusable(boolean bool) {
-        setFocusableComponents(bool, setUpkeyBtn, setDownKeyBtn, setLeftKeyBtn, setRightKeyBtn, setStaticKeyBtn,
+        setFocusableComponents(bool, setUpKeyBtn, setDownKeyBtn, setLeftKeyBtn, setRightKeyBtn, setStaticKeyBtn,
                 initKeyGridReturnBtn);
     }
 
     public void setSettingBtnsFocusable(boolean bool) {
-        setFocusableComponents(bool, setDisplayBtn, initKeyButton, initMenuBtn, isColorBlindBtn, returnMenuBtn);
+        setFocusableComponents(bool, setDisplayBtn, initKeyBtn, initMenuBtn, isColorBlindBtn, returnSettingToMainBtn);
     }
 
     public void setInitSettingBtnsFocusable(boolean bool) {
@@ -335,7 +252,7 @@ public class SettingView extends JPanel {
         initKeyGridPane.setLayout(gbl);
         setInitKeyBtnsFocusable(false);
 
-        addGridBagComponents(initKeyGridPane, setUpkeyBtn, 0, 0);
+        addGridBagComponents(initKeyGridPane, setUpKeyBtn, 0, 0);
         addGridBagComponents(initKeyGridPane, setDownKeyBtn, 1, 0);
         addGridBagComponents(initKeyGridPane, setLeftKeyBtn, 2, 0);
         addGridBagComponents(initKeyGridPane, setRightKeyBtn, 3, 0);

@@ -1,13 +1,7 @@
 package tetris.view;
 
-import javax.swing.border.CompoundBorder;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.border.CompoundBorder;
-import javax.swing.BoxLayout;
-import javax.swing.BorderFactory;
+import javax.swing.*;
+import javax.swing.border.*;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -16,16 +10,12 @@ public class GameView extends JPanel {
 
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
-    private JButton returnButton;
+    private JButton returnGameToMainBtn;
     private JPanel gameInfoPane;
     private JLabel score;
 
-    public JButton getReturnButton() {
-        return this.returnButton;
-    }
-
-    public void setReturnButton(JButton returnButton) {
-        this.returnButton = returnButton;
+    public JButton getReturnGameToMainBtn() {
+        return this.returnGameToMainBtn;
     }
 
     /* singleton Instance (LazyHolder) */
@@ -50,8 +40,9 @@ public class GameView extends JPanel {
         gameInfoPane = new JPanel();
         nextBlockPane = new JTextPane();
         score = new JLabel("점수표기");
-        returnButton = new JButton("Return");
+        returnGameToMainBtn = initAndSetName("returnGameToMainBtn", new JButton("Return"));
 
+        returnGameToMainBtn.setFocusable(true);
         gamePane.setEditable(false);
         gamePane.setBackground(Color.BLACK);
         nextBlockPane.setEditable(false);
@@ -64,7 +55,7 @@ public class GameView extends JPanel {
         gameInfoPane.setLayout(new GridLayout(3, 0, 0, 0));
         gameInfoPane.add(nextBlockPane);
         gameInfoPane.add(this.score);
-        gameInfoPane.add(returnButton);
+        gameInfoPane.add(returnGameToMainBtn);
 
         super.add(gamePane);
         super.add(gameInfoPane);
@@ -74,7 +65,8 @@ public class GameView extends JPanel {
         return this.gamePane;
     }
 
-    public void setGamePane(JTextPane gamePane) {
-        this.gamePane = gamePane;
+    private <T extends JComponent> T initAndSetName(String name, T comp) {
+        comp.setName(name);
+        return comp;
     }
 }
