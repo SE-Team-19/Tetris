@@ -49,7 +49,7 @@ public class GameView extends JPanel {
     private JTextPane nextTetrisBlockPane;
     private JButton returnButton;
     private JPanel gameInfoPane;
-    private JLabel score;
+    private JLabel jScore;
     private SimpleAttributeSet styleSetGameBoard;
     private SimpleAttributeSet styleSetNextBlockBoard;
     private KeyListener PlayerKeyListener;
@@ -66,6 +66,8 @@ public class GameView extends JPanel {
     int nextBlockY = 1;
 
     private static final int initInterval = 1000;
+
+    public static int score = 0;    //  game 점수 부분
 
 
 
@@ -108,12 +110,12 @@ public class GameView extends JPanel {
         nextTetrisBlockPane.setBorder(border);
 
         gameInfoPane = new JPanel();
-        score = new JLabel("점수표기");
+        jScore = new JLabel("점수표기");
         returnButton = new JButton("Return");
 
         gameInfoPane.setLayout(new GridLayout(3, 0, 0, 0));
         gameInfoPane.add(nextTetrisBlockPane);
-        gameInfoPane.add(this.score);
+        gameInfoPane.add(this.jScore);
         gameInfoPane.add(returnButton);
 
         super.add(tetrisGamePane);
@@ -222,17 +224,18 @@ public class GameView extends JPanel {
         }
     }
 
-    public void moveDown() {
+    protected void moveDown() {
         eraseCurr();
-        if(y < HEIGHT - currentBlock.height()) {
+
+        if(y < GAME_HEIGHT - currentBlock.height()) {
             y++;
         }
+
         else {
             placeBlock();
             currentBlock = nextBlock;
-            eraseNext();    // 생략하면 안됨
-
             nextBlock = getRandomBlock_NormalMode();
+            eraseNext();
             placeNextBlock();
             drawNextBlockBoard();
             x = 3;
@@ -243,7 +246,7 @@ public class GameView extends JPanel {
 
     public void moveRight() {
         eraseCurr();
-        if(x < WIDTH - currentBlock.width()){
+        if(x < GAME_WIDTH - currentBlock.width()){
             x++;
         }
         placeBlock();
