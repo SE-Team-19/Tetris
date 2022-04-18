@@ -1,5 +1,6 @@
 package tetris.view;
 
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,6 +18,7 @@ import javax.swing.BorderFactory;
 import java.awt.Color;
 import java.awt.GridLayout;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
@@ -39,7 +41,7 @@ public class GameView extends JPanel {
     public static int NEXT_BOARD_HEIGHT = 5;
     public static int NEXT_BOARD_WIDTH = 4;
     public static final char BORDER_CHAR = 'X';
-    private final int SPEED = 300;
+    public static final char BLOCK_CHAR = 'O';
     private Timer timer;
 
     private int [][] board;      // tetrisGamePane 의 'X' size를 결정하기 위한 변수
@@ -67,9 +69,10 @@ public class GameView extends JPanel {
 
     private static final int initInterval = 1000;
 
+    private int mode = 0;  // 0 : normal , 1 : easy, 2 : hard
+
     public static int score = 0;    //  game 점수 부분
-
-
+    private boolean isPaused = false;
 
     public JButton getReturnButton() {
         return this.returnButton;
@@ -126,6 +129,8 @@ public class GameView extends JPanel {
         //setBounds(0, 0, 600, 400);
         //setBackground(Color.BLACK);
 
+        // int bSize = getBounds().width / GAME_WIDTH;
+
 
         timer = new Timer(initInterval, new ActionListener() {
             @Override
@@ -158,6 +163,83 @@ public class GameView extends JPanel {
     }
 
 
+    // 블록이 7개
+    // 확률이 1/7인데, 20% 더 등장이면,
+    // 10, 10, 10, 10, 10, 10, 12 -> 5, 5, 5, 5, 5, 5, 6
+    private Block getRandomBlock(int n) {
+
+        // normal mode
+        if (n == 0) {
+            Random random = new Random(System.currentTimeMillis());
+            int block = random.nextInt(7);
+            switch(block) {
+                case 0:
+//                currentBlock = new IBlock();
+//                return currentBlock;
+                    return new IBlock();
+                case 1:
+                    return new JBlock();
+                case 2:
+                    return new LBlock();
+                case 3:
+                    return new ZBlock();
+                case 4:
+                    return new SBlock();
+                case 5:
+                    return new TBlock();
+                case 6:
+                    return new OBlock();
+            }
+        }
+
+        // easy mode
+        if (n == 1) {
+            Random random = new Random(System.currentTimeMillis());
+            int block = random.nextInt(73);
+            switch( block / 10 ) {
+                case 0:
+                    return new OBlock();
+                case 1:
+                    return new JBlock();
+                case 2:
+                    return new LBlock();
+                case 3:
+                    return new ZBlock();
+                case 4:
+                    return new SBlock();
+                case 5:
+                    return new TBlock();
+                case 6:
+                case 7:
+                    return new IBlock();
+            }
+        }
+
+        // hard mode
+        if (n == 2) {
+            Random random = new Random(System.currentTimeMillis());
+            int block = random.nextInt(68);
+            switch( block / 10 ) {
+                case 0:
+                    return new OBlock();
+                case 1:
+                    return new JBlock();
+                case 2:
+                    return new LBlock();
+                case 3:
+                    return new ZBlock();
+                case 4:
+                    return new SBlock();
+                case 5:
+                    return new TBlock();
+                case 6:
+                    return new IBlock();
+            }
+        }
+        return new IBlock();
+    }
+
+
     private Block getRandomBlock_NormalMode() {
         Random random = new Random(System.currentTimeMillis());
         int block = random.nextInt(7);
@@ -182,17 +264,69 @@ public class GameView extends JPanel {
         return new LBlock();
     }
 
-    private Block getRandomBlock_EasyMode() {
-        return new IBlock();
+
+    // Block 색칠 method -> 추가적 구현 필요
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        doDrawing(g);
     }
-    private Block getRandomBlock_HardMode() {return new IBlock();}
 
+    private void doDrawing(Graphics g) {
+        for (int i = 0; i < GAME_HEIGHT; i++) {
+            for (int j = 0; j < GAME_WIDTH; j++) {
 
+                if (currentBlock != null) {
+                    drawSquare(g, j * currentBlock.getWidth(), i * currentBlock.getHeight(),
+                        currentBlock);
+                }
+            }
+        }
+    }
+    private void drawSquare(Graphics g, int x, int y, Block shape) {
+        // I, J, L, Z, S, T, O
+        Color colors[] = {Color.RED, Color.ORANGE, Color.BLUE, Color.GREEN
+            , Color.MAGENTA, Color.CYAN, Color.YELLOW
+        };
+
+        int index = 0;
+
+        if (new IBlock().equals(currentBlock)) {
+            index = 0;
+        } else if (new JBlock().equals(currentBlock)) {
+            index = 1;
+        } else if (new LBlock().equals(currentBlock)) {
+            index = 2;
+        } else if (new ZBlock().equals(currentBlock)) {
+            index = 3;
+        } else if (new SBlock().equals(currentBlock)) {
+            index = 4;
+        } else if (new TBlock().equals(currentBlock)) {
+            index = 5;
+        } else if (new OBlock().equals(currentBlock)) {
+            index = 6;
+        }
+
+        var color = colors[index];
+
+        g.setColor(color);
+        g.fillRect(x + 1, y + 1, currentBlock.getWidth() - 2, currentBlock.getHeight() - 2);
+
+        g.setColor(color.brighter());
+        g.drawLine(x, y + currentBlock.getHeight() - 1, x, y);
+        g.drawLine(x, y, x + currentBlock.getWidth() - 1, y);
+
+        g.setColor(color.darker());
+        g.drawLine(x + 1, y + currentBlock.getHeight() - 1,
+            x + currentBlock.getWidth() - 1, y + currentBlock.getHeight() - 1);
+        g.drawLine(x + currentBlock.getWidth() - 1, y + currentBlock.getHeight() - 1,
+            x + currentBlock.getWidth() - 1, y + 1);
+    }
 
 
     private void placeBlock() {
-        for(int j = 0; j < currentBlock.height(); j++) {
-            for(int i = 0; i < currentBlock.width(); i++) {
+        for(int j = 0; j < currentBlock.getHeight(); j++) {
+            for(int i = 0; i < currentBlock.getWidth(); i++) {
                 board[y + j][x + i] = currentBlock.getShape(i, j);
                 // getShape -> return j, i
             }
@@ -200,8 +334,8 @@ public class GameView extends JPanel {
     }
 
     private void placeNextBlock() {
-        for(int j = 0; j < nextBlock.height(); j++) {
-            for(int i = 0; i < nextBlock.width(); i++) {
+        for(int j = 0; j < nextBlock.getHeight(); j++) {
+            for(int i = 0; i < nextBlock.getWidth(); i++) {
                 nextBoard[nextBlockY + j][nextBlockX + i] = nextBlock.getShape(i, j);
                 // getShape -> return j, i
             }
@@ -209,16 +343,16 @@ public class GameView extends JPanel {
     }
 
     private void eraseCurr() {
-        for(int i = x; i < x + currentBlock.width(); i++) {
-            for(int j = y; j < y + currentBlock.height(); j++) {
+        for(int i = x; i < x + currentBlock.getWidth(); i++) {
+            for(int j = y; j < y + currentBlock.getHeight(); j++) {
                 board[j][i] = 0;
             }
         }
     }
 
     private void eraseNext() {
-        for(int i = nextBlockX; i < nextBlockX + nextBlock.width(); i++) {
-            for(int j = nextBlockY; j < nextBlockY + nextBlock.height(); j++) {
+        for(int i = nextBlockX; i < nextBlockX + nextBlock.getWidth(); i++) {
+            for(int j = nextBlockY; j < nextBlockY + nextBlock.getHeight(); j++) {
                 nextBoard[j][i] = 0;
             }
         }
@@ -227,7 +361,7 @@ public class GameView extends JPanel {
     protected void moveDown() {
         eraseCurr();
 
-        if(y < GAME_HEIGHT - currentBlock.height()) {
+        if(y < GAME_HEIGHT - currentBlock.getHeight()) {
             y++;
         }
 
@@ -246,7 +380,12 @@ public class GameView extends JPanel {
 
     public void moveRight() {
         eraseCurr();
-        if(x < GAME_WIDTH - currentBlock.width()){
+
+        if (currentBlock == null) {
+            return;
+        }
+
+        if (x < GAME_WIDTH - currentBlock.getWidth()){
             x++;
         }
         placeBlock();
@@ -254,7 +393,11 @@ public class GameView extends JPanel {
 
     public void moveLeft() {
         eraseCurr();
-        if(x > 0) {
+
+        if (currentBlock == null) {
+            return;
+        }
+        if (x > 0) {
             x--;
         }
         placeBlock();
@@ -269,8 +412,37 @@ public class GameView extends JPanel {
 
     // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
     public void dropDown() {
+        eraseCurr();
 
+        if (currentBlock == null) {
+            return;
+        }
+
+        while (checkBottom() && checkCollision()) {
+            moveDown();
+        }
+
+        placeBlock();
     }
+
+    public boolean checkBottom() {
+        if (y == GAME_HEIGHT - currentBlock.getHeight()){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean checkCollision() {
+        for (int i = 0; i < currentBlock.getHeight(); i++) {
+            for (int j = 0; j < currentBlock.getWidth(); j++) {
+                if (currentBlock.getShape(j, i) == 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
@@ -306,7 +478,7 @@ public class GameView extends JPanel {
         StyleConstants.setFontSize(styleSetGameBoard, 20);
         StyleConstants.setFontFamily(styleSetGameBoard, "Courier New");
         StyleConstants.setBold(styleSetGameBoard, true);
-        StyleConstants.setForeground(styleSetGameBoard, Color.WHITE);
+        //StyleConstants.setForeground(styleSetGameBoard, Color.WHITE);
         StyleConstants.setAlignment(styleSetGameBoard, StyleConstants.ALIGN_CENTER);
         //StyleConstants.setAlignment(styleSetGameBoard, StyleConstants.ALIGN_JUSTIFIED);
     }
@@ -316,7 +488,7 @@ public class GameView extends JPanel {
         StyleConstants.setFontSize(styleSetNextBlockBoard, 15);
         StyleConstants.setFontFamily(styleSetNextBlockBoard, "Courier New");
         StyleConstants.setBold(styleSetNextBlockBoard, true);
-        StyleConstants.setForeground(styleSetNextBlockBoard, Color.WHITE);
+        //StyleConstants.setForeground(styleSetNextBlockBoard, Color.WHITE);
         StyleConstants.setAlignment(styleSetNextBlockBoard, StyleConstants.ALIGN_CENTER);
     }
 
@@ -330,7 +502,7 @@ public class GameView extends JPanel {
             sb.append(BORDER_CHAR);
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
-                    sb.append(BORDER_CHAR);
+                    sb.append(BLOCK_CHAR);     // currentBlock 의 모양을 그려준다.
                 } else {
                     sb.append(" ");
                 }
@@ -342,10 +514,14 @@ public class GameView extends JPanel {
             sb.append(BORDER_CHAR);
         }
         tetrisGamePane.setText(sb.toString());
+
+        // String 색상 변경
+        StyleConstants.setForeground(styleSetGameBoard, currentBlock.getColor());
+
         StyledDocument doc = tetrisGamePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSetGameBoard, false);
 
-        //StyledDocument boardDoc = tetrisGamePane.getStyledDocument();
+
     }
 
     public void drawNextBlockBoard() {
@@ -353,7 +529,7 @@ public class GameView extends JPanel {
         for (int i = 0; i < nextBoard.length; i++) {
             for (int j = 0; j < nextBoard[i].length; j++) {
                 if(nextBoard[i][j] == 1) {
-                    sb.append(BORDER_CHAR);
+                    sb.append(BLOCK_CHAR);       // nextBlock 의 모양을 그려준다.
                 } else {
                     sb.append(" ");
                 }
@@ -361,6 +537,9 @@ public class GameView extends JPanel {
             sb.append("\n");
         }
         nextTetrisBlockPane.setText(sb.toString());
+
+        StyleConstants.setForeground(styleSetNextBlockBoard, nextBlock.getColor());
+
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSetNextBlockBoard, false);
 
@@ -372,9 +551,7 @@ public class GameView extends JPanel {
     // 키보드 입력을 받는다.
     public class PlayerKeyListener implements KeyListener {
         @Override
-        public void keyTyped(KeyEvent e) {
-
-        }
+        public void keyTyped(KeyEvent e) { }
 
         @Override
         public void keyPressed(KeyEvent e) {
@@ -409,9 +586,7 @@ public class GameView extends JPanel {
         }
 
         @Override
-        public void keyReleased(KeyEvent e) {
-
-        }
+        public void keyReleased(KeyEvent e) {  }
     }
 
 }
