@@ -50,5 +50,4 @@ public class ScoreView extends JPanel {
         comp.setName(name);
         return comp;
     }
-
 }
