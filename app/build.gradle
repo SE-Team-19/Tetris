@@ -39,7 +39,9 @@ dependencies {
     )
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // This dependency is used by the application.
-    implementation('com.google.guava:guava:31.1-jre')
+    implementation('com.google.guava:guava:31.1-jre',
+        'com.google.code.gson:gson:2.9.0'
+    )
 }
 
 application {

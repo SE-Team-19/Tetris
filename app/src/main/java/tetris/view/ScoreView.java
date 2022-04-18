@@ -1,28 +1,20 @@
 package tetris.view;
 
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.BoxLayout;
-
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class ScoreView extends JPanel {
 
-    private JButton returnButton;
+    private JButton returnScoreToMainBtn;
     private ArrayList<JLabel> names;
 
-    public JButton getReturnButton() {
-        return this.returnButton;
-    }
-
-    public void setReturnButton(JButton returnButton) {
-        this.returnButton = returnButton;
+    public JButton getReturnScoreToMainBtn() {
+        return this.returnScoreToMainBtn;
     }
 
     private ScoreView() {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        returnButton = new JButton("Return");
+        returnScoreToMainBtn = initAndSetName("returnScoreToMainBtn", new JButton("Return"));
         names = new ArrayList<>();
 
         names.add(new JLabel("호호이1"));
@@ -34,6 +26,7 @@ public class ScoreView extends JPanel {
         names.add(new JLabel("호호이7"));
 
         addLabel(names);
+        super.add(returnScoreToMainBtn);
     }
 
     private static class LazyHolder {
@@ -44,10 +37,18 @@ public class ScoreView extends JPanel {
         return LazyHolder.INSTANCE;
     }
 
-    /***************************************/
-
     private void addLabel(ArrayList<JLabel> players) {
         for (JLabel player : players)
             super.add(player);
     }
+
+    public void addComponent(JComponent comp) {
+        super.add(comp);
+    }
+
+    private <T extends JComponent> T initAndSetName(String name, T comp) {
+        comp.setName(name);
+        return comp;
+    }
+
 }

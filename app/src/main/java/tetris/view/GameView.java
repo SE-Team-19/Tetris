@@ -1,11 +1,7 @@
 package tetris.view;
 
-import javax.swing.border.CompoundBorder;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.BorderFactory;
+import javax.swing.*;
+import javax.swing.border.*;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -14,19 +10,14 @@ public class GameView extends JPanel {
 
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
-    private JButton returnButton;
+    private JButton returnGameToMainBtn;
     private JPanel gameInfoPane;
-    private JLabel scoreLabel;
+    private JLabel score;
 
-    public JButton getReturnButton() {
-        return this.returnButton;
+    public JButton getReturnGameToMainBtn() {
+        return this.returnGameToMainBtn;
     }
 
-    public void setReturnButton(JButton returnButton) {
-        this.returnButton = returnButton;
-    }
-
-    /* singleton Instance (LazyHolder) */
     private GameView() {
         initGameView();
     }
@@ -39,17 +30,16 @@ public class GameView extends JPanel {
         return LazyHolder.INSTANCE;
     }
 
-    /***************************************/
-
     private void initGameView() {
         super.setLayout(new GridLayout(0, 2, 0, 0));
 
         gamePane = new JTextPane();
         gameInfoPane = new JPanel();
         nextBlockPane = new JTextPane();
-        scoreLabel = new JLabel("점수표기");
-        returnButton = new JButton("Return");
+        score = new JLabel("점수표기");
+        returnGameToMainBtn = initAndSetName("returnGameToMainBtn", new JButton("Return"));
 
+        returnGameToMainBtn.setFocusable(true);
         gamePane.setEditable(false);
         gamePane.setBackground(Color.BLACK);
         nextBlockPane.setEditable(false);
@@ -62,8 +52,8 @@ public class GameView extends JPanel {
 
         gameInfoPane.setLayout(new GridLayout(3, 0, 0, 0));
         gameInfoPane.add(nextBlockPane);
-        gameInfoPane.add(this.scoreLabel);
-        gameInfoPane.add(returnButton);
+        gameInfoPane.add(this.score);
+        gameInfoPane.add(returnGameToMainBtn);
 
         super.add(gamePane);
         super.add(gameInfoPane);
@@ -73,7 +63,8 @@ public class GameView extends JPanel {
         return this.gamePane;
     }
 
-    public void setGamePane(JTextPane gamePane) {
-        this.gamePane = gamePane;
+    private <T extends JComponent> T initAndSetName(String name, T comp) {
+        comp.setName(name);
+        return comp;
     }
 }
