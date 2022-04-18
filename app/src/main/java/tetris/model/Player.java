@@ -3,7 +3,12 @@ package tetris.model;
 public class Player {
 
     private String name;
-    private int score;
+    private Integer score;
+
+    public Player(String name, Integer score) {
+        this.name = name;
+        this.score = score;
+    }
 
     public String getName() {
         return name;
@@ -14,11 +19,11 @@ public class Player {
         this.score = 0;
     }
 
-    public int getScore() {
+    public Integer getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Integer score) {
         this.score = score;
     }
 }
