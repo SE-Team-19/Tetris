@@ -19,6 +19,7 @@ public abstract class Block {
 //        y = 0;
     }
 
+    public int [][] getShape() {return shape;}
     public int getShape(int x, int y) {
         return shape[y][x];
     }
@@ -27,11 +28,11 @@ public abstract class Block {
         return color;
     }
 
-    public int height() {
+    public int getHeight() {
         return shape.length;
     }
 
-    public int width() {
+    public int getWidth() {
         if(shape.length > 0)
             return shape[0].length;
         return 0;
