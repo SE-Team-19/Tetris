@@ -1,29 +1,14 @@
 package tetris.view;
 
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.Random;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
-import javax.swing.border.CompoundBorder;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.BorderFactory;
+import javax.swing.*;
 
-import java.awt.Color;
-import java.awt.GridLayout;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.border.CompoundBorder;
+import javax.swing.text.*;
 
 import tetris.model.Block;
-
 import tetris.model.IBlock;
 import tetris.model.JBlock;
 import tetris.model.LBlock;
@@ -32,16 +17,14 @@ import tetris.model.SBlock;
 import tetris.model.TBlock;
 import tetris.model.ZBlock;
 
-
 public class GameView extends JPanel {
 
-
-    public static int GAME_HEIGHT = 20;
-    public static int GAME_WIDTH = 10;
-    public static int NEXT_BOARD_HEIGHT = 5;
-    public static int NEXT_BOARD_WIDTH = 4;
-    public static final char BORDER_CHAR = 'X';
-    public static final char BLOCK_CHAR = 'O';
+    private static final int GAME_HEIGHT = 20;
+    private static final int GAME_WIDTH = 10;
+    private static final int NEXT_BOARD_HEIGHT = 5;
+    private static final int NEXT_BOARD_WIDTH = 4;
+    private static final char BORDER_CHAR = 'X';
+    private static final char BLOCK_CHAR = 'O';
     private Timer timer;
 
     private int [][] board;      // tetrisGamePane 의 'X' size를 결정하기 위한 변수
@@ -54,18 +37,20 @@ public class GameView extends JPanel {
     private JLabel jScore;
     private SimpleAttributeSet styleSetGameBoard;
     private SimpleAttributeSet styleSetNextBlockBoard;
+    private SimpleAttributeSet styleSetBlockChar;
+    private SimpleAttributeSet styleSetNextBlockChar;
     private KeyListener PlayerKeyListener;
 
     private Block currentBlock;
     private Block nextBlock;
 
-    private GameBoard gameBoard;
+    //private GameBoard gameBoard;
 
-    int x = 3;
-    int y = 0;
+    private int x = 3;
+    private int y = 0;
 
-    int nextBlockX = 0; // warning: 시작 위치 조절
-    int nextBlockY = 1;
+    private int nextBlockX = 0; // warning: 시작 위치 조절
+    private int nextBlockY = 1;
 
     private static final int initInterval = 1000;
 
@@ -131,7 +116,6 @@ public class GameView extends JPanel {
 
         // int bSize = getBounds().width / GAME_WIDTH;
 
-
         timer = new Timer(initInterval, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -167,7 +151,6 @@ public class GameView extends JPanel {
     // 확률이 1/7인데, 20% 더 등장이면,
     // 10, 10, 10, 10, 10, 10, 12 -> 5, 5, 5, 5, 5, 5, 6
     private Block getRandomBlock(int n) {
-
         // normal mode
         if (n == 0) {
             Random random = new Random(System.currentTimeMillis());
@@ -271,7 +254,6 @@ public class GameView extends JPanel {
         super.paintComponent(g);
         doDrawing(g);
     }
-
     private void doDrawing(Graphics g) {
         for (int i = 0; i < GAME_HEIGHT; i++) {
             for (int j = 0; j < GAME_WIDTH; j++) {
@@ -360,11 +342,9 @@ public class GameView extends JPanel {
 
     protected void moveDown() {
         eraseCurr();
-
         if(y < GAME_HEIGHT - currentBlock.getHeight()) {
             y++;
         }
-
         else {
             placeBlock();
             currentBlock = nextBlock;
@@ -380,11 +360,9 @@ public class GameView extends JPanel {
 
     public void moveRight() {
         eraseCurr();
-
         if (currentBlock == null) {
             return;
         }
-
         if (x < GAME_WIDTH - currentBlock.getWidth()){
             x++;
         }
@@ -393,7 +371,6 @@ public class GameView extends JPanel {
 
     public void moveLeft() {
         eraseCurr();
-
         if (currentBlock == null) {
             return;
         }
@@ -413,15 +390,12 @@ public class GameView extends JPanel {
     // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
     public void dropDown() {
         eraseCurr();
-
         if (currentBlock == null) {
             return;
         }
-
         while (checkBottom() && checkCollision()) {
             moveDown();
         }
-
         placeBlock();
     }
 
@@ -442,7 +416,6 @@ public class GameView extends JPanel {
         }
         return false;
     }
-
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
@@ -492,6 +465,16 @@ public class GameView extends JPanel {
         StyleConstants.setAlignment(styleSetNextBlockBoard, StyleConstants.ALIGN_CENTER);
     }
 
+    public void setStyleBlockChar(Color color) {
+        styleSetBlockChar = new SimpleAttributeSet();
+        StyleConstants.setForeground(styleSetBlockChar, color);
+    }
+
+    public void setStyleNextBlockChar(Color color) {
+        styleSetNextBlockChar = new SimpleAttributeSet();
+        StyleConstants.setForeground(styleSetNextBlockChar, color);
+    }
+
     public void drawGameBoard() {
         StringBuilder sb = new StringBuilder();
         for (int t = 0; t < GAME_WIDTH + 2; t++) {
@@ -516,12 +499,11 @@ public class GameView extends JPanel {
         tetrisGamePane.setText(sb.toString());
 
         // String 색상 변경
-        StyleConstants.setForeground(styleSetGameBoard, currentBlock.getColor());
+        // StyleConstants.setForeground(styleSetGameBoard, currentBlock.getColor());
 
         StyledDocument doc = tetrisGamePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSetGameBoard, false);
-
-
+        drawBlockColor(currentBlock.getColor());
     }
 
     public void drawNextBlockBoard() {
@@ -537,16 +519,39 @@ public class GameView extends JPanel {
             sb.append("\n");
         }
         nextTetrisBlockPane.setText(sb.toString());
-
-        StyleConstants.setForeground(styleSetNextBlockBoard, nextBlock.getColor());
+        //StyleConstants.setForeground(styleSetNextBlockBoard, nextBlock.getColor());
 
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), styleSetNextBlockBoard, false);
-
+        drawNextBlockColor(nextBlock.getColor());
     }
 
+    private void drawBlockColor(Color color) {
+        StyledDocument doc = tetrisGamePane.getStyledDocument();
+        setStyleBlockChar(color);
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == 1) {
+                    doc.setCharacterAttributes(
+                        (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
+                        styleSetBlockChar, false);
+                }
+            }
+        }
+    }
 
-
+    private void drawNextBlockColor(Color color) {
+        StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
+        setStyleNextBlockChar(color);
+        for (int i = 0; i < nextBoard.length; i++) {
+            for (int j = 0; j < nextBoard[i].length; j++) {
+                if (nextBoard[i][j] == 1) {
+                    doc.setCharacterAttributes((nextBoard[i].length * i) + j, 1,
+                        styleSetNextBlockChar, false);
+                }
+            }
+        }
+    }
 
     // 키보드 입력을 받는다.
     public class PlayerKeyListener implements KeyListener {
@@ -584,9 +589,7 @@ public class GameView extends JPanel {
                     break;
             }
         }
-
         @Override
         public void keyReleased(KeyEvent e) {  }
     }
-
 }
