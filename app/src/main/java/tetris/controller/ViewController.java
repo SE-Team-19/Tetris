@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.util.Timer;
 import java.util.*;
 import tetris.view.*;
-import tetris.controller.*;
 
 public class ViewController extends JFrame {
 

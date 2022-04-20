@@ -209,6 +209,15 @@ public class GameController {
     }
 
     private void paintNextBlock(Color color) {
+        // nextBlock 부분에 중복해서 그려지는 것을 방지
+        int [][] board1 = nextBoard;
+        for (int i = 0; i < nextBoard.length; i++) {
+            for (int j = 0; j < nextBoard[i].length; j++) {
+                nextBoard[i][j] = 0;
+            }
+        }
+        nextBoard = board1;
+
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         SimpleAttributeSet nextBlockAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(nextBlockAttributeSet, color);
@@ -354,12 +363,15 @@ public class GameController {
                 "Option", JOptionPane.YES_NO_OPTION);
 
         if (inputValue == JOptionPane.YES_OPTION) {
+            // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
             System.exit(0);
         }
-        else {
+        else if (inputValue == -1) {
+            // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작)
             timer.restart();
             restart();
         }
+        // 그 외에는 중단된 상태에서 재시작
     }
 
     public class PlayerKeyListener implements KeyListener {
