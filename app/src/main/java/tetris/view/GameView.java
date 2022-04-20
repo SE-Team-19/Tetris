@@ -24,7 +24,7 @@ public class GameView extends JPanel {
     }
 
     private static class LazyHolder {
-        private static final GameView INSTANCE = new GameView();
+        private static GameView INSTANCE = new GameView();
     }
 
     public static GameView getInstance() {
