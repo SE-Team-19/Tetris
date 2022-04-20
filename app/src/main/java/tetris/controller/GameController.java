@@ -22,15 +22,20 @@ public class GameController {
 
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] nextBoard;
+    private int[][] accumulatedBoard;     // 충돌되는 부분 설정
 
     private int x = 3;
     private int y = 0;
     private int nextBlockX = 0; // warning: 시작 위치 조절
     private int nextBlockY = 1;
+    private int score = 0;      // game 점수와 관련된 변수
+    private int lineCount = 0;  // 제거된 라인의 개수를 담는 변수. 이를 통해 score를 주는 방식을 지정할 것임
 
     private GameView gameView = GameView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
+    private SimpleAttributeSet boardAttributeSet;
+    private SimpleAttributeSet nextBoardAttributeSet;
 
     public GameController() {
         KeyListener playerKeyListener = new PlayerKeyListener();
@@ -38,6 +43,7 @@ public class GameController {
 
         board = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
+        accumulatedBoard = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
 
         currentBlock = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
@@ -45,14 +51,17 @@ public class GameController {
         // gamePane 위치 조정
         gamePane = gameView.getGamePane();
 
+        setBoardAttributeSet();
+        setNextBoardAttributeSet();
+
         drawGameBoard();
         drawNextBlock();
 
         placeCurrentBlock();
+        //placeAccumulatedBlock();      // collision add
         placeNextBlock();
 
         startTime();
-
     }
 
     public void startTime() {
@@ -63,6 +72,42 @@ public class GameController {
 
         timer.start();
     }
+
+    public void setBoardAttributeSet() {
+        boardAttributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontSize(boardAttributeSet, 20);
+        StyleConstants.setFontFamily(boardAttributeSet, "Courier New");
+        StyleConstants.setBold(boardAttributeSet, true);
+        StyleConstants.setForeground(boardAttributeSet, Color.WHITE);
+        StyleConstants.setAlignment(boardAttributeSet, StyleConstants.ALIGN_CENTER);
+    }
+
+    public void setNextBoardAttributeSet() {
+        nextBoardAttributeSet = new SimpleAttributeSet();
+        StyleConstants.setFontSize(nextBoardAttributeSet, 15);
+        StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
+        StyleConstants.setBold(nextBoardAttributeSet, true);
+        StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
+        StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
+    }
+
+    /*
+    private void selectMode() {
+        String [] gameMode = {"Easy", "Normal", "Hard"};
+
+        String strGameMode = (String)JOptionPane.showInputDialog(null, "Select",
+            "Difficulty", JOptionPane.WARNING_MESSAGE, null, gameMode, gameMode[0]);
+
+        if (strGameMode.equals(gameMode[0])) {
+            mode = 0;
+        }
+        else if (strGameMode.equals(gameMode[1])) {
+            mode = 1;
+        }
+        else {
+            mode = 2;
+        }
+    } */
 
     // 블록이 7개
     // 확률이 1/7인데, 20% 더 등장이면,
@@ -168,8 +213,21 @@ public class GameController {
         gamePane.setText(sb.toString());
 
         StyledDocument doc = gamePane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), gameView.getBoardAttributeSet(), false);
+        doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, false);
         paintBlock(currentBlock.getColor());
+
+        // collision 부분 추가
+        /*
+        for (int i = 0; i < accumulatedBoard.length; i++) {
+            for (int j = 0; j < accumulatedBoard[i].length; j++) {
+                if (accumulatedBoard[i][j] == 2) {
+                    sb.append(GameView.BORDER_WIDTH);
+                }
+                else {
+                    sb.append(" ");
+                }
+            }
+        }*/
     }
 
     public void drawNextBlock() {
@@ -189,7 +247,7 @@ public class GameController {
         nextBlockPane.setText(sb.toString());
 
         StyledDocument doc = nextBlockPane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), gameView.getNextBoardAttributeSet(), false);
+        doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
         paintBlock(nextBlock.getColor());
     }
 
@@ -249,6 +307,19 @@ public class GameController {
         }
     }
 
+    private void placeAccumulatedBlock() {
+        for(int j = 0; j < currentBlock.getHeight(); j++) {
+            for(int i = 0; i < currentBlock.getWidth(); i++) {
+                if (currentBlock.getShape(i, j) == 1) {
+                    accumulatedBoard[y + j][x + i] =  currentBlock.getShape(i, j);  // setting board 2
+                }
+                else {
+                    accumulatedBoard[y + j][x + i] = 0;
+                }
+            }
+        }
+    }
+
     private void eraseCurrentBlock() {
         for (int i = x; i < x + currentBlock.getWidth(); i++) {
             for (int j = y; j < y + currentBlock.getHeight(); j++) {
@@ -267,6 +338,23 @@ public class GameController {
 
     protected void moveDown() {
         eraseCurrentBlock();
+
+        if (currentBlock == null) {
+            return;
+        }
+
+        if (!checkCollision()) {
+            saveBlock();
+            currentBlock = nextBlock;
+            nextBlock = getRandomBlock(mode);
+            eraseNextBlock();
+            placeNextBlock();
+            drawNextBlock();
+            x = 3;
+            y = 0;
+
+        }
+
         if (y < GameView.BORDER_HEIGHT - currentBlock.getHeight()) {
             y++;
         }
@@ -313,7 +401,7 @@ public class GameController {
 
 
     // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
-    public void dropDown() {
+    private void dropDown() {
         eraseCurrentBlock();
         if (currentBlock == null) {
             return;
@@ -324,23 +412,58 @@ public class GameController {
         placeCurrentBlock();
     }
 
-    public boolean checkBottom() {
+    private boolean checkBottom() {
         if (y == GameView.BORDER_HEIGHT - currentBlock.getHeight()) {
             return false;
         }
         return true;
     }
 
-    public boolean checkCollision() {
+    private boolean checkCollision() {
         for (int i = 0; i < currentBlock.getHeight(); i++) {
             for (int j = 0; j < currentBlock.getWidth(); j++) {
-                if (currentBlock.getShape(j, i) == 1) {
-                    return true;
+                if (currentBlock.getShape(j, i) == 1 && i + y < 19) {
+                    if (accumulatedBoard[i][j] == 2) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
+
+    // Block이 바닥에 쌓인다.
+    private void saveBlock() {
+        for (int i = 0; i < currentBlock.getHeight(); i++) {
+            for (int j = 0; j < currentBlock.getWidth(); j++) {
+                if (currentBlock.getShape(j, i) == 1) {
+                    accumulatedBoard[y + i][j + x] = 2;
+                }
+            }
+        }
+    }
+
+    // 블럭이 한 줄 쌓였는지 Check
+    private boolean oneLineCheck() {
+        int lineCount = 0;
+
+        for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
+            for (int j = 0; j < GameView.BORDER_WIDTH; j++) {
+                if (accumulatedBoard[i][j] == 2) {
+                    lineCount += 1;
+                }
+            }
+        }
+
+        if (lineCount == GameView.BORDER_WIDTH) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
