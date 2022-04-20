@@ -14,6 +14,8 @@ public class PlayerController {
 
     private List<Player> playerList;
 
+    private ScoreView scoreView = ScoreView.getInstance();
+
     public PlayerController() {
         playerList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -24,7 +26,6 @@ public class PlayerController {
 
     private void initView() {
         loadPlayerList();
-        ScoreView scoreView = ScoreView.getInstance();
 
         playerList.forEach(
                 player -> scoreView.addComponent(new JLabel(player.getName() + player.getScore())));
