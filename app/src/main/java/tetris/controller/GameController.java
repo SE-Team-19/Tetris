@@ -1,5 +1,7 @@
 package tetris.controller;
 
+import static tetris.view.GameView.BORDER_HEIGHT;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
@@ -34,6 +36,7 @@ public class GameController {
     private GameView gameView = GameView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
+    private JLabel gameOverText;            // 게임 종료를 나타내주는 문구
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
 
@@ -41,9 +44,9 @@ public class GameController {
         KeyListener playerKeyListener = new PlayerKeyListener();
         gameView.addKeyListener(playerKeyListener);
 
-        board = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
-        accumulatedBoard = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        accumulatedBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
 
         currentBlock = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
@@ -339,12 +342,17 @@ public class GameController {
     protected void moveDown() {
         eraseCurrentBlock();
 
-        if (currentBlock == null) {
-            return;
+        if(ifBlockOutOfBounds()) {
+            timer.stop();
+
+            gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
+            gameOverText.setVisible(true);    // Game Over 글자를 나타냄
+            //gameOverDisplay();
+
         }
 
-        if (!checkCollision()) {
-            saveBlock();
+        if (!checkBlockCollision() || !checkBottom()) {
+            accumulatedBlock();
             currentBlock = nextBlock;
             nextBlock = getRandomBlock(mode);
             eraseNextBlock();
@@ -355,7 +363,7 @@ public class GameController {
 
         }
 
-        if (y < GameView.BORDER_HEIGHT - currentBlock.getHeight()) {
+        if (y < BORDER_HEIGHT - currentBlock.getHeight()) {
             y++;
         }
         else {
@@ -406,26 +414,48 @@ public class GameController {
         if (currentBlock == null) {
             return;
         }
-        while (checkBottom() && checkCollision()) {
+        while (checkBottom() && checkBlockCollision()) {
             moveDown();
         }
         placeCurrentBlock();
     }
 
-    private boolean checkBottom() {
-        if (y == GameView.BORDER_HEIGHT - currentBlock.getHeight()) {
+    // Block이 바닥에 닿는지 확인
+    public boolean checkBottom() {
+        if (y == GameView.BORDER_HEIGHT - currentBlock.getHeight()){
             return false;
+        }
+
+        int [][] shape = currentBlock.getShape();
+        int width = currentBlock.getWidth();
+        int height = currentBlock.getHeight();
+
+        for (int i = 0; i < width; i++) {
+            for (int j = height - 1; j >= 0; j--) {
+                if(shape[j][i] != 0) {
+
+                    int row = i + x;
+                    int column = j + y + 1;
+                    if (board[column][row] != 0){
+                        return false;
+                    }
+                }
+            }
         }
         return true;
     }
 
-    private boolean checkCollision() {
+    // Block이 바닥에 쌓여있는 Block과 충돌하는지 확인
+    private boolean checkBlockCollision() {
         for (int i = 0; i < currentBlock.getHeight(); i++) {
             for (int j = 0; j < currentBlock.getWidth(); j++) {
                 if (currentBlock.getShape(j, i) == 1 && i + y < 19) {
-                    if (accumulatedBoard[i][j] == 2) {
-                        return true;
+
+                    int value  = board[i + y + 1][j + x];
+                    if (value == 1) {
+                        return false;
                     }
+
                 }
             }
         }
@@ -433,23 +463,27 @@ public class GameController {
     }
 
     // Block이 바닥에 쌓인다.
-    private void saveBlock() {
+    private void accumulatedBlock() {
         for (int i = 0; i < currentBlock.getHeight(); i++) {
             for (int j = 0; j < currentBlock.getWidth(); j++) {
                 if (currentBlock.getShape(j, i) == 1) {
-                    accumulatedBoard[y + i][j + x] = 2;
+                    board[y + i][j + x] = 1;
+                    //accumulatedBoard[y + i][j + x] = 2;
                 }
             }
         }
     }
 
-    // 블럭이 한 줄 쌓였는지 Check
+    // 블럭이 한 줄 쌓였는지 Check. 
     private boolean oneLineCheck() {
         int lineCount = 0;
 
-        for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
+        for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
             for (int j = 0; j < GameView.BORDER_WIDTH; j++) {
-                if (accumulatedBoard[i][j] == 2) {
+//                if (accumulatedBoard[i][j] == 2) {
+//                    lineCount += 1;
+//                }
+                if (board[i][j] == 1) {
                     lineCount += 1;
                 }
             }
@@ -462,12 +496,44 @@ public class GameController {
         return false;
     }
 
+    private void clearLine() {
+        boolean ifLineIsFilled;
+
+        for (int height = BORDER_HEIGHT - 1; height >=0; height--) {
+            ifLineIsFilled = true;
+
+            for (int width = 0; width < GameView.BORDER_WIDTH; width++ ) {
+
+                // 구현 중..
+
+            }
+        }
+    }
+
+    // 줄을 지우는 메소드
+    private void eraseLine(int n) {
+        for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
+            board[n][i] = 0;
+        }
+    }
+
+
+    // Block이 경계를 넘는지 확인(게임 종료를 위해)
+    private boolean ifBlockOutOfBounds() {
+        for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
+            if(board[2][i] != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
-        board = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
         x = 3;
         y = 0;
