@@ -32,12 +32,18 @@ public class GameController {
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
 
-    private GameController() {
+    public GameController() {
         KeyListener playerKeyListener = new PlayerKeyListener();
         gameView.addKeyListener(playerKeyListener);
 
+        board = new int[GameView.BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
+
         currentBlock = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
+
+        // gamePane 위치 조정
+        gamePane = gameView.getGamePane();
 
         drawGameBoard();
         drawNextBlock();
@@ -45,7 +51,8 @@ public class GameController {
         placeCurrentBlock();
         placeNextBlock();
 
-        gamePane = gameView.getGamePane();
+        startTime();
+
     }
 
     public void startTime() {
@@ -178,7 +185,7 @@ public class GameController {
             }
             sb.append("\n");
         }
-        JTextPane nextBlockPane = gameView.getnextBlockPane();
+        JTextPane nextBlockPane = gameView.getNextBlockPane();
         nextBlockPane.setText(sb.toString());
 
         StyledDocument doc = nextBlockPane.getStyledDocument();

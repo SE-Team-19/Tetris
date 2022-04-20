@@ -65,7 +65,7 @@ public class GameView extends JPanel {
         return this.gamePane;
     }
 
-    public JTextPane getnextBlockPane() {
+    public JTextPane getNextBlockPane() {
         return this.nextBlockPane;
     }
 

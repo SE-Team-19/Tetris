@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.util.Timer;
 import java.util.*;
 import tetris.view.*;
+import tetris.controller.*;
 
 public class ViewController extends JFrame {
 
@@ -18,6 +19,8 @@ public class ViewController extends JFrame {
     private GameView gameView = GameView.getInstance();
     private ScoreView scoreView = ScoreView.getInstance();
     private SettingView settingView = SettingView.getInstance();
+
+    private GameController gameController;
 
     public ViewController() {
         initView();
@@ -46,14 +49,16 @@ public class ViewController extends JFrame {
         contentPane.setLayout(new GridLayout(1, 0, 0, 0)); // Frame의 레이아웃 방식을 설정, row 1
         contentPane.add(mainView);
 
-        task = new TimerTask() {
-            public void run() {
-                revalidate();
-                repaint();
-            }
-        };
-        refresh = new Timer();
-        refresh.scheduleAtFixedRate(task, 0L, 1000L);
+        gameController = new GameController();
+
+//        task = new TimerTask() {
+//            public void run() {
+//                revalidate();
+//                repaint();
+//            }
+//        };
+//        refresh = new Timer();
+//        refresh.scheduleAtFixedRate(task, 0L, 1000L);
     }
 
     private void addEventListner() {
@@ -120,6 +125,8 @@ public class ViewController extends JFrame {
         focus(to);
         revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
         repaint(); // component 변화 후 JFrame 새로고침(component 색 등의 성질 적용) */
+
+
     }
 
     private void focus(Container to) {
@@ -127,7 +134,7 @@ public class ViewController extends JFrame {
             mainView.getStartBtn().requestFocus();
         }
         else if (to.equals(gameView)) {
-            gameView.getReturnButton().requestFocus();
+            gameView.requestFocus();
         }
         else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
