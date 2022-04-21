@@ -651,6 +651,10 @@ public class GameController {
         }
     }
 
+    public void stopTimer() {
+        timer.stop();
+    }
+
     private void showCurrnent() {
         System.out.println("블록현황 x:" + x + " y:" + y + " width" + currentBlock.getWidth() + "height"
                 + currentBlock.getHeight());

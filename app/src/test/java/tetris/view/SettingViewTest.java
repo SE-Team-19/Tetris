@@ -20,11 +20,6 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetDisplayList() {
-        assertThat(settingViewTest.getDisplayList()).isInstanceOf(String[].class);
-    }
-
-    @Test
     void testGetDownKeyLabel() {
         assertThat(settingViewTest.getDownKeyLabel()).isInstanceOf(JLabel.class);
     }
@@ -105,8 +100,8 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetSetStaticKeyBtn() {
-        assertThat(settingViewTest.getSetStaticKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetStackKeyBtn() {
+        assertThat(settingViewTest.getSetStackKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
@@ -115,8 +110,8 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetStaticKeyLabel() {
-        assertThat(settingViewTest.getStaticKeyLabel()).isInstanceOf(JLabel.class);
+    void testGetStackKeyLabel() {
+        assertThat(settingViewTest.getStackKeyLabel()).isInstanceOf(JLabel.class);
     }
 
     @Test

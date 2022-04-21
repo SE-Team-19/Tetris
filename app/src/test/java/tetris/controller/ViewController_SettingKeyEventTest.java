@@ -1,49 +1,88 @@
 package tetris.controller;
 
 import org.junit.jupiter.api.*;
-import org.assertj.swing.edt.*;
-import org.assertj.swing.fixture.FrameFixture;
 import static org.assertj.core.api.Assertions.*;
 import static java.awt.event.KeyEvent.*;
 
 import javax.swing.*;
+import java.awt.AWTException;
+import tetris.TestAllView;
+import tetris.TestRobot;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ViewController_SettingKeyEventTest {
 
-    private FrameFixture window;
+    ViewController frame;
+    TestAllView testAllView;
+    TestRobot testRobot;
 
     @BeforeAll
     public static void setUpOnce() {
-        FailOnThreadViolationRepaintManager.install();
+        // FailOnThreadViolationRepaintManager.install();
     }
 
     @BeforeEach
     public void setUp() {
-        ViewController frame = GuiActionRunner.execute(() -> new ViewController());
-        window = new FrameFixture(frame);
+        frame = new ViewController();
+        testAllView = new TestAllView();
+        try {
+            testRobot = new TestRobot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
         assertThat(frame).isInstanceOf(JFrame.class);
     }
 
     @Test
-    public void testSettingKeyEvent() {
-        window.button("settingBtn").pressAndReleaseKeys(VK_ENTER);
-        window.button("setDisplayBtn").pressAndReleaseKeys(VK_SPACE);
-        window.comboBox("displayComboBox").pressAndReleaseKeys(VK_UP, VK_UP, VK_UP, VK_DOWN, VK_DOWN, VK_DOWN,
-                VK_SPACE);
-        window.button("initKeyBtn").pressAndReleaseKeys(VK_SPACE);
-        window.toggleButton("setUpKeyBtn").pressAndReleaseKeys(VK_LEFT);
-        window.toggleButton("setDownKeyBtn").pressAndReleaseKeys(VK_RIGHT);
-        window.button("initKeyGridReturnBtn").pressAndReleaseKeys(VK_SPACE);
-        window.button("initKeyBtn").pressAndReleaseKeys(VK_DOWN);
-        window.button("initMenuBtn").pressAndReleaseKeys(VK_SPACE);
-        window.button("initReturnBtn").pressAndReleaseKeys(VK_SPACE);
-        window.toggleButton("isColorBlindBtn").pressAndReleaseKeys(VK_SPACE);
-        assertThat(window.toggleButton("isColorBlindBtn").isEnabled()).isTrue();
-        window.button("returnSettingToMainBtn").pressAndReleaseKeys(VK_SPACE);
+    @Order(1)
+    public void testSettingKeys() {
+        int keyInput[] = {VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_DOWN, VK_SPACE,
+                VK_DOWN, VK_SPACE, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT,
+                VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN, VK_SPACE,
+                VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN,
+                VK_SPACE, VK_SPACE, VK_DOWN};
+        testRobot.pressAndReleaseKeys(keyInput);
+        assertThat(frame.getFocusOwner())
+                .isEqualTo(testAllView.getSettingView().getReturnSettingToMainBtn());
+        testRobot.pressAndReleaseKeys(VK_SPACE);
+    }
+
+    @Test
+    @Order(2)
+    public void testDisplayChange() {
+        int keyInput[] = {VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_SPACE,
+                VK_DOWN, VK_SPACE, VK_SPACE, VK_DOWN, VK_SPACE};
+        testRobot.pressAndReleaseKeys(keyInput);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf((int) frame.getBounds().getWidth()));
+        sb.append("X");
+        sb.append(String.valueOf((int) frame.getBounds().getHeight()));
+        assertThat(sb.toString()).hasToString(
+                (String) testAllView.getSettingView().getDisplayComboBox().getSelectedItem());
+    }
+
+    @Test
+    @Order(3)
+    public void testKeymapping() {
+        int keyInput[] = {VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_SPACE, VK_RIGHT, VK_SPACE,
+                VK_SPACE, VK_W, VK_RIGHT, VK_SPACE, VK_S, VK_RIGHT, VK_SPACE, VK_A, VK_RIGHT,
+                VK_SPACE, VK_D, VK_D, VK_SPACE, VK_R, VK_D, VK_R};
+        testRobot.pressAndReleaseKeys(keyInput);
+        assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo("W");
+    }
+
+    @Test
+    @Order(4)
+    public void testResetSettings() {
+        int keyInput[] = {VK_S, VK_R, VK_W, VK_W, VK_R, VK_D, VK_R};
+        testRobot.pressAndReleaseKeys(keyInput);
+        assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo("Up");
     }
 
     @AfterEach
     public void tearDown() {
-        window.cleanUp();
+        testAllView.removeAllEventListeners();
+        frame.dispose();
     }
 }
