@@ -6,12 +6,13 @@ public abstract class Block {
 
     protected int[][] shape;
     protected Color color;
+    protected int indentifynumber;
     // protected int x,y;
 
     public Block() {
         shape = new int[][] {{1, 1}, {1, 1}};
         color = Color.YELLOW;
-
+        indentifynumber = 1;
         // x = 3;
         // y = 0;
     }
@@ -41,6 +42,10 @@ public abstract class Block {
         if (shape.length > 0)
             return shape[0].length;
         return 0;
+    }
+
+    public int getIndentifynumber() {
+        return this.indentifynumber;
     }
 
 

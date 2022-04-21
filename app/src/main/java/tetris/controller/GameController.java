@@ -8,6 +8,8 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import tetris.model.*;
 import tetris.view.GameView;
@@ -24,6 +26,7 @@ public class GameController {
     private Block nextBlock;
     private Block blockBuffer;
 
+    private int[][] colorBoard;
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
     private int[][] nextBoard;
@@ -43,17 +46,29 @@ public class GameController {
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
 
+    private Map<Integer, Color> colorMap;
+
     public GameController() {
         KeyListener playerKeyListener = new PlayerKeyListener();
         gameView.addKeyListener(playerKeyListener);
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         boardBuffer = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        colorBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
         accumulatedBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         currentBlock = getRandomBlock(mode);
         blockBuffer = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
+
+        colorMap = new HashMap<>();
+        colorMap.put(new IBlock().getIndentifynumber(), new IBlock().getColor());
+        colorMap.put(new JBlock().getIndentifynumber(), new JBlock().getColor());
+        colorMap.put(new LBlock().getIndentifynumber(), new LBlock().getColor());
+        colorMap.put(new OBlock().getIndentifynumber(), new OBlock().getColor());
+        colorMap.put(new SBlock().getIndentifynumber(), new SBlock().getColor());
+        colorMap.put(new TBlock().getIndentifynumber(), new TBlock().getColor());
+        colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getColor());
 
         // gamePane 위치 조정
         gamePane = gameView.getGamePane();
@@ -67,6 +82,10 @@ public class GameController {
         placeCurrentBlock();
         // placeAccumulatedBlock(); // collision add
         placeNextBlock();
+
+        nextTetrisBlockPane = gameView.getNextBlockPane();
+        nextTetrisBlockPane.repaint();
+        nextTetrisBlockPane.revalidate();
 
         startTime();
     }
@@ -97,7 +116,7 @@ public class GameController {
         StyleConstants.setBold(nextBoardAttributeSet, true);
         StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
         StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
-        StyleConstants.setLineSpacing(boardAttributeSet, -0.5f);
+        StyleConstants.setLineSpacing(nextBoardAttributeSet, -0.5f);
     }
 
     /*
@@ -241,19 +260,25 @@ public class GameController {
 
         StyledDocument doc = nextBlockPane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
-        paintBlock(nextBlock.getColor());
+        // paintNextBlock(nextBlock.getColor());
     }
 
     private void paintBlock(Color color) {
         StyledDocument doc = gamePane.getStyledDocument();
         SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(blockAttributeSet, color);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
+                    StyleConstants.setForeground(blockAttributeSet, color);
                     doc.setCharacterAttributes(
                             (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, false);
+                            blockAttributeSet, true);
+                }
+                if (colorBoard[i][j] > 1) {
+                    StyleConstants.setForeground(blockAttributeSet, colorMap.get(colorBoard[i][j]));
+                    doc.setCharacterAttributes(
+                            (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
+                            blockAttributeSet, true);
                 }
             }
         }
@@ -617,7 +642,7 @@ public class GameController {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
-                    System.out.println("doit!");
+                    colorBoard[i][j] = currentBlock.getIndentifynumber();
                     board[i][j] = 2;
                 }
             }
