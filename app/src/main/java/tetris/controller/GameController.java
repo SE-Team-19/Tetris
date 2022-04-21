@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tetris.model.*;
-import tetris.view.GameView;
+import tetris.view.*;
 
 public class GameController {
 
@@ -42,19 +42,22 @@ public class GameController {
     private String userName;
 
     private GameView gameView = GameView.getInstance();
+    private ScoreView scoreView = ScoreView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
     private JLabel gameOverText; // 게임 종료를 나타내주는 문구
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
+    private Container contentPane;
 
     private Map<Integer, Color> colorMap;
 
     private Setting setting;
     private boolean isColorBlindMode;
 
-    public GameController(Setting setting) {
+    public GameController(Setting setting, Container contentPane) {
         this.setting = setting;
+        this.contentPane = contentPane;
         isColorBlindMode = setting.isColorBlindMode();
         KeyListener gameKeyListener = new GameKeyListener();
         gameView.addKeyListener(gameKeyListener);
@@ -107,6 +110,20 @@ public class GameController {
         nextTetrisBlockPane.revalidate();
 
         startGame();
+    }
+
+    private void transitView(Container pane, Container to, Container from) {
+        pane.add(to);
+        pane.remove(from);
+        focus(to);
+        contentPane.revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
+        contentPane.repaint(); // component 변화 후 JFrame 새로고침(component 색 등의 성질 적용) */
+    }
+
+    private void focus(Container to) {
+        if (to.equals(scoreView)) {
+            scoreView.getReturnScoreToMainBtn().requestFocus();
+        }
     }
 
     public void startGame() {
@@ -378,6 +395,7 @@ public class GameController {
                 gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
                 gameOverText.setVisible(true); // Game Over 글자를 나타냄
                 getGameOverDialog().setVisible(true);
+                transitView(contentPane, scoreView, gameView);
             }
             gamePane.revalidate();
             gamePane.repaint();
@@ -721,6 +739,7 @@ public class GameController {
     private class DialogKeyEventListener extends KeyAdapter {
         int moveRightKey = setting.getMoveRightKey();
         int moveLeftKey = setting.getMoveLeftKey();
+        int stackKey = setting.getStackKey();
 
         @Override
         public void keyPressed(KeyEvent e) {
@@ -729,7 +748,7 @@ public class GameController {
                 e.getComponent().transferFocusBackward();
             } else if (e.getKeyCode() == moveRightKey) {
                 e.getComponent().transferFocus();
-            } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            } else if (e.getKeyCode() == stackKey) {
                 ((JButton) e.getComponent()).doClick();
             }
         }
