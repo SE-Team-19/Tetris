@@ -1,61 +1,85 @@
 package tetris.controller;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.*;
-import org.assertj.swing.edt.*;
-import org.assertj.swing.fixture.*;
-
 import static org.assertj.core.api.Assertions.*;
 import static java.awt.event.KeyEvent.*;
 
 import javax.swing.*;
+import java.awt.AWTException;
 
+import tetris.TestRobot;
+import tetris.TestAllView;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ViewControllerTest {
-
-    private FrameFixture window;
+    ViewController frame;
+    int[] keyList;
+    TestAllView testAllView;
+    TestRobot testRobot;
 
     @BeforeAll
     public static void setUpOnce() {
-        FailOnThreadViolationRepaintManager.install();
+        // FailOnThreadViolationRepaintManager.install();
     }
 
     @BeforeEach
     public void setUp() {
-        ViewController frame = GuiActionRunner.execute(() -> new ViewController());
-        window = new FrameFixture(frame);
+        frame = new ViewController();
+        testAllView = new TestAllView();
         assertThat(frame).isInstanceOf(JFrame.class);
+        try {
+            testRobot = new TestRobot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
+    @Order(1)
     public void testMainKeyEvent() {
-        assertThat(window.button("startBtn").getClass()).isEqualTo(JButtonFixture.class);
-        window.button("startBtn").pressAndReleaseKeys(VK_DOWN);
-        window.button("exitBtn").pressAndReleaseKeys(VK_UP);
+        int keyInput[] = {VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP, VK_UP};
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.Click(frame.getFocusOwner());
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView());
     }
 
-    @Test
+    @Ignore
+    @Order(2)
     public void testMainToGameEvent() {
-        window.button("startBtn").pressAndReleaseKeys(VK_ENTER);
-        assertThat(window.button("returnGameToMainBtn").getClass()).isEqualTo(JButtonFixture.class);
-        window.button("returnGameToMainBtn").pressAndReleaseKeys(VK_SPACE);
+        int keyInput[] = {VK_SPACE};
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.Click(frame.getFocusOwner());
+        testRobot.Click(frame.getFocusOwner());
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
     }
 
     @Test
+    @Order(3)
     public void testMainToSettingEvent() {
-        window.button("settingBtn").pressAndReleaseKeys(VK_ENTER);
-        assertThat(window.button("returnSettingToMainBtn").getClass()).isEqualTo(JButtonFixture.class);
-        window.button("returnSettingToMainBtn").pressAndReleaseKeys(VK_SPACE);
+        int keyInput[] = {VK_DOWN, VK_SPACE, VK_SPACE};
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.pressAndReleaseKeys(VK_DOWN);
+        testRobot.Click(frame.getFocusOwner());
+        testRobot.Click(frame.getFocusOwner());
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
     }
 
     @Test
+    @Order(4)
     public void testMainToScoreEvent() {
-        window.button("scoreBoardBtn").pressAndReleaseKeys(VK_ENTER);
-        assertThat(window.button("returnScoreToMainBtn").getClass()).isEqualTo(JButtonFixture.class);
-        window.button("returnScoreToMainBtn").pressAndReleaseKeys(VK_ENTER);
+        int keyInput[] = {VK_DOWN, VK_DOWN, VK_SPACE, VK_SPACE};
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.pressAndReleaseKeys(VK_DOWN, VK_DOWN);
+        testRobot.Click(frame.getFocusOwner());
+        testRobot.Click(frame.getFocusOwner());
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
     }
 
     @AfterEach
     public void tearDown() {
-        window.cleanUp();
+        testAllView.removeAllEventListeners();
+        frame.dispose();
     }
 
 }

@@ -8,5 +8,6 @@ public class LBlock extends Block {
         shape = new int[][] { { 1, 0 }, { 1, 0 }, { 1, 1 } };
         color = Color.BLUE;
         blindColor = Color.BLUE;
+        indentifynumber = 4;
     }
 }

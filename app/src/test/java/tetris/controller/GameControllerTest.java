@@ -1,85 +1,60 @@
 package tetris.controller;
 
-import java.awt.event.KeyEvent;
 import org.junit.jupiter.api.*;
 import static org.assertj.core.api.Assertions.*;
+import static java.awt.event.KeyEvent.*;
 
-import tetris.model.*;
+import javax.swing.*;
+import java.awt.AWTException;
+import tetris.TestAllView;
+import tetris.TestRobot;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameControllerTest {
-    private GameController gameController = new GameController(
-            new Setting(0, false, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN,
-                    KeyEvent.VK_UP, KeyEvent.VK_SPACE));
 
-    @Test
-    public void generateIBlockMoreThan20Pct() {
-        int IblockCount = 0;
-        int JblockCount = 0;
-        int LblockCount = 0;
-        int ZblockCount = 0;
-        int SblockCount = 0;
-        int TblockCount = 0;
-        int OblockCount = 0;
-        for (int i = 0; i < 144000; i++) {
-            Block randomBlock = gameController.getRandomBlock(1);
-            if (randomBlock instanceof IBlock)
-                IblockCount++;
-            else if (randomBlock instanceof JBlock)
-                JblockCount++;
-            else if (randomBlock instanceof LBlock)
-                LblockCount++;
-            else if (randomBlock instanceof ZBlock)
-                ZblockCount++;
-            else if (randomBlock instanceof SBlock)
-                SblockCount++;
-            else if (randomBlock instanceof TBlock)
-                TblockCount++;
-            else if (randomBlock instanceof OBlock)
-                OblockCount++;
+    ViewController frame;
+    TestAllView testAllView;
+    TestRobot testRobot;
+
+    @BeforeAll
+    public static void setUpOnce() {
+        // FailOnThreadViolationRepaintManager.install();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        frame = new ViewController();
+        testAllView = new TestAllView();
+        try {
+            testRobot = new TestRobot();
+        } catch (AWTException e) {
+            e.printStackTrace();
         }
-
-        assertThat(IblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(JblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(LblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(ZblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(SblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(TblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(OblockCount).isGreaterThan(19000).isLessThan(21000);
+        assertThat(frame).isInstanceOf(JFrame.class);
     }
 
     @Test
-    public void generateIBlockLessThan20Pct() {
-        int IblockCount = 0;
-        int JblockCount = 0;
-        int LblockCount = 0;
-        int ZblockCount = 0;
-        int SblockCount = 0;
-        int TblockCount = 0;
-        int OblockCount = 0;
-        for (int i = 0; i < 164000; i++) {
-            Block randomBlock = gameController.getRandomBlock(2);
-            if (randomBlock instanceof IBlock)
-                IblockCount++;
-            else if (randomBlock instanceof JBlock)
-                JblockCount++;
-            else if (randomBlock instanceof LBlock)
-                LblockCount++;
-            else if (randomBlock instanceof ZBlock)
-                ZblockCount++;
-            else if (randomBlock instanceof SBlock)
-                SblockCount++;
-            else if (randomBlock instanceof TBlock)
-                TblockCount++;
-            else if (randomBlock instanceof OBlock)
-                OblockCount++;
-        }
+    @Order(1)
+    public void testGameController() {
+        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP, VK_UP };
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.pressAndReleaseKeys(VK_SPACE);
+    }
 
-        assertThat(IblockCount).isGreaterThan(19000).isLessThan(21000);
-        assertThat(JblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(LblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(ZblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(SblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(TblockCount).isGreaterThan(22800).isLessThan(25200);
-        assertThat(OblockCount).isGreaterThan(22800).isLessThan(25200);
+    @Test
+    @Order(2)
+    public void testGameController2() {
+        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP, VK_UP };
+        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.pressAndReleaseKeys(VK_SPACE);
+        testRobot.delay(10000);
+}
+
+@AfterEach
+    public void tearDown() {
+        testAllView.removeAllEventListeners();
+        testAllView.getGameView().getGamePane().setText("");
+        frame.dispose();
     }
 }
+    

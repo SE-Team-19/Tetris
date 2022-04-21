@@ -8,5 +8,6 @@ public class SBlock extends Block {
         shape = new int[][] { { 0, 1, 1 }, { 1, 1, 0 } };
         color = Color.MAGENTA;
         blindColor = Color.MAGENTA;
+        indentifynumber = 6;
     }
 }

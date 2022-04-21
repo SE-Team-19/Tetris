@@ -100,8 +100,18 @@ public class SettingViewTest {
     }
 
     @Test
+    void testGetSetStackKeyBtn() {
+        assertThat(settingViewTest.getSetStackKeyBtn()).isInstanceOf(JToggleButton.class);
+    }
+
+    @Test
     void testGetSetUpKeyBtn() {
         assertThat(settingViewTest.getSetUpKeyBtn()).isInstanceOf(JToggleButton.class);
+    }
+
+    @Test
+    void testGetStackKeyLabel() {
+        assertThat(settingViewTest.getStackKeyLabel()).isInstanceOf(JLabel.class);
     }
 
     @Test

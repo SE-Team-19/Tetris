@@ -8,5 +8,6 @@ public class IBlock extends Block {
         shape = new int[][] { { 1, 1, 1, 1 } };
         color = Color.RED;
         blindColor = new Color(227, 66, 52);
+        indentifynumber = 2;
     }
 }

@@ -75,7 +75,6 @@ public class ViewController extends JFrame {
             public void run() {
                 revalidate();
                 repaint();
-                System.out.println("repaint!");
             }
         };
         refresh = new Timer();
@@ -117,7 +116,6 @@ public class ViewController extends JFrame {
 
     private void addEventListener() {
         addMainViewEventListener();
-        // addGameViewEventListner();
         addSettingViewEventListener();
         addScoreViewEventListener();
     }
@@ -137,8 +135,6 @@ public class ViewController extends JFrame {
             buttonComp.addKeyListener(mainKeyEventListner);
         }
     }
-
-    // private void addGameViewEventListner() {}
 
     private void addSettingViewEventListener() {
         SettingKeyListner settingEventListner = new SettingKeyListner();
@@ -175,8 +171,9 @@ public class ViewController extends JFrame {
         if (to.equals(mainView)) {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
-            gameController = new GameController(settingController.getSetting());
             refresh.cancel();
+            gameController = new GameController(settingController.getSetting());
+            gameView.requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
         }

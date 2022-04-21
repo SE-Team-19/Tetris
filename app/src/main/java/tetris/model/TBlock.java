@@ -8,5 +8,6 @@ public class TBlock extends Block {
         shape = new int[][] { { 0, 1, 0 }, { 1, 1, 1 } };
         color = Color.CYAN;
         blindColor = Color.CYAN;
+        indentifynumber = 7;
     }
 }

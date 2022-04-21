@@ -48,7 +48,7 @@ public class SettingController {
 
     public void saveSetting() {
         try (Writer sw = new OutputStreamWriter(
-                new FileOutputStream("src/main/java/tetris/data/Setting.json"),
+                new FileOutputStream("data/Setting.json"),
                 StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(setting, sw);
@@ -64,7 +64,7 @@ public class SettingController {
     public void loadSetting() {
         while (true) {
             try (Reader br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("src/main/java/tetris/data/Setting.json"),
+                    new FileInputStream("data/Setting.json"),
                     StandardCharsets.UTF_8))) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 setting = gson.fromJson(br, Setting.class);

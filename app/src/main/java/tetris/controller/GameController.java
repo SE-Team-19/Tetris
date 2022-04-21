@@ -9,6 +9,8 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import tetris.model.*;
 import tetris.view.GameView;
@@ -25,6 +27,7 @@ public class GameController {
     private Block nextBlock;
     private Block blockBuffer;
 
+    private int[][] colorBoard;
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
     private int[][] nextBoard;
@@ -44,6 +47,8 @@ public class GameController {
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
 
+    private Map<Integer, Color> colorMap;
+
     private Setting setting;
     private boolean isColorBlindMode;
 
@@ -55,14 +60,26 @@ public class GameController {
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         boardBuffer = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
+        colorBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
         accumulatedBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         currentBlock = getRandomBlock(mode);
         blockBuffer = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
+        gameOverText = new JLabel("Game Over");
+
+        colorMap = new HashMap<>();
+        colorMap.put(new IBlock().getIndentifynumber(), new IBlock().getColor());
+        colorMap.put(new JBlock().getIndentifynumber(), new JBlock().getColor());
+        colorMap.put(new LBlock().getIndentifynumber(), new LBlock().getColor());
+        colorMap.put(new OBlock().getIndentifynumber(), new OBlock().getColor());
+        colorMap.put(new SBlock().getIndentifynumber(), new SBlock().getColor());
+        colorMap.put(new TBlock().getIndentifynumber(), new TBlock().getColor());
+        colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getColor());
 
         // gamePane 위치 조정
         gamePane = gameView.getGamePane();
+        nextTetrisBlockPane = gameView.getNextBlockPane();
 
         setBoardAttributeSet();
         setNextBoardAttributeSet();
@@ -109,7 +126,7 @@ public class GameController {
         StyleConstants.setBold(nextBoardAttributeSet, true);
         StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
         StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
-        StyleConstants.setLineSpacing(boardAttributeSet, -0.5f);
+        StyleConstants.setLineSpacing(nextBoardAttributeSet, -0.5f);
     }
 
     private class Pair<K, V> {
@@ -260,31 +277,29 @@ public class GameController {
     private void paintBlock(Color color) {
         StyledDocument doc = gamePane.getStyledDocument();
         SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setForeground(blockAttributeSet, color);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
+                    StyleConstants.setForeground(blockAttributeSet, color);
                     doc.setCharacterAttributes(
                             (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, false);
+                            blockAttributeSet, true);
+                }
+                if (colorBoard[i][j] > 1) {
+                    StyleConstants.setForeground(blockAttributeSet, colorMap.get(colorBoard[i][j]));
+                    doc.setCharacterAttributes(
+                            (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
+                            blockAttributeSet, true);
                 }
             }
         }
     }
 
     private void paintNextBlock(Color color) {
-
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         SimpleAttributeSet nextBlockAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(nextBlockAttributeSet, color);
-        for (int i = 0; i < nextBoard.length; i++) {
-            for (int j = 0; j < nextBoard[i].length; j++) {
-                if (nextBoard[i][j] == 1) {
-                    doc.setCharacterAttributes((nextBoard[i].length * i) + j, 1,
-                            nextBlockAttributeSet, false);
-                }
-            }
-        }
+        doc.setCharacterAttributes(0, doc.getLength(), nextBlockAttributeSet, false);
     }
 
     private void placeCurrentBlock() {
@@ -334,6 +349,7 @@ public class GameController {
     }
 
     protected void moveDown() {
+
         if (!checkBottom()) {
             fixBoard();
             eraseCurrentBlock();
@@ -347,6 +363,13 @@ public class GameController {
             y = 0;
             clearLine();
             placeCurrentBlock();
+            if (checkBlockCollision()) {
+                timer.stop();
+                gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
+                gameOverText.setVisible(true); // Game Over 글자를 나타냄
+                // gameOverDisplay();
+
+            }
             gamePane.revalidate();
             gamePane.repaint();
             return;
@@ -628,11 +651,15 @@ public class GameController {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
-                    System.out.println("doit!");
+                    colorBoard[i][j] = currentBlock.getIndentifynumber();
                     board[i][j] = 2;
                 }
             }
         }
+    }
+
+    public void stopTimer() {
+        timer.stop();
     }
 
     private void showCurrnent() {

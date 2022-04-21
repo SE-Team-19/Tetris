@@ -8,5 +8,6 @@ public class OBlock extends Block {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };
         color = Color.YELLOW;
         blindColor = Color.YELLOW;
+        indentifynumber = 5;
     }
 }
