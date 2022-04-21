@@ -541,4 +541,8 @@ public class ViewController extends JFrame {
                 settingMap.get(key).isKeyPressed();
         }
     }
+
+    public void stopTimer() {
+        gameController.stopTimer();
+    }
 }

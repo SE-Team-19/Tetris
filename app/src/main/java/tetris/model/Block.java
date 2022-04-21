@@ -60,18 +60,6 @@ public abstract class Block {
         return this.indentifynumber;
     }
 
-    /*
-     * public int getX() {return x;} public int getY() {return y;}
-     * 
-     * public void moveDown() {y++;} public void moveLeft() {x--;} public void
-     * moveRight() {x++;}
-     * 
-     * public int getBottomEdge() { return y + height(); } public int getLeftEdge()
-     * {return x;}
-     * public int getRightEdge() {return x+ width();}
-     */
-
-    // 시계방향으로 90도 회전시킨다.
     public void rotate() {
         int length = shape.length;
         int width = shape[0].length;

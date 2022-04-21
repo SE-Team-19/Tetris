@@ -38,8 +38,7 @@ public class ViewControllerTest {
     @Test
     @Order(1)
     public void testMainKeyEvent() {
-        int keyInput[] = { VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP,
-                VK_UP };
+        int keyInput[] = { VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP, VK_UP };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.Click(frame.getFocusOwner());
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView());

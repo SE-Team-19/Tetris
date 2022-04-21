@@ -122,17 +122,16 @@ public class GameControllerTest {
     @Test
     @Order(2)
     public void testGameController2() {
-        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP,
-                VK_UP };
+        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP, VK_UP };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.pressAndReleaseKeys(VK_SPACE);
-        testRobot.delay(10000);
     }
 
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
         testAllView.getGameView().getGamePane().setText("");
+        frame.stopTimer();
         frame.dispose();
     }
 }
