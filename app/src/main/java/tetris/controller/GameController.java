@@ -305,18 +305,6 @@ public class GameController {
         }
     }
 
-    private void placeAccumulatedBlock() {
-        for (int j = 0; j < currentBlock.getHeight(); j++) {
-            for (int i = 0; i < currentBlock.getWidth(); i++) {
-                if (currentBlock.getShape(i, j) == 1) {
-                    accumulatedBoard[y + j][x + i] = currentBlock.getShape(i, j); // setting board 2
-                } else {
-                    accumulatedBoard[y + j][x + i] = 0;
-                }
-            }
-        }
-    }
-
     private void eraseCurrentBlock() {
         for (int i = x; i < x + currentBlock.getWidth(); i++) {
             for (int j = y; j < y + currentBlock.getHeight(); j++) {
@@ -388,24 +376,66 @@ public class GameController {
 
     public void moveRotate() {
         eraseCurrentBlock();
-        blockBuffer.rotate();
-        if (!checkBlockCollision()) {
-            currentBlock.rotate();
-        }
+        safetyRotate();
+        currentBlock.rotate();
         blockBuffer.copyBlock(currentBlock);
         placeCurrentBlock();
+    }
 
+    private void safetyRotate() {
+        int count = 0;
+        int height = currentBlock.getHeight();
+        int width = currentBlock.getWidth();
+
+        if (height > 2) {
+            blockBuffer.rotate();
+            while (count < 2) {
+                if (ifBlockOutOfBounds() || checkBlockCollision())
+                    x--;
+                else
+                    break;
+                count++;
+            }
+        }
+        if (width > 2) {
+            blockBuffer.rotate();
+            while (count < 2) {
+                if (ifBlockOutOfBounds() || checkBlockCollision())
+                    y--;
+                else
+                    break;
+                count++;
+            }
+        }
     }
 
 
     // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
     private void dropDown() {
-        eraseCurrentBlock();
         if (currentBlock == null) {
             return;
         }
-        while (checkBottom() && checkBlockCollision()) {
-            moveDown();
+        eraseCurrentBlock();
+        int width = currentBlock.getWidth();
+        int height = currentBlock.getHeight();
+        y += height;
+
+        Outter: while (y < GameView.BORDER_HEIGHT - height) {
+            for (int i = 0; i < width; i++) {
+                if (board[y][x + i] > 1)
+                    break Outter;
+                System.out.println("board[" + y + "][" + (x + i) + "]=" + board[y][x + i]);
+            }
+            y++;
+        }
+        y -= height;
+
+        while (true) {
+            y++;
+            if (ifBlockOutOfBounds() || checkBlockCollision()) {
+                y--;
+                break;
+            }
         }
         placeCurrentBlock();
     }
@@ -431,7 +461,7 @@ public class GameController {
         return true;
     }
 
-    // Block끼리 충돌하는 지 확인
+    // Block끼리 충돌하는지 확인
     private boolean checkBlockCollision() {
         saveBoardBuffer();
         placeBufferBlock();
@@ -445,6 +475,16 @@ public class GameController {
         }
         return false;
     }
+
+    // Block이 경계를 넘는지 확인
+    private boolean ifBlockOutOfBounds() {
+        if (x + blockBuffer.getWidth() > GameView.BORDER_WIDTH
+                || y + blockBuffer.getHeight() > GameView.BORDER_HEIGHT)
+            return true;
+        else
+            return false;
+    }
+
 
 
     // 블럭이 한 줄 쌓였는지 Check.
@@ -463,7 +503,7 @@ public class GameController {
     private void clearLine() {
         int filledLine = oneLineCheck();
 
-        for (int i = 0; i < filledLine; i++) {
+        for (int i = GameView.BORDER_HEIGHT; i < filledLine; i++) {
             eraseLine(GameView.BORDER_HEIGHT - i - 1);
         }
     }
@@ -474,13 +514,6 @@ public class GameController {
             board[n][i] = 0;
         }
     }
-
-
-    // Block이 경계를 넘는지 확인
-    private boolean ifBlockOutOfBounds() {
-        /* 작성 중 */
-    }
-
 
 
     // 게임 중단 상태에서 다시 실행하는 경우
