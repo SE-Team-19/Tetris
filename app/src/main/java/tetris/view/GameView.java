@@ -11,10 +11,11 @@ public class GameView extends JPanel {
     public static final int BORDER_WIDTH = 10;
     public static final char BORDER_CHAR = 'X';
     public static final char BLOCK_CHAR = 'O';
-    public static int mode;
 
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
+    private JTextPane scorePane;
+
     // private SimpleAttributeSet boardAttributeSet;
     // private SimpleAttributeSet nextBoardAttributeSet;
 
@@ -41,9 +42,8 @@ public class GameView extends JPanel {
         gamePane.setBackground(Color.BLACK);
         gamePane.setEditable(false);
         // gamePane.setEnabled(false);
-        CompoundBorder border =
-                BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
-                        BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+                BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gamePane.setBorder(border);
 
         nextBlockPane = new JTextPane();
@@ -53,14 +53,20 @@ public class GameView extends JPanel {
         // nextBlockPane.setEnabled(false);
 
         JPanel infoPane = new JPanel();
+        scorePane = new JTextPane();
+        scorePane.setEditable(false);
 
         infoPane.setLayout(new GridLayout(3, 0, 0, 0));
         infoPane.add(nextBlockPane);
-        infoPane.add(new JLabel("점수표기"));
-        infoPane.setFocusable(false);
+        infoPane.add(scorePane);
 
         super.add(gamePane);
         super.add(infoPane);
+    }
+
+    private <T extends JComponent> T initAndSetName(String name, T comp) {
+        comp.setName(name);
+        return comp;
     }
 
     public JTextPane getGamePane() {
@@ -69,6 +75,10 @@ public class GameView extends JPanel {
 
     public JTextPane getNextBlockPane() {
         return this.nextBlockPane;
+    }
+
+    public JTextPane getScorePane() {
+        return this.scorePane;
     }
 
     // public SimpleAttributeSet getBoardAttributeSet() {
@@ -93,6 +103,7 @@ public class GameView extends JPanel {
     // StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
     // StyleConstants.setBold(nextBoardAttributeSet, true);
     // StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
-    // StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
+    // StyleConstants.setAlignment(nextBoardAttributeSet,
+    // StyleConstants.ALIGN_CENTER);
     // }
 }

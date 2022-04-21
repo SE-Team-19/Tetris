@@ -6,10 +6,10 @@ public abstract class Block {
 
     protected int[][] shape;
     protected Color color;
-    // protected int x,y;
+    protected Color blindColor;
 
-    public Block() {
-        shape = new int[][] {{1, 1}, {1, 1}};
+    protected Block() {
+        shape = new int[][] { { 1, 1 }, { 1, 1 } };
         color = Color.YELLOW;
 
         // x = 3;
@@ -33,6 +33,18 @@ public abstract class Block {
         return color;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Color getBlindColor() {
+        return blindColor;
+    }
+
+    public void setBlindColor(Color blindColor) {
+        this.blindColor = blindColor;
+    }
+
     public int getHeight() {
         return shape.length;
     }
@@ -43,14 +55,14 @@ public abstract class Block {
         return 0;
     }
 
-
-
     /*
      * public int getX() {return x;} public int getY() {return y;}
      * 
-     * public void moveDown() {y++;} public void moveLeft() {x--;} public void moveRight() {x++;}
+     * public void moveDown() {y++;} public void moveLeft() {x--;} public void
+     * moveRight() {x++;}
      * 
-     * public int getBottomEdge() { return y + height(); } public int getLeftEdge() {return x;}
+     * public int getBottomEdge() { return y + height(); } public int getLeftEdge()
+     * {return x;}
      * public int getRightEdge() {return x+ width();}
      */
 

@@ -5,7 +5,8 @@ import java.awt.Color;
 public class TBlock extends Block {
 
     public TBlock() {
-        shape = new int[][] {{1, 1, 1}, {0, 1, 0}};
+        shape = new int[][] { { 0, 1, 0 }, { 1, 1, 1 } };
         color = Color.CYAN;
+        blindColor = Color.CYAN;
     }
 }

@@ -6,15 +6,15 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
-import tetris.view.*;
 
+import tetris.view.*;
 
 public class ViewController extends JFrame {
 
     private Container contentPane;
     private HashMap<JButton, Container> viewMap;
-    private static Map<KeyPair, PressedKeyEvent> mainMap;
-    private static Map<KeyPair, PressedKeyEvent> settingMap;
+    private transient Map<KeyPair, PressedKeyEvent> mainMap;
+    private transient Map<KeyPair, PressedKeyEvent> settingMap;
     private transient InitMainMap initMainMap;
     private transient InitSettingMap initSettingMap;
     private transient Timer refresh;
@@ -27,15 +27,15 @@ public class ViewController extends JFrame {
     private ScoreView scoreView;
     private SettingView settingView;
 
-    private transient SettingController settingController = new SettingController();
     private transient PlayerController playerController = new PlayerController();
+    private transient SettingController settingController = new SettingController();
     private transient GameController gameController;
 
     public ViewController() {
         initJFrame();
         initViewAndController();
         initView();
-        addEventListner();
+        addEventListener();
     }
 
     private void initViewAndController() {
@@ -91,7 +91,6 @@ public class ViewController extends JFrame {
     }
 
     private void initSettingView() {
-
         int upKey = settingController.getRotateKey();
         int downKey = settingController.getMoveDownKey();
         int leftKey = settingController.getMoveLeftKey();
@@ -116,15 +115,15 @@ public class ViewController extends JFrame {
         scoreView.fillScoreBoard();
     }
 
-    private void addEventListner() {
-        addMainViewEventListner();
+    private void addEventListener() {
+        addMainViewEventListener();
         // addGameViewEventListner();
-        addSettingViewEventListner();
-        addScoreViewEventListner();
+        addSettingViewEventListener();
+        addScoreViewEventListener();
     }
 
-    private void addMainViewEventListner() {
-        MainKeyEvent mainKeyEventListner = new MainKeyEvent();
+    private void addMainViewEventListener() {
+        MainKeyListener mainKeyEventListner = new MainKeyListener();
         mainView.getStartBtn().requestFocus();
         for (Component buttonComp : mainView.getButtonPanel().getComponents()) {
             AbstractButton button = (AbstractButton) buttonComp;
@@ -141,24 +140,24 @@ public class ViewController extends JFrame {
 
     // private void addGameViewEventListner() {}
 
-    private void addSettingViewEventListner() {
-        SettingKeyEventListner settingKeyEventListner = new SettingKeyEventListner();
+    private void addSettingViewEventListener() {
+        SettingKeyListner settingEventListner = new SettingKeyListner();
 
         settingView.getReturnSettingToMainBtn()
                 .addActionListener(e -> transitView(contentPane, mainView, settingView));
         for (Component viewComp : settingView.getComponents()) {
             if (viewComp instanceof JPanel) {
                 for (Component panelComp : ((JPanel) viewComp).getComponents()) {
-                    panelComp.addKeyListener(settingKeyEventListner);
+                    panelComp.addKeyListener(settingEventListner);
                 }
             }
             if (viewComp.getClass().equals(JLabel.class))
                 continue;
-            viewComp.addKeyListener(settingKeyEventListner);
+            viewComp.addKeyListener(settingEventListner);
         }
     }
 
-    private void addScoreViewEventListner() {
+    private void addScoreViewEventListener() {
         scoreView.getReturnScoreToMainBtn()
                 .addActionListener(e -> transitView(contentPane, mainView, scoreView));
     }
@@ -176,7 +175,7 @@ public class ViewController extends JFrame {
         if (to.equals(mainView)) {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
-            gameController = new GameController();
+            gameController = new GameController(settingController.getSetting());
             refresh.cancel();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
@@ -207,7 +206,7 @@ public class ViewController extends JFrame {
             initStackKey(stackKey);
         }
 
-        private static void resetMap() {
+        private void resetMap() {
             mainMap = new HashMap<>();
         }
 
@@ -277,7 +276,7 @@ public class ViewController extends JFrame {
             keyList.add(stackKey);
         }
 
-        private static void resetMap() {
+        private void resetMap() {
             settingMap = new HashMap<>();
         }
 
@@ -499,9 +498,7 @@ public class ViewController extends JFrame {
         public int hashCode() {
             return Objects.hash(keyCode, component);
         }
-
     }
-
 
     @FunctionalInterface
     private interface PressedKeyEvent {
@@ -513,7 +510,7 @@ public class ViewController extends JFrame {
         void domapping(int key);
     }
 
-    private class MainKeyEvent extends KeyAdapter {
+    private class MainKeyListener extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
@@ -523,8 +520,7 @@ public class ViewController extends JFrame {
         }
     }
 
-
-    private class SettingKeyEventListner extends KeyAdapter {
+    private class SettingKeyListner extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {

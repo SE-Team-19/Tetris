@@ -4,6 +4,7 @@ import static tetris.view.GameView.BORDER_HEIGHT;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.text.*;
@@ -14,11 +15,11 @@ import tetris.view.GameView;
 
 public class GameController {
 
-    private static final int INTERVAL = 1000;
     private static final int NEXT_BOARD_HEIGHT = 5;
     private static final int NEXT_BOARD_WIDTH = 4;
 
     private Timer timer;
+    private int delay;
     private int mode;
     private Block currentBlock;
     private Block nextBlock;
@@ -33,7 +34,7 @@ public class GameController {
     private int y = 0;
     private int nextBlockX = 0; // warning: 시작 위치 조절
     private int nextBlockY = 0;
-    private int score = 0; // game 점수와 관련된 변수
+    private int score; // game 점수와 관련된 변수
     private int lineCount; // 제거된 라인의 개수를 담는 변수. 이를 통해 score를 주는 방식을 지정할 것임
 
     private GameView gameView = GameView.getInstance();
@@ -43,9 +44,14 @@ public class GameController {
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
 
-    public GameController() {
-        KeyListener playerKeyListener = new PlayerKeyListener();
-        gameView.addKeyListener(playerKeyListener);
+    private Setting setting;
+    private boolean isColorBlindMode;
+
+    public GameController(Setting setting) {
+        this.setting = setting;
+        isColorBlindMode = setting.isColorBlindMode();
+        KeyListener gameKeyListener = new GameKeyListener();
+        gameView.addKeyListener(gameKeyListener);
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         boardBuffer = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
@@ -68,13 +74,19 @@ public class GameController {
         // placeAccumulatedBlock(); // collision add
         placeNextBlock();
 
-        startTime();
+        startGame();
     }
 
-    public void startTime() {
-        timer = new Timer(INTERVAL, e -> {
+    public void startGame() {
+        score = 0;
+        delay = 1000;
+        showScore();
+
+        timer = new Timer(delay, e -> {
             moveDown();
             drawGameBoard();
+            delay -= delay > 250 ? 5 : 0;
+            timer.setDelay(delay);
             showCurrnent();
         });
         timer.start();
@@ -100,20 +112,18 @@ public class GameController {
         StyleConstants.setLineSpacing(boardAttributeSet, -0.5f);
     }
 
-    /*
-     * private void selectMode() { String [] gameMode = {"Easy", "Normal", "Hard"};
-     * 
-     * String strGameMode = (String)JOptionPane.showInputDialog(null, "Select", "Difficulty",
-     * JOptionPane.WARNING_MESSAGE, null, gameMode, gameMode[0]);
-     * 
-     * if (strGameMode.equals(gameMode[0])) { mode = 0; } else if (strGameMode.equals(gameMode[1]))
-     * { mode = 1; } else { mode = 2; } }
-     */
+    private class Pair<K, V> {
 
-    // 블록이 7개
-    // 확률이 1/7인데, 20% 더 등장이면,
-    // 10, 10, 10, 10, 10, 10, 12 -> 5, 5, 5, 5, 5, 5, 6
-    private Block getRandomBlock(int mode) {
+        K block;
+        V weight;
+
+        public Pair(K block, V weight) {
+            this.block = block;
+            this.weight = weight;
+        }
+    }
+
+    public Block getRandomBlock(int mode) {
         // normal mode
         if (mode == 0) {
             Random random = new Random(System.currentTimeMillis());
@@ -140,50 +150,45 @@ public class GameController {
 
         // easy mode
         if (mode == 1) {
-            Random random = new Random(System.currentTimeMillis());
-            int block = random.nextInt(73);
-            switch (block / 10) {
-                case 0:
-                    return new OBlock();
-                case 1:
-                    return new JBlock();
-                case 2:
-                    return new LBlock();
-                case 3:
-                    return new ZBlock();
-                case 4:
-                    return new SBlock();
-                case 5:
-                    return new TBlock();
-                case 6:
-                case 7:
-                    return new IBlock();
-                default:
-                    return new OBlock();
+            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
+                    new Pair<>(new JBlock(), 5 / 36d),
+                    new Pair<>(new LBlock(), 5 / 36d),
+                    new Pair<>(new ZBlock(), 5 / 36d),
+                    new Pair<>(new SBlock(), 5 / 36d),
+                    new Pair<>(new TBlock(), 5 / 36d),
+                    new Pair<>(new OBlock(), 5 / 36d),
+                    new Pair<>(new IBlock(), 6 / 36d));
+
+            double pivot = Math.random();
+            double acc = 0;
+            for (Pair<? extends Block, Double> pair : candidates) {
+                acc += pair.weight;
+
+                if (pivot <= acc) {
+                    return pair.block;
+                }
             }
         }
 
         // hard mode
         if (mode == 2) {
-            Random random = new Random(System.currentTimeMillis());
-            int block = random.nextInt(68);
-            switch (block / 10) {
-                case 0:
-                    return new OBlock();
-                case 1:
-                    return new JBlock();
-                case 2:
-                    return new LBlock();
-                case 3:
-                    return new ZBlock();
-                case 4:
-                    return new SBlock();
-                case 5:
-                    return new TBlock();
-                case 6:
-                    return new IBlock();
-                default:
-                    return new OBlock();
+            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
+                    new Pair<>(new JBlock(), 6 / 41d),
+                    new Pair<>(new LBlock(), 6 / 41d),
+                    new Pair<>(new ZBlock(), 6 / 41d),
+                    new Pair<>(new SBlock(), 6 / 41d),
+                    new Pair<>(new TBlock(), 6 / 41d),
+                    new Pair<>(new OBlock(), 6 / 41d),
+                    new Pair<>(new IBlock(), 5 / 41d));
+
+            double pivot = Math.random();
+            double acc = 0;
+            for (Pair<? extends Block, Double> pair : candidates) {
+                acc += pair.weight;
+
+                if (pivot <= acc) {
+                    return pair.block;
+                }
             }
         }
         return new IBlock();
@@ -214,6 +219,10 @@ public class GameController {
 
         StyledDocument doc = gamePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, false);
+        if (isColorBlindMode) {
+            paintBlock(currentBlock.getBlindColor());
+            return;
+        }
         paintBlock(currentBlock.getColor());
 
         // collision 부분 추가
@@ -241,6 +250,10 @@ public class GameController {
 
         StyledDocument doc = nextBlockPane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
+        if (isColorBlindMode) {
+            paintBlock(nextBlock.getBlindColor());
+            return;
+        }
         paintBlock(nextBlock.getColor());
     }
 
@@ -344,6 +357,8 @@ public class GameController {
 
         gamePane.revalidate();
         gamePane.repaint();
+        score += (201 - delay / 5);
+        showScore();
     }
 
     public void moveRight() {
@@ -407,7 +422,6 @@ public class GameController {
         }
     }
 
-
     // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
     private void dropDown() {
         if (currentBlock == null) {
@@ -448,7 +462,6 @@ public class GameController {
         int width = currentBlock.getWidth();
         int height = currentBlock.getHeight();
 
-
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (board[y + j + 1][x + i] > 1 && board[y + j][x + i] == 1) {
@@ -482,8 +495,6 @@ public class GameController {
             return false;
     }
 
-
-
     // 블럭 줄삭제
     private void clearLine() {
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
@@ -492,6 +503,9 @@ public class GameController {
                 copyLines(i);
             }
         }
+
+        score += 25;
+        showScore();
     }
 
     // 줄을 지우는 메소드 (줄 애니메이션으로 바꿀 예정)
@@ -500,7 +514,6 @@ public class GameController {
             board[n][i] = 0;
         }
     }
-
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
@@ -534,47 +547,45 @@ public class GameController {
         // 그 외에는 중단된 상태에서 재시작
     }
 
-    public class PlayerKeyListener implements KeyListener {
-        @Override
-        public void keyTyped(KeyEvent e) {}
+    public class GameKeyListener extends KeyAdapter {
+        // int moveDownKey = setting.getMoveDownKey();
+        int moveRightKey = setting.getMoveRightKey();
+        int moveLeftKey = setting.getMoveLeftKey();
+        int rotateKey = setting.getRotateKey();
+        int stackKey = setting.getStackKey();
 
         @Override
-        public void keyPressed(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_DOWN:
-                    moveDown();
-                    drawGameBoard();
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    moveRight();
-                    drawGameBoard();
-                    break;
-                case KeyEvent.VK_LEFT:
-                    moveLeft();
-                    drawGameBoard();
-                    break;
-                case KeyEvent.VK_UP:
-                    moveRotate();
-                    drawGameBoard();
-                    break;
-                case KeyEvent.VK_SPACE:
-                    dropDown();
-                    drawGameBoard();
-                    break;
-                case KeyEvent.VK_ESCAPE:
-                    timer.stop();
-                    gameView.repaint();
-                    showESCMessage();
-                    timer.start();
-                    break;
-                default:
-                    break;
+        public void keyReleased(KeyEvent e) {
+            int keyCode = e.getKeyCode();
+            if (keyCode == KeyEvent.VK_DOWN) {
+                moveDown();
+                drawGameBoard();
             }
         }
 
         @Override
-        public void keyReleased(KeyEvent e) {}
-
+        public void keyPressed(KeyEvent e) {
+            int keyCode = e.getKeyCode();
+            if (keyCode == moveRightKey) {
+                moveRight();
+                drawGameBoard();
+            } else if (keyCode == moveLeftKey) {
+                moveLeft();
+                drawGameBoard();
+            } else if (keyCode == rotateKey) {
+                moveRotate();
+                drawGameBoard();
+            } else if (keyCode == stackKey) {
+                dropDown();
+                moveDown();
+                drawGameBoard();
+            } else if (keyCode == KeyEvent.VK_ESCAPE) {
+                timer.stop();
+                gameView.repaint();
+                showESCMessage();
+                timer.start();
+            }
+        }
     }
 
     private void initZeroBoard(int[][] board) {
@@ -646,4 +657,7 @@ public class GameController {
         }
     }
 
+    private void showScore() {
+        gameView.getScorePane().setText(String.format("%d", score));
+    }
 }

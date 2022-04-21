@@ -54,6 +54,7 @@ public class SettingController {
             gson.toJson(setting, sw);
 
         } catch (IOException e) {
+            System.out.println(e);
             JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 저장하는데 실패하였습니다.",
                     "File cannot save error", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
@@ -77,6 +78,10 @@ public class SettingController {
                 System.exit(0);
             }
         }
+    }
+
+    public Setting getSetting() {
+        return setting;
     }
 
     public void setDisplayMode(int displayMode) {

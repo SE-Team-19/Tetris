@@ -33,9 +33,8 @@ public class PlayerController {
     }
 
     public void savePlayerList() {
-        try (Writer sw =
-                new OutputStreamWriter(new FileOutputStream("src/main/java/tetris/data/Score.json"),
-                        StandardCharsets.UTF_8)) {
+        try (Writer sw = new OutputStreamWriter(new FileOutputStream("src/main/java/tetris/data/Score.json"),
+                StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(playerList, sw);
 
