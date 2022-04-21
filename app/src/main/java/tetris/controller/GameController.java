@@ -73,7 +73,7 @@ public class GameController {
 
     public void startTime() {
         timer = new Timer(INTERVAL, e -> {
-            // moveDown();
+            moveDown();
             drawGameBoard();
         });
         timer.start();
@@ -487,28 +487,17 @@ public class GameController {
 
 
 
-    // 블럭이 한 줄 쌓였는지 Check.
-    private int oneLineCheck() {
-        int lineCount = 0;
-
+    // 블럭 줄삭제
+    private void clearLine() {
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
             int sum = Arrays.stream(board[i]).reduce(0, (a, b) -> a + b);
-            if (sum == 20)
-                lineCount++;
-        }
-
-        return lineCount;
-    }
-
-    private void clearLine() {
-        int filledLine = oneLineCheck();
-
-        for (int i = GameView.BORDER_HEIGHT; i < filledLine; i++) {
-            eraseLine(GameView.BORDER_HEIGHT - i - 1);
+            if (sum > 19) {
+                copyLines(i);
+            }
         }
     }
 
-    // 줄을 지우는 메소드
+    // 줄을 지우는 메소드 (줄 애니메이션으로 바꿀 예정)
     private void eraseLine(int n) {
         for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
             board[n][i] = 0;
@@ -592,16 +581,30 @@ public class GameController {
     }
 
     private void initZeroBoard(int[][] board) {
-        for (int i = 0; i < this.board.length; i++) {
-            for (int j = 0; j < this.board[i].length; j++) {
-                this.board[i][j] = 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                board[i][j] = 0;
             }
         }
     }
 
-    private void copyBoard(int[][] copy, int[][] paste) {
+    private void pasteLines(int[][] copy, int[][] paste) {
         for (int i = 0; i < copy.length; i++) {
-            paste[i] = Arrays.copyOf(copy[i], copy.length);
+            System.out.println("paste.length = " + copy.length);
+            System.out.println("paste[" + i + "].length = " + paste[i].length);
+            paste[i + 1] = Arrays.copyOf(copy[i], paste[i].length);
+        }
+    }
+
+    private void copyLines(int index) {
+        int[][] copy = new int[index][GameView.BORDER_WIDTH];
+        copyBoard(board, copy);
+        pasteLines(copy, board);
+    }
+
+    private void copyBoard(int[][] copy, int[][] paste) {
+        for (int i = 0; i < paste.length; i++) {
+            paste[i] = Arrays.copyOf(copy[i], paste[i].length);
         }
     }
 

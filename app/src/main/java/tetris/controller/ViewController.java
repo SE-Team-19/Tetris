@@ -118,7 +118,7 @@ public class ViewController extends JFrame {
 
     private void addEventListner() {
         addMainViewEventListner();
-        addGameViewEventListner();
+        // addGameViewEventListner();
         addSettingViewEventListner();
         addScoreViewEventListner();
     }
@@ -139,7 +139,7 @@ public class ViewController extends JFrame {
         }
     }
 
-    private void addGameViewEventListner() {}
+    // private void addGameViewEventListner() {}
 
     private void addSettingViewEventListner() {
         SettingKeyEventListner settingKeyEventListner = new SettingKeyEventListner();
