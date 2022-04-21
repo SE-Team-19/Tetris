@@ -16,8 +16,8 @@ public class GameView extends JPanel {
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
     private JButton returnButton;
-//    private SimpleAttributeSet boardAttributeSet;
-//    private SimpleAttributeSet nextBoardAttributeSet;
+    // private SimpleAttributeSet boardAttributeSet;
+    // private SimpleAttributeSet nextBoardAttributeSet;
 
     private GameView() {
         initView();
@@ -33,8 +33,8 @@ public class GameView extends JPanel {
 
     private void initView() {
         setFocusable(true);
-        //setBoardAttributeSet();
-        //setNextBoardAttributeSet();
+        // setBoardAttributeSet();
+        // setNextBoardAttributeSet();
 
         super.setLayout(new GridLayout(0, 2, 0, 0));
 
@@ -78,28 +78,28 @@ public class GameView extends JPanel {
         this.returnButton = returnButton;
     }
 
-//    public SimpleAttributeSet getBoardAttributeSet() {
-//        return this.boardAttributeSet;
-//    }
+    // public SimpleAttributeSet getBoardAttributeSet() {
+    // return this.boardAttributeSet;
+    // }
 
-//    public void setBoardAttributeSet() {
-//        boardAttributeSet = new SimpleAttributeSet();
-//        StyleConstants.setFontSize(boardAttributeSet, 20);
-//        StyleConstants.setFontFamily(boardAttributeSet, "Courier New");
-//        StyleConstants.setBold(boardAttributeSet, true);
-//        StyleConstants.setAlignment(boardAttributeSet, StyleConstants.ALIGN_CENTER);
-//    }
+    // public void setBoardAttributeSet() {
+    // boardAttributeSet = new SimpleAttributeSet();
+    // StyleConstants.setFontSize(boardAttributeSet, 20);
+    // StyleConstants.setFontFamily(boardAttributeSet, "Courier New");
+    // StyleConstants.setBold(boardAttributeSet, true);
+    // StyleConstants.setAlignment(boardAttributeSet, StyleConstants.ALIGN_CENTER);
+    // }
 
-//    public SimpleAttributeSet getNextBoardAttributeSet() {
-//        return this.nextBoardAttributeSet;
-//    }
+    // public SimpleAttributeSet getNextBoardAttributeSet() {
+    // return this.nextBoardAttributeSet;
+    // }
 
-//    public void setNextBoardAttributeSet() {
-//        nextBoardAttributeSet = new SimpleAttributeSet();
-//        StyleConstants.setFontSize(nextBoardAttributeSet, 15);
-//        StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
-//        StyleConstants.setBold(nextBoardAttributeSet, true);
-//        StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
-//        StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
-//    }
+    // public void setNextBoardAttributeSet() {
+    // nextBoardAttributeSet = new SimpleAttributeSet();
+    // StyleConstants.setFontSize(nextBoardAttributeSet, 15);
+    // StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
+    // StyleConstants.setBold(nextBoardAttributeSet, true);
+    // StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
+    // StyleConstants.setAlignment(nextBoardAttributeSet, StyleConstants.ALIGN_CENTER);
+    // }
 }

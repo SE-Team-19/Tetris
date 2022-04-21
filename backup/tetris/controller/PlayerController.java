@@ -70,6 +70,7 @@ public class PlayerController {
         }
     }
 
+
     public List<Player> getPlayerList() {
         return this.playerList;
     }

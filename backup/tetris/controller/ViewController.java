@@ -29,7 +29,6 @@ public class ViewController extends JFrame {
 
     private transient SettingController settingController = new SettingController();
     private transient PlayerController playerController = new PlayerController();
-    private transient GameController gameController;
 
     public ViewController() {
         initJFrame();
@@ -75,7 +74,6 @@ public class ViewController extends JFrame {
             public void run() {
                 revalidate();
                 repaint();
-                System.out.println("repaint!");
             }
         };
         refresh = new Timer();
@@ -139,7 +137,10 @@ public class ViewController extends JFrame {
         }
     }
 
-    private void addGameViewEventListner() {}
+    private void addGameViewEventListner() {
+        gameView.getReturnGameToMainBtn()
+                .addActionListener(e -> transitView(contentPane, mainView, gameView));
+    }
 
     private void addSettingViewEventListner() {
         SettingKeyEventListner settingKeyEventListner = new SettingKeyEventListner();
@@ -176,8 +177,7 @@ public class ViewController extends JFrame {
         if (to.equals(mainView)) {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
-            gameController = new GameController();
-            refresh.cancel();
+            gameView.getReturnGameToMainBtn().requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
         }

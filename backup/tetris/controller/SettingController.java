@@ -21,9 +21,9 @@ public class SettingController {
 
     private void initSetting() {
         List<Rectangle> displayList = new ArrayList<>();
-        displayList.add(new Rectangle(0, 0, 366, 342));
-        displayList.add(new Rectangle(0, 0, 380, 350));
-        displayList.add(new Rectangle(0, 0, 640, 960));
+        displayList.add(new Rectangle(0, 0, 360, 230));
+        displayList.add(new Rectangle(0, 0, 700, 800));
+        displayList.add(new Rectangle(0, 0, 900, 1000));
         setting = new Setting(0, false, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN,
                 KeyEvent.VK_UP, KeyEvent.VK_SPACE);
         setting.setDisplayList(displayList);
@@ -56,7 +56,6 @@ public class SettingController {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 저장하는데 실패하였습니다.",
                     "File cannot save error", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
         }
     }
 
@@ -74,7 +73,6 @@ public class SettingController {
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 불러오는데 실패하였습니다.",
                         "File Not Found error", JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
             }
         }
     }
