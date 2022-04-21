@@ -38,7 +38,8 @@ public class ViewControllerTest {
     @Test
     @Order(1)
     public void testMainKeyEvent() {
-        int keyInput[] = {VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP, VK_UP};
+        int keyInput[] = { VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP,
+                VK_UP };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.Click(frame.getFocusOwner());
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView());
@@ -47,7 +48,7 @@ public class ViewControllerTest {
     @Ignore
     @Order(2)
     public void testMainToGameEvent() {
-        int keyInput[] = {VK_SPACE};
+        int keyInput[] = { VK_SPACE };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.Click(frame.getFocusOwner());
         testRobot.Click(frame.getFocusOwner());
@@ -57,7 +58,7 @@ public class ViewControllerTest {
     @Test
     @Order(3)
     public void testMainToSettingEvent() {
-        int keyInput[] = {VK_DOWN, VK_SPACE, VK_SPACE};
+        int keyInput[] = { VK_DOWN, VK_SPACE, VK_SPACE };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.pressAndReleaseKeys(VK_DOWN);
         testRobot.Click(frame.getFocusOwner());
@@ -68,7 +69,7 @@ public class ViewControllerTest {
     @Test
     @Order(4)
     public void testMainToScoreEvent() {
-        int keyInput[] = {VK_DOWN, VK_DOWN, VK_SPACE, VK_SPACE};
+        int keyInput[] = { VK_DOWN, VK_DOWN, VK_SPACE, VK_SPACE };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.pressAndReleaseKeys(VK_DOWN, VK_DOWN);
         testRobot.Click(frame.getFocusOwner());

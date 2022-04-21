@@ -527,6 +527,12 @@ public class GameController {
             }
         }
 
+        if (mode == 1)
+            delay -= 80;
+        else if (mode == 2)
+            delay -= 120;
+        else
+            delay -= 100;
         score += 25;
         showScore();
     }
