@@ -60,6 +60,7 @@ public class GameController {
         currentBlock = getRandomBlock(mode);
         blockBuffer = getRandomBlock(mode);
         nextBlock = getRandomBlock(mode);
+        gameOverText = new JLabel("Game Over");
 
         colorMap = new HashMap<>();
         colorMap.put(new IBlock().getIndentifynumber(), new IBlock().getColor());
@@ -72,6 +73,7 @@ public class GameController {
 
         // gamePane 위치 조정
         gamePane = gameView.getGamePane();
+        nextTetrisBlockPane = gameView.getNextBlockPane();
 
         setBoardAttributeSet();
         setNextBoardAttributeSet();
@@ -83,7 +85,7 @@ public class GameController {
         // placeAccumulatedBlock(); // collision add
         placeNextBlock();
 
-        nextTetrisBlockPane = gameView.getNextBlockPane();
+
         nextTetrisBlockPane.repaint();
         nextTetrisBlockPane.revalidate();
 
@@ -260,7 +262,7 @@ public class GameController {
 
         StyledDocument doc = nextBlockPane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
-        // paintNextBlock(nextBlock.getColor());
+        paintNextBlock(nextBlock.getColor());
     }
 
     private void paintBlock(Color color) {
@@ -285,18 +287,10 @@ public class GameController {
     }
 
     private void paintNextBlock(Color color) {
-
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         SimpleAttributeSet nextBlockAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(nextBlockAttributeSet, color);
-        for (int i = 0; i < nextBoard.length; i++) {
-            for (int j = 0; j < nextBoard[i].length; j++) {
-                if (nextBoard[i][j] == 1) {
-                    doc.setCharacterAttributes((nextBoard[i].length * i) + j, 1,
-                            nextBlockAttributeSet, false);
-                }
-            }
-        }
+        doc.setCharacterAttributes(0, doc.getLength(), nextBlockAttributeSet, false);
     }
 
     private void placeCurrentBlock() {
@@ -346,6 +340,7 @@ public class GameController {
     }
 
     protected void moveDown() {
+
         if (!checkBottom()) {
             fixBoard();
             eraseCurrentBlock();
@@ -359,6 +354,13 @@ public class GameController {
             y = 0;
             clearLine();
             placeCurrentBlock();
+            if (checkBlockCollision()) {
+                timer.stop();
+                gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
+                gameOverText.setVisible(true); // Game Over 글자를 나타냄
+                // gameOverDisplay();
+
+            }
             gamePane.revalidate();
             gamePane.repaint();
             return;
