@@ -44,6 +44,8 @@ public class GameController {
     private int score = 0; // game 점수와 관련된 변수
     private int lineCount; // 제거된 라인의 개수를 담는 변수. 이를 통해 score를 주는 방식을 지정할 것임
 
+    private String userName;
+
     private GameView gameView = GameView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
@@ -104,7 +106,6 @@ public class GameController {
         timer = new Timer(INTERVAL, e -> {
             moveDown();
             drawGameBoard();
-            showCurrnent();
         });
         timer.start();
     }
@@ -377,7 +378,8 @@ public class GameController {
                 timer.stop();
                 gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
                 gameOverText.setVisible(true); // Game Over 글자를 나타냄
-                // gameOverDisplay();
+                getGameOverDialog().setVisible(true);
+                System.out.println(userName);
 
             }
             gamePane.revalidate();
@@ -474,7 +476,7 @@ public class GameController {
             for (int i = 0; i < width; i++) {
                 if (board[y][x + i] > 1)
                     break Outter;
-                System.out.println("board[" + y + "][" + (x + i) + "]=" + board[y][x + i]);
+
             }
             y++;
         }
@@ -681,6 +683,25 @@ public class GameController {
                 }
             }
         }
+    }
+
+    public JDialog getGameOverDialog() {
+        JFrame frame = new JFrame();
+        JDialog gameOverDialog = new JDialog(frame, "이름을 입력하세요", true);
+        gameOverDialog.setBounds(0, 0, 300, 200);
+        gameOverDialog.setLocationRelativeTo(null);
+        JPanel pane = new JPanel();
+        pane.setLayout(new GridLayout(2, 1, 0, 0));
+        JTextField inputName = new JTextField();
+        JButton enterButton = new JButton();
+        inputName.addActionListener(e -> {
+            userName = inputName.getText();
+            gameOverDialog.dispose();
+        });
+        pane.add(inputName);
+        pane.add(enterButton);
+        gameOverDialog.setContentPane(pane);
+        return gameOverDialog;
     }
 
     public void stopTimer() {

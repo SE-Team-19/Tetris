@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'org.sonarqube' version '3.3'
     id 'jacoco'
+    id 'edu.sc.seis.launch4j' version '2.5.3'
 }
 
 sonarqube {
@@ -23,6 +24,11 @@ sonarqube {
 
 jacoco {
     toolVersion = '0.8.7'
+}
+
+launch4j {
+  mainClassName = 'app/src/main/java/tetris/App.java'
+  icon = "${projectDir}/icons/myApp.ico"
 }
 
 repositories {

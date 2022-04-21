@@ -75,7 +75,6 @@ public class ViewController extends JFrame {
             public void run() {
                 revalidate();
                 repaint();
-                System.out.println("repaint!");
             }
         };
         refresh = new Timer();
@@ -548,5 +547,9 @@ public class ViewController extends JFrame {
             } else if (settingMap.containsKey(key))
                 settingMap.get(key).isKeyPressed();
         }
+    }
+
+    public void stopTimer() {
+        gameController.stopTimer();
     }
 }
