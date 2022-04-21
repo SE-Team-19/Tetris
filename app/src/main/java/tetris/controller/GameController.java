@@ -32,7 +32,7 @@ public class GameController {
     private int x = 3;
     private int y = 0;
     private int nextBlockX = 0; // warning: 시작 위치 조절
-    private int nextBlockY = 1;
+    private int nextBlockY = 0;
     private int score = 0; // game 점수와 관련된 변수
     private int lineCount; // 제거된 라인의 개수를 담는 변수. 이를 통해 score를 주는 방식을 지정할 것임
 
@@ -75,6 +75,7 @@ public class GameController {
         timer = new Timer(INTERVAL, e -> {
             moveDown();
             drawGameBoard();
+            showCurrnent();
         });
         timer.start();
     }
@@ -91,7 +92,7 @@ public class GameController {
 
     public void setNextBoardAttributeSet() {
         nextBoardAttributeSet = new SimpleAttributeSet();
-        StyleConstants.setFontSize(nextBoardAttributeSet, 15);
+        StyleConstants.setFontSize(nextBoardAttributeSet, 20);
         StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
         StyleConstants.setBold(nextBoardAttributeSet, true);
         StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
@@ -259,11 +260,6 @@ public class GameController {
     }
 
     private void paintNextBlock(Color color) {
-        // nextBlock 부분에 중복해서 그려지는 것을 방지
-        int[][] board1 = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
-        copyBoard(nextBoard, board1);
-        initZeroBoard(nextBoard);
-        copyBoard(board1, nextBoard);
 
         StyledDocument doc = nextTetrisBlockPane.getStyledDocument();
         SimpleAttributeSet nextBlockAttributeSet = new SimpleAttributeSet();
@@ -297,6 +293,7 @@ public class GameController {
     }
 
     private void placeNextBlock() {
+        initZeroBoard(nextBoard);
         for (int j = 0; j < nextBlock.getHeight(); j++) {
             for (int i = 0; i < nextBlock.getWidth(); i++) {
                 nextBoard[nextBlockY + j][nextBlockX + i] = nextBlock.getShape(i, j);
@@ -315,6 +312,7 @@ public class GameController {
     }
 
     private void eraseNextBlock() {
+        initZeroBoard(nextBoard);
         for (int i = nextBlockX; i < nextBlockX + nextBlock.getWidth(); i++) {
             for (int j = nextBlockY; j < nextBlockY + nextBlock.getHeight(); j++) {
                 nextBoard[j][i] = 0;
@@ -465,7 +463,6 @@ public class GameController {
     private boolean checkBlockCollision() {
         saveBoardBuffer();
         placeBufferBlock();
-        showBuffer();
         for (int j = 0; j < blockBuffer.getHeight(); j++) {
             for (int i = 0; i < blockBuffer.getWidth(); i++) {
                 if (boardBuffer[y + j][x + i] > 2) {

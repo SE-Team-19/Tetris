@@ -15,7 +15,6 @@ public class GameView extends JPanel {
 
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
-    private JButton returnButton;
     // private SimpleAttributeSet boardAttributeSet;
     // private SimpleAttributeSet nextBoardAttributeSet;
 
@@ -40,6 +39,8 @@ public class GameView extends JPanel {
 
         gamePane = new JTextPane();
         gamePane.setBackground(Color.BLACK);
+        gamePane.setEditable(false);
+        // gamePane.setEnabled(false);
         CompoundBorder border =
                 BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
                         BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
@@ -49,14 +50,14 @@ public class GameView extends JPanel {
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
         nextBlockPane.setBorder(border);
+        // nextBlockPane.setEnabled(false);
 
         JPanel infoPane = new JPanel();
-        returnButton = new JButton("Return");
 
         infoPane.setLayout(new GridLayout(3, 0, 0, 0));
         infoPane.add(nextBlockPane);
         infoPane.add(new JLabel("점수표기"));
-        infoPane.add(returnButton);
+        infoPane.setFocusable(false);
 
         super.add(gamePane);
         super.add(infoPane);
@@ -68,14 +69,6 @@ public class GameView extends JPanel {
 
     public JTextPane getNextBlockPane() {
         return this.nextBlockPane;
-    }
-
-    public JButton getReturnButton() {
-        return this.returnButton;
-    }
-
-    public void setReturnButton(JButton returnButton) {
-        this.returnButton = returnButton;
     }
 
     // public SimpleAttributeSet getBoardAttributeSet() {
