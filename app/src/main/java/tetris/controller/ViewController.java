@@ -172,7 +172,7 @@ public class ViewController extends JFrame {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
             refresh.cancel();
-            gameController = new GameController(settingController.getSetting(), contentPane);
+            gameController = new GameController(settingController.getSetting(), playerController, contentPane);
             gameView.requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();

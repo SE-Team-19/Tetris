@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static java.awt.event.KeyEvent.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.AWTException;
 import tetris.TestAllView;
 import tetris.TestRobot;
@@ -16,7 +17,8 @@ public class GameControllerTest {
 
     GameController gameController = new GameController(
             new Setting(0, false, VK_LEFT, VK_RIGHT, VK_DOWN,
-                    VK_UP, VK_SPACE));
+                    VK_UP, VK_SPACE),
+            new PlayerController(), new Container());
     ViewController frame;
     TestAllView testAllView;
     TestRobot testRobot;

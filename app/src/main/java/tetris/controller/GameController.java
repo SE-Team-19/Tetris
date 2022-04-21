@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import tetris.controller.*;
 import tetris.model.*;
 import tetris.view.*;
 
@@ -54,10 +55,12 @@ public class GameController {
 
     private Setting setting;
     private boolean isColorBlindMode;
+    private PlayerController playerController;
 
-    public GameController(Setting setting, Container contentPane) {
+    public GameController(Setting setting, PlayerController playerController, Container contentPane) {
         this.setting = setting;
         this.contentPane = contentPane;
+        this.playerController = playerController;
         isColorBlindMode = setting.isColorBlindMode();
         KeyListener gameKeyListener = new GameKeyListener();
         gameView.addKeyListener(gameKeyListener);
@@ -395,6 +398,13 @@ public class GameController {
                 gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
                 gameOverText.setVisible(true); // Game Over 글자를 나타냄
                 getGameOverDialog().setVisible(true);
+                String difficulty = "normal";
+                if (mode == 1)
+                    difficulty = "easy";
+                else if (mode == 2)
+                    difficulty = "hard";
+                playerController.addPlayer(userName, score, difficulty);
+                playerController.savePlayerList();
                 transitView(contentPane, scoreView, gameView);
             }
             gamePane.revalidate();
@@ -715,11 +725,11 @@ public class GameController {
         JButton normalBtn = new JButton("Normal");
         JButton hardBtn = new JButton("Hard");
         easyBtn.addActionListener(e -> {
-            mode = 0;
+            mode = 1;
             selectModeDialog.dispose();
         });
         normalBtn.addActionListener(e -> {
-            mode = 1;
+            mode = 0;
             selectModeDialog.dispose();
         });
         hardBtn.addActionListener(e -> {
