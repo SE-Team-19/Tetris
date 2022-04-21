@@ -11,6 +11,7 @@ import javax.swing.text.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 import tetris.controller.*;
 import tetris.model.*;
@@ -395,7 +396,7 @@ public class GameController {
             placeCurrentBlock();
             if (checkBlockCollision()) {
                 timer.stop();
-                gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
+                // gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
                 gameOverText.setVisible(true); // Game Over 글자를 나타냄
                 getGameOverDialog().setVisible(true);
                 String difficulty = "normal";
@@ -405,6 +406,13 @@ public class GameController {
                     difficulty = "hard";
                 playerController.addPlayer(userName, score, difficulty);
                 playerController.savePlayerList();
+                playerController.loadPlayerList();
+                scoreView.resetRankingList();
+                playerController.getPlayerList()
+                        .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
+                                Integer.toString(player.getScore()), player.getDifficulty()))));
+                scoreView.initRankingPane();
+                scoreView.fillScoreBoard(userName);
                 transitView(contentPane, scoreView, gameView);
             }
             gamePane.revalidate();

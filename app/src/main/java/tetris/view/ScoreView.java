@@ -32,10 +32,10 @@ public class ScoreView extends JPanel {
 
     private void initView() {
         GridBagLayout gridBag = new GridBagLayout();
-        gridBag.columnWidths = new int[] {0, 0};
-        gridBag.rowHeights = new int[] {0, 0, 0, 0};
-        gridBag.columnWeights = new double[] {1.0, Double.MIN_VALUE};
-        gridBag.rowWeights = new double[] {0.2, 1.0, 0.2, Double.MIN_VALUE};
+        gridBag.columnWidths = new int[] { 0, 0 };
+        gridBag.rowHeights = new int[] { 0, 0, 0, 0 };
+        gridBag.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+        gridBag.rowWeights = new double[] { 0.2, 1.0, 0.2, Double.MIN_VALUE };
         super.setLayout(gridBag);
 
         super.add(rankingTitle, addGridBagComponents(0, 0));
@@ -51,13 +51,13 @@ public class ScoreView extends JPanel {
         initRankingPane();
     }
 
-    private void initRankingPane() {
+    public void initRankingPane() {
         GridBagLayout gridBag = new GridBagLayout();
-        gridBag.columnWidths = new int[] {0, 0, 0, 0};
-        gridBag.rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gridBag.columnWeights = new double[] {0.5, 1.0, 1.0, 0.5, Double.MIN_VALUE};
-        gridBag.rowWeights = new double[] {0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                Double.MIN_VALUE};
+        gridBag.columnWidths = new int[] { 0, 0, 0, 0 };
+        gridBag.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        gridBag.columnWeights = new double[] { 0.5, 1.0, 1.0, 0.5, Double.MIN_VALUE };
+        gridBag.rowWeights = new double[] { 0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                Double.MIN_VALUE };
 
         rankingPane = new JPanel();
 
@@ -81,6 +81,20 @@ public class ScoreView extends JPanel {
         }
     }
 
+    private void addRankInfo(Container pane, List<String> array, int y, String userName) {
+        int i = 0;
+        y++;
+        addGridBagComponents(pane, new JLabel(String.valueOf(y)), i, y);
+        i++;
+        for (String a : array) {
+            JLabel user = new JLabel(a);
+            if (a.equals(userName))
+                user.setBackground(Color.BLUE);
+            addGridBagComponents(pane, user, i, y);
+            i++;
+        }
+    }
+
     /* GridBaglayout에 간편하게 넣기 위한 함수들 (overloading) */
     private GridBagConstraints addGridBagComponents(int x, int y) {
         GridBagConstraints gridBag = new GridBagConstraints();
@@ -98,7 +112,6 @@ public class ScoreView extends JPanel {
 
     /**********************************************************/
 
-
     private <T extends JComponent> T initAndSetName(String name, T comp) {
         comp.setName(name);
         return comp;
@@ -109,6 +122,15 @@ public class ScoreView extends JPanel {
         int i = 0;
         while (iter.hasNext() && i < 10) {
             addRankInfo(rankingPane, iter.next(), i);
+            i++;
+        }
+    }
+
+    public void fillScoreBoard(String UserName) {
+        ListIterator<List<String>> iter = rankingList.listIterator();
+        int i = 0;
+        while (iter.hasNext() && i < 10) {
+            addRankInfo(rankingPane, iter.next(), i, UserName);
             i++;
         }
     }
