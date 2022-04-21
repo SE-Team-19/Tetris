@@ -10,6 +10,8 @@ import javax.swing.text.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.Robot;
+import java.awt.AWTException;
 
 import tetris.model.*;
 import tetris.view.GameView;
@@ -17,10 +19,13 @@ import tetris.view.GameView;
 public class GameController {
 
     private static final int INTERVAL = 1000;
+    private static final int ANIMATION_INTERVAL = 500;
     private static final int NEXT_BOARD_HEIGHT = 5;
     private static final int NEXT_BOARD_WIDTH = 4;
+    private static final int ANIMATION_CODE = 20;
 
     private Timer timer;
+    private Timer animationTimer;
     private int mode;
     private Block currentBlock;
     private Block nextBlock;
@@ -70,6 +75,7 @@ public class GameController {
         colorMap.put(new SBlock().getIndentifynumber(), new SBlock().getColor());
         colorMap.put(new TBlock().getIndentifynumber(), new TBlock().getColor());
         colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getColor());
+        colorMap.put(ANIMATION_CODE, Color.WHITE);
 
         // gamePane 위치 조정
         gamePane = gameView.getGamePane();
@@ -78,12 +84,14 @@ public class GameController {
         setBoardAttributeSet();
         setNextBoardAttributeSet();
 
+        placeCurrentBlock();
+        placeNextBlock();
         drawGameBoard();
         drawNextBlock();
 
-        placeCurrentBlock();
+
         // placeAccumulatedBlock(); // collision add
-        placeNextBlock();
+
 
 
         nextTetrisBlockPane.repaint();
@@ -245,6 +253,11 @@ public class GameController {
          */
     }
 
+    private void drawGameBoard(Color color) {
+        drawGameBoard();
+        paintBlock(color);
+    }
+
     public void drawNextBlock() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < nextBoard.length; i++) {
@@ -274,12 +287,18 @@ public class GameController {
                     StyleConstants.setForeground(blockAttributeSet, color);
                     doc.setCharacterAttributes(
                             (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, true);
+                            blockAttributeSet, false);
                 }
                 if (colorBoard[i][j] > 1) {
                     StyleConstants.setForeground(blockAttributeSet, colorMap.get(colorBoard[i][j]));
                     doc.setCharacterAttributes(
                             (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
+                            blockAttributeSet, false);
+                }
+                if (board[i][j] == ANIMATION_CODE) {
+                    StyleConstants.setForeground(blockAttributeSet, color);
+                    doc.setCharacterAttributes(
+                            (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
                             blockAttributeSet, true);
                 }
             }
@@ -344,6 +363,7 @@ public class GameController {
         if (!checkBottom()) {
             fixBoard();
             eraseCurrentBlock();
+            clearLine();
             currentBlock = nextBlock;
             blockBuffer.copyBlock(currentBlock);
             nextBlock = getRandomBlock(mode);
@@ -352,7 +372,6 @@ public class GameController {
             drawNextBlock();
             x = 3;
             y = 0;
-            clearLine();
             placeCurrentBlock();
             if (checkBlockCollision()) {
                 timer.stop();
@@ -414,12 +433,18 @@ public class GameController {
 
         if (height > 2) {
             blockBuffer.rotate();
-            while (count < 2) {
-                if (ifBlockOutOfBounds() || checkBlockCollision())
+            while (count < 3) {
+                if (ifBlockOutOfBounds())
                     x--;
                 else
                     break;
                 count++;
+            }
+            while (true) {
+                if (checkBlockCollision())
+                    y--;
+                else
+                    break;
             }
         }
         if (width > 2) {
@@ -516,16 +541,23 @@ public class GameController {
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
             int sum = Arrays.stream(board[i]).reduce(0, (a, b) -> a + b);
             if (sum > 19) {
+                // launchDeleteAnimation(i);
                 copyLines(i);
             }
         }
     }
 
     // 줄을 지우는 메소드 (줄 애니메이션으로 바꿀 예정)
-    private void eraseLine(int n) {
-        for (int i = 0; i < GameView.BORDER_WIDTH; i++) {
-            board[n][i] = 0;
-        }
+    private void launchDeleteAnimation(int n) {
+        for (int i = 0; i < GameView.BORDER_WIDTH; i++)
+            board[n][i] = ANIMATION_CODE;
+        animateColor(Color.WHITE);
+    }
+
+    private void animateColor(Color color) {
+        drawGameBoard(color);
+        gamePane.repaint();
+        gamePane.revalidate();
     }
 
 
@@ -614,8 +646,6 @@ public class GameController {
 
     private void pasteLines(int[][] copy, int[][] paste) {
         for (int i = 0; i < copy.length; i++) {
-            System.out.println("paste.length = " + copy.length);
-            System.out.println("paste[" + i + "].length = " + paste[i].length);
             paste[i + 1] = Arrays.copyOf(copy[i], paste[i].length);
         }
     }
@@ -624,6 +654,8 @@ public class GameController {
         int[][] copy = new int[index][GameView.BORDER_WIDTH];
         copyBoard(board, copy);
         pasteLines(copy, board);
+        copyBoard(colorBoard, copy);
+        pasteLines(copy, colorBoard);
     }
 
     private void copyBoard(int[][] copy, int[][] paste) {
