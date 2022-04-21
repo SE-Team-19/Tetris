@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'org.sonarqube' version '3.3'
     id 'jacoco'
+    id 'edu.sc.seis.launch4j' version '2.4.6'
 }
 
 sonarqube {
@@ -22,7 +23,23 @@ sonarqube {
 }
 
 jacoco {
-    toolVersion = '0.8.6'
+    toolVersion = '0.8.7'
+}
+
+launch4j {
+    mainClassName = 'tetris.App'
+    bundledJrePath = 'jre'
+    bundledJre64Bit = true
+    setBundledJrePath('gradle/wrapper/gradle-wrapper.jar')
+    jreMinVersion = '1.8.0'
+}
+
+launch4j {
+    mainClassName = 'tetris.App'
+    bundledJrePath = 'jre'
+    bundledJre64Bit = true
+    setBundledJrePath('gradle/wrapper/gradle-wrapper.jar')
+    jreMinVersion = '1.8.0'
 }
 
 repositories {
@@ -39,7 +56,9 @@ dependencies {
     )
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     // This dependency is used by the application.
-    implementation('com.google.guava:guava:31.1-jre')
+    implementation('com.google.guava:guava:31.1-jre',
+        'com.google.code.gson:gson:2.9.0'
+    )
 }
 
 application {
@@ -67,17 +86,17 @@ jacocoTestCoverageVerification {
         rule {
             element = 'CLASS'
 
-            // limit {
-            //     counter = 'LINE'
-            //     value = 'COVEREDRATIO'
-            //     minimum = 0.80
-            // }
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
 
-            // limit {
-            //     counter = 'BRANCH'
-            //     value = 'COVEREDRATIO'
-            //     minimum = 0.80
-            // }
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
         }
     }
 }
