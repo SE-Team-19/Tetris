@@ -88,11 +88,14 @@ public class ScoreView extends JPanel {
         i++;
         for (String a : array) {
             JLabel user = new JLabel(a);
-            if (a.equals(userName))
+            if (a.equals(userName)) {
                 user.setBackground(Color.BLUE);
+            }
             addGridBagComponents(pane, user, i, y);
             i++;
         }
+        rankingPane.repaint();
+        rankingPane.revalidate();
     }
 
     /* GridBaglayout에 간편하게 넣기 위한 함수들 (overloading) */

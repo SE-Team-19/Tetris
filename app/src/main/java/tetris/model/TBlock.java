@@ -9,5 +9,6 @@ public class TBlock extends Block {
         color = Color.CYAN;
         blindColor = Color.CYAN;
         indentifynumber = 7;
+        rotateCount = 0;
     }
 }

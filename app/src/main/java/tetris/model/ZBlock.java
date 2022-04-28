@@ -9,6 +9,7 @@ public class ZBlock extends Block {
         color = Color.GREEN;
         blindColor = new Color(0, 146, 115);
         indentifynumber = 8;
+        rotateCount = 0;
     }
 
 }

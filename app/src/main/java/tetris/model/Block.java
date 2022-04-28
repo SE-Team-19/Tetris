@@ -8,11 +8,13 @@ public abstract class Block {
     protected Color color;
     protected Color blindColor;
     protected int indentifynumber;
+    protected int rotateCount;
 
     protected Block() {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };
         color = Color.YELLOW;
         indentifynumber = 1;
+        rotateCount = 0;
         // x = 3;
         // y = 0;
     }
@@ -20,6 +22,9 @@ public abstract class Block {
     public void copyBlock(Block src) {
         this.shape = src.getShape();
         this.color = src.getColor();
+        this.indentifynumber = src.getIndentifynumber();
+        this.rotateCount = src.rotateCount;
+        this.blindColor = src.blindColor;
     }
 
     public int[][] getShape() {
@@ -57,7 +62,11 @@ public abstract class Block {
     }
 
     public int getIndentifynumber() {
-        return this.indentifynumber;
+        return indentifynumber;
+    }
+
+    public int getRotateCount() {
+        return rotateCount;
     }
 
     public void rotate() {
@@ -71,5 +80,23 @@ public abstract class Block {
             }
         }
         shape = rotate;
+        plusRotateCount();
+    }
+
+    public void plusRotateCount() {
+        int length = shape.length;
+        int width = shape[0].length;
+
+        // OBlock
+        if (width == length) {
+            rotateCount = 3;
+            return;
+        }
+
+        rotateCount = (rotateCount + 1) % 4;
+
+        // IBlock
+        if (Math.abs(width - length) > 2)
+            rotateCount += 4;
     }
 }

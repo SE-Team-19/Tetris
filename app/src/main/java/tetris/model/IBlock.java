@@ -9,5 +9,6 @@ public class IBlock extends Block {
         color = Color.RED;
         blindColor = new Color(227, 66, 52);
         indentifynumber = 2;
+        rotateCount = 4;
     }
 }

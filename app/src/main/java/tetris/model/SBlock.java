@@ -9,5 +9,6 @@ public class SBlock extends Block {
         color = Color.MAGENTA;
         blindColor = Color.MAGENTA;
         indentifynumber = 6;
+        rotateCount = 0;
     }
 }
