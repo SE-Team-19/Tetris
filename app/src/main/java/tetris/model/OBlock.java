@@ -9,6 +9,6 @@ public class OBlock extends Block {
         color = Color.YELLOW;
         blindColor = Color.YELLOW;
         indentifynumber = 5;
-        rotateCount = 0;
+        rotateCount = 3;
     }
 }

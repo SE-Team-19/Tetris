@@ -20,9 +20,8 @@ public class GameController {
 
     private static final int NEXT_BOARD_HEIGHT = 5;
     private static final int NEXT_BOARD_WIDTH = 4;
-    private static final int ANIMATION_CODE = 20;
 
-    private Timer timer;
+    private Timer gameTimer;
     private int delay;
     private int mode;
     private Block currentBlock;
@@ -50,6 +49,7 @@ public class GameController {
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
     private Container contentPane;
+    KeyListener gameKeyListener;
 
     private Map<Integer, Color> colorMap;
     private Map<Integer, Runnable> rotateMap;
@@ -64,7 +64,7 @@ public class GameController {
         this.contentPane = contentPane;
         this.playerController = playerController;
         isColorBlindMode = setting.isColorBlindMode();
-        KeyListener gameKeyListener = new GameKeyListener();
+        gameKeyListener = new GameKeyListener();
         gameView.addKeyListener(gameKeyListener);
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
@@ -145,7 +145,10 @@ public class GameController {
         nextTetrisBlockPane.repaint();
         nextTetrisBlockPane.revalidate();
 
-        startGame();
+        score = 0;
+        delay = 1000;
+        showScore();
+        startGameTimer(delay);
     }
 
     private void initWallKickList() {
@@ -187,19 +190,17 @@ public class GameController {
         }
     }
 
-    public void startGame() {
-        score = 0;
-        delay = 1000;
-        showScore();
+    public void startGameTimer(int startDelay) {
 
-        timer = new Timer(delay, e -> {
-            // moveDown();
+        gameTimer = new Timer(startDelay, e -> {
+            moveDown();
             drawGameBoard();
             delay -= delay > 250 ? 5 : 0;
-            timer.setDelay(delay);
+            gameTimer.setDelay(delay);
+            System.out.println("현재 delay: " + gameTimer.getDelay());
             // showCurrnent();
         });
-        timer.start();
+        gameTimer.start();
     }
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
@@ -366,12 +367,6 @@ public class GameController {
                             (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
                             blockAttributeSet, true);
                 }
-                if (board[i][j] == ANIMATION_CODE) {
-                    StyleConstants.setForeground(blockAttributeSet, color);
-                    doc.setCharacterAttributes(
-                            (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, true);
-                }
             }
         }
     }
@@ -398,41 +393,7 @@ public class GameController {
     protected void moveDown() {
 
         if (!checkBottom()) {
-            fixBoard();
-            eraseBlock(board, currentBlock);
-            clearLine();
-            currentBlock.copyBlock(nextBlock);
-            blockBuffer.copyBlock(currentBlock);
-            nextBlock = getRandomBlock(mode, 0);
-            initZeroBoard(nextBoard); // nextBoard 초기화
-            placeBlock(nextBoard, nextBlock, nextBlockX, nextBlockY);
-            drawNextBlock();
-            x = 3;
-            y = 0;
-            placeBlock(board, currentBlock, x, y);
-            if (checkBlockCollision()) {
-                timer.stop();
-                // gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
-                gameOverText.setVisible(true); // Game Over 글자를 나타냄
-                getGameOverDialog().setVisible(true);
-                String difficulty = "normal";
-                if (mode == 1)
-                    difficulty = "easy";
-                else if (mode == 2)
-                    difficulty = "hard";
-                playerController.addPlayer(userName, score, difficulty);
-                playerController.savePlayerList();
-                playerController.loadPlayerList();
-                scoreView.initRankingPane();
-                scoreView.resetRankingList();
-                playerController.getPlayerList()
-                        .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
-                                Integer.toString(player.getScore()), player.getDifficulty()))));
-                scoreView.fillScoreBoard(userName);
-                transitView(contentPane, scoreView, gameView);
-            }
-            gamePane.revalidate();
-            gamePane.repaint();
+            lockDelay();
             return;
         }
         eraseBlock(board, currentBlock);
@@ -582,12 +543,21 @@ public class GameController {
     }
 
     // 블럭 줄삭제
-    private void clearLine() {
+    private boolean clearLine() {
+        boolean existFullyLine = false;
+        int fullyLines = 0;
+        int startindex = -1;
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
             int sum = Arrays.stream(board[i]).reduce(0, (a, b) -> a + b);
             if (sum > 19) {
-                copyLines(i);
+                startindex = i;
+                fullyLines++;
+                existFullyLine = true;
             }
+        }
+        if (fullyLines > 0) {
+            startindex = startindex - fullyLines + 1;
+            launchDeleteAnimation(startindex, fullyLines);
         }
 
         if (mode == 1)
@@ -598,6 +568,92 @@ public class GameController {
             delay -= 10;
         score += 25;
         showScore();
+        return existFullyLine;
+    }
+
+    // 줄삭제 애니메이션
+    private void launchDeleteAnimation(int index, int lines) {
+        gameTimer.stop();
+        gameView.removeKeyListener(gameKeyListener);
+        Timer aniTimer;
+        int count = 0;
+        int aniDelay = 50;
+        for (count = 0; count < 10; count++) {
+            if (count % 2 == 0)
+                aniTimer = new Timer(count * aniDelay, e -> paintLines(index, lines, Color.WHITE));
+            else
+                aniTimer = new Timer(count * aniDelay, e -> paintLines(index, lines, Color.BLACK));
+            aniTimer.setRepeats(false);
+            aniTimer.start();
+        }
+        int totaldelay = count * aniDelay;
+        aniTimer = new Timer(totaldelay, e -> {
+            overWriteLines(index, lines);
+            takeOutNextBlock();
+            gamePane.setRequestFocusEnabled(true);
+            gameView.addKeyListener(gameKeyListener);
+        });
+        aniTimer.setRepeats(false);
+        aniTimer.start();
+        startGameTimer(totaldelay + 10);
+
+    }
+
+    // 줄색칠 메소드
+    private void paintLines(int index, int lines, Color color) {
+        StyledDocument doc = gamePane.getStyledDocument();
+        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
+        int width = board[index].length;
+        StyleConstants.setForeground(blockAttributeSet, color);
+        for (int i = 0; i < lines; i++) {
+            doc.setCharacterAttributes(
+                    (width + 4) + (index + i) * (width + 3), width,
+                    blockAttributeSet, true);
+        }
+    }
+
+    // 바닥 도달시
+    private void lockDelay() {
+        fixBoard();
+        eraseBlock(board, currentBlock);
+        if (!clearLine())
+            takeOutNextBlock();
+
+        gamePane.revalidate();
+        gamePane.repaint();
+    }
+
+    // 다음 블록 놓기
+    private void takeOutNextBlock() {
+        currentBlock.copyBlock(nextBlock);
+        blockBuffer.copyBlock(currentBlock);
+        nextBlock = getRandomBlock(mode, 0);
+        initZeroBoard(nextBoard); // nextBoard 초기화
+        placeBlock(nextBoard, nextBlock, nextBlockX, nextBlockY);
+        drawNextBlock();
+        x = 3;
+        y = 0;
+        placeBlock(board, currentBlock, x, y);
+        if (checkBlockCollision()) {
+            // gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
+            gameOverText.setVisible(true); // Game Over 글자를 나타냄
+            getGameOverDialog().setVisible(true);
+            String difficulty = "normal";
+            if (mode == 1)
+                difficulty = "easy";
+            else if (mode == 2)
+                difficulty = "hard";
+            playerController.addPlayer(userName, score, difficulty);
+            playerController.savePlayerList();
+            playerController.loadPlayerList();
+            scoreView.initRankingPane();
+            scoreView.resetRankingList();
+            playerController.getPlayerList()
+                    .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
+                            Integer.toString(player.getScore()), player.getDifficulty()))));
+            scoreView.fillScoreBoard(userName);
+            transitView(contentPane, scoreView, gameView);
+        }
     }
 
     // 게임 중단 상태에서 다시 실행하는 경우
@@ -626,7 +682,7 @@ public class GameController {
             System.exit(0);
         } else if (inputValue == -1) {
             // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작)
-            timer.restart();
+            gameTimer.restart();
             restart();
         }
         // 그 외에는 중단된 상태에서 재시작
@@ -690,10 +746,10 @@ public class GameController {
                 // moveDown(); hard drop 적용
                 drawGameBoard();
             } else if (keyCode == KeyEvent.VK_ESCAPE) {
-                timer.stop();
+                gameTimer.stop();
                 gameView.repaint();
                 showESCMessage();
-                timer.start();
+                gameTimer.start();
             } else if (keyCode == KeyEvent.VK_DOWN) {
                 moveDown();
                 drawGameBoard();
@@ -715,7 +771,13 @@ public class GameController {
         }
     }
 
-    private void copyLines(int index) {
+    private void overWriteLines(int startIndex, int Lines) {
+        int endIndex = startIndex + Lines;
+        for (int i = startIndex; i < endIndex; i++)
+            overWriteLine(i);
+    }
+
+    private void overWriteLine(int index) {
         int[][] copy = new int[index][GameView.BORDER_WIDTH];
         copyBoard(board, copy);
         pasteLines(copy, board);
@@ -811,7 +873,7 @@ public class GameController {
     }
 
     public void stopTimer() {
-        timer.stop();
+        gameTimer.stop();
     }
 
     private void showCurrnent(int[][] board, Block block) {
