@@ -543,6 +543,6 @@ public class ViewController extends JFrame {
     }
 
     public void stopTimer() {
-        gameController.stopTimer();
+        gameController.stopGameDelayTimer();
     }
 }

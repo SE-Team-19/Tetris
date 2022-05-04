@@ -5,11 +5,12 @@ import static tetris.view.GameView.BORDER_HEIGHT;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.Random;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.text.*;
 import java.util.*;
+import java.util.stream.*;
 
 import tetris.model.*;
 import tetris.view.*;
@@ -20,23 +21,22 @@ public class GameController {
     private static final int NEXT_BOARD_WIDTH = 4;
     private static final int ANIMATION_INTERVAL = 50;
 
+    private Timer gameDelayTimer;
     private Timer gameTimer;
     private int delay;
+    private int gameTime;
     private int diffMode; // 난이도 설정
     private int gameMode; // 게임모드 설정
     private Block currentBlock;
     private Block nextBlock;
     private Block blockBuffer;
 
-    private int[][] colorBoard;
+    private int[][] visualBoard;
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
-    private int[][] nextBoard;
 
     private int x = 3;
     private int y = 0;
-    private int nextBlockX = 0; // warning: 시작 위치 조절
-    private int nextBlockY = 0;
     private int score; // game 점수와 관련된 변수
 
     private String userName;
@@ -54,6 +54,7 @@ public class GameController {
     private Map<KeyPair, Runnable> gameKeyMap;
     private Map<Integer, Color> colorMap;
     private Map<Integer, Runnable> rotateMap;
+    private Map<Integer, Character> blockCharMap;
     private List<List<WallKick>> wallKickList;
 
     private Setting setting;
@@ -72,8 +73,7 @@ public class GameController {
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         boardBuffer = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
-        colorBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
-        nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
+        visualBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         currentBlock = getRandomBlock(diffMode, 0);
         blockBuffer = getRandomBlock(diffMode, 0);
         nextBlock = getRandomBlock(diffMode, 10);
@@ -84,6 +84,7 @@ public class GameController {
 
         // getSelectModeDialog().setVisible(true);
 
+        initBlockCharMap();
         initColorMap();
         initRotateMap();
         initWallKickList();
@@ -96,8 +97,7 @@ public class GameController {
         setAttributeSet(boardAttributeSet);
         setAttributeSet(nextBoardAttributeSet);
 
-        placeBlock(board, currentBlock, x, y);
-        placeBlock(nextBoard, nextBlock, nextBlockX, nextBlockY);
+        placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
         drawNextBlock();
 
@@ -108,56 +108,80 @@ public class GameController {
 
         score = 0;
         delay = 1000;
+        gameTime = 0;
+
         showScore();
+    }
+
+    private void initBlockCharMap() {
+        blockCharMap = new HashMap<>();
+        blockCharMap.put(Block.IBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.JBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.LBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.OBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.SBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.TBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.ZBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, GameView.ONELINE_CHAR);
+        blockCharMap.put(Block.NULL_IDENTIFY_NUMBER, GameView.NULL_CHAR);
     }
 
     private void initColorMap() {
         colorMap = new HashMap<>();
+        colorMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, Color.WHITE);
+        colorMap.put(Block.NULL_IDENTIFY_NUMBER, Color.WHITE);
         if (isColorBlindMode) {
-            colorMap.put(new IBlock().getIndentifynumber(), new IBlock().getBlindColor());
-            colorMap.put(new JBlock().getIndentifynumber(), new JBlock().getBlindColor());
-            colorMap.put(new LBlock().getIndentifynumber(), new LBlock().getBlindColor());
-            colorMap.put(new OBlock().getIndentifynumber(), new OBlock().getBlindColor());
-            colorMap.put(new SBlock().getIndentifynumber(), new SBlock().getBlindColor());
-            colorMap.put(new TBlock().getIndentifynumber(), new TBlock().getBlindColor());
-            colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getBlindColor());
+            colorMap.put(new IBlock().getIdentifynumber(), new IBlock().getBlindColor());
+            colorMap.put(new JBlock().getIdentifynumber(), new JBlock().getBlindColor());
+            colorMap.put(new LBlock().getIdentifynumber(), new LBlock().getBlindColor());
+            colorMap.put(new OBlock().getIdentifynumber(), new OBlock().getBlindColor());
+            colorMap.put(new SBlock().getIdentifynumber(), new SBlock().getBlindColor());
+            colorMap.put(new TBlock().getIdentifynumber(), new TBlock().getBlindColor());
+            colorMap.put(new ZBlock().getIdentifynumber(), new ZBlock().getBlindColor());
+            colorMap.put(new WeightBlock().getIdentifynumber(), new WeightBlock().getBlindColor());
 
         } else {
-            colorMap.put(new IBlock().getIndentifynumber(), new IBlock().getColor());
-            colorMap.put(new JBlock().getIndentifynumber(), new JBlock().getColor());
-            colorMap.put(new LBlock().getIndentifynumber(), new LBlock().getColor());
-            colorMap.put(new OBlock().getIndentifynumber(), new OBlock().getColor());
-            colorMap.put(new SBlock().getIndentifynumber(), new SBlock().getColor());
-            colorMap.put(new TBlock().getIndentifynumber(), new TBlock().getColor());
-            colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getColor());
+            colorMap.put(new IBlock().getIdentifynumber(), new IBlock().getColor());
+            colorMap.put(new JBlock().getIdentifynumber(), new JBlock().getColor());
+            colorMap.put(new LBlock().getIdentifynumber(), new LBlock().getColor());
+            colorMap.put(new OBlock().getIdentifynumber(), new OBlock().getColor());
+            colorMap.put(new SBlock().getIdentifynumber(), new SBlock().getColor());
+            colorMap.put(new TBlock().getIdentifynumber(), new TBlock().getColor());
+            colorMap.put(new ZBlock().getIdentifynumber(), new ZBlock().getColor());
+            colorMap.put(new WeightBlock().getIdentifynumber(), new WeightBlock().getColor());
         }
     }
 
     private void initRotateMap() {
         rotateMap = new HashMap<>();
-        rotateMap.put(3, () -> {
+        rotateMap.put(Block.FOURTH_ROTATE_STATE, () -> {
         });
-        rotateMap.put(0, () -> x++);
-        rotateMap.put(1, () -> {
+        rotateMap.put(Block.FIRST_ROTATE_STATE, () -> x++);
+        rotateMap.put(Block.SECOND_ROTATE_STATE, () -> {
             y++;
             x--;
         });
-        rotateMap.put(2, () -> y--);
-        rotateMap.put(7, () -> {
+        rotateMap.put(Block.THIRD_ROTATE_STATE, () -> y--);
+        rotateMap.put(Block.IBLOCK_FOURTH_ROTATE_STATE, () -> {
             x--;
             y++;
         });
-        rotateMap.put(4, () -> {
+        rotateMap.put(Block.IBLOCK_FIRST_ROTATE_STATE, () -> {
             x += 2;
             y--;
         });
-        rotateMap.put(5, () -> {
+        rotateMap.put(Block.IBLOCK_SECOND_ROTATE_STATE, () -> {
             x -= 2;
             y += 2;
         });
-        rotateMap.put(6, () -> {
+        rotateMap.put(Block.IBLOCK_THIRD_ROTATE_STATE, () -> {
             x++;
             y -= 2;
+        });
+        rotateMap.put(Block.DO_NOT_ROTATE_STATE, () -> {
+        });
+        rotateMap.put(Block.OBLOCK_ROTATE_STATE, () -> {
         });
     }
 
@@ -205,15 +229,22 @@ public class GameController {
             gamePane.requestFocus();
     }
 
-    public void startGameTimer(int startDelay) {
-
-        gameTimer = new Timer(startDelay, e -> {
+    public void startGameDelayTimer(int startDelay) {
+        gameDelayTimer = new Timer(startDelay, e -> {
             moveDown();
             drawGameBoard();
             delay -= delay > 250 ? 5 : 0;
-            gameTimer.setDelay(delay);
-            System.out.println("현재 delay: " + gameTimer.getDelay());
-            // showCurrnent();
+            gameDelayTimer.setDelay(delay);
+            System.out.println(delay);
+        });
+        gameDelayTimer.start();
+        startStopWatch();
+    }
+
+    private void startStopWatch() {
+        gameTimer = new Timer(1000, e -> {
+            gameTime++;
+            showTime();
         });
         gameTimer.start();
     }
@@ -242,24 +273,26 @@ public class GameController {
         // normal mode
         if (mode == 0) {
             Random random = new Random(System.currentTimeMillis() + seed);
-            int block = random.nextInt(7);
+            int block = random.nextInt(8);
             switch (block) {
                 case 0:
-                    return new IBlock();
+                    return new IBlock(true);
                 case 1:
-                    return new JBlock();
+                    return new JBlock(true);
                 case 2:
-                    return new LBlock();
+                    return new LBlock(true);
                 case 3:
-                    return new ZBlock();
+                    return new ZBlock(true);
                 case 4:
-                    return new SBlock();
+                    return new SBlock(true);
                 case 5:
-                    return new TBlock();
+                    return new TBlock(true);
                 case 6:
-                    return new OBlock();
+                    return new OBlock(true);
+                case 7:
+                    return new WeightBlock();
                 default:
-                    return new IBlock();
+                    return new IBlock(true);
             }
         }
 
@@ -306,6 +339,7 @@ public class GameController {
                 }
             }
         }
+
         return new IBlock();
     }
 
@@ -318,11 +352,7 @@ public class GameController {
         for (int i = 0; i < board.length; i++) {
             sb.append(GameView.BORDER_CHAR);
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] > 0) {
-                    sb.append(GameView.BLOCK_CHAR); // currentBlock 의 모양을 그려준다.
-                } else {
-                    sb.append(" ");
-                }
+                sb.append(blockCharMap.get(visualBoard[i][j])); // currentBlock 의 모양을 그려준다.
             }
             sb.append(GameView.BORDER_CHAR);
             sb.append("\n");
@@ -334,51 +364,44 @@ public class GameController {
 
         StyledDocument doc = gamePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, false);
-        if (isColorBlindMode) {
-            paintBlock(currentBlock.getBlindColor());
-            return;
-        }
-        paintBlock(currentBlock.getColor());
+        paintBlock();
     }
 
     public void drawNextBlock() {
+        int nextHeight = nextBlock.getHeight();
+        int nextWidth = nextBlock.getWidth();
+
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < nextBoard.length; i++) {
-            for (int j = 0; j < nextBoard[i].length; j++) {
-                if (nextBoard[i][j] == 1) {
-                    sb.append(GameView.BLOCK_CHAR); // nextBlock 의 모양을 그려준다.
-                } else {
-                    sb.append(" ");
-                }
+        for (int j = 0; j < nextHeight; j++) {
+            for (int i = 0; i < nextWidth; i++) {
+                sb.append(blockCharMap.get(nextBlock.getVisualShape(i, j)));
             }
             sb.append("\n");
         }
         nextBlockPane.setText(sb.toString());
 
         StyledDocument doc = nextBlockPane.getStyledDocument();
-        if (isColorBlindMode)
-            StyleConstants.setForeground(nextBoardAttributeSet, nextBlock.getBlindColor());
-        paintBlock(nextBlock.getColor());
-        StyleConstants.setForeground(nextBoardAttributeSet, nextBlock.getColor());
         doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
+        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
+        for (int j = 0; j < nextHeight; j++) {
+            for (int i = 0; i < nextWidth; i++) {
+                StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getVisualShape(i, j)));
+                doc.setCharacterAttributes(i + j + j * nextWidth, 1, blockAttributeSet, false);
+                System.out.println("offset: " + (i + j + j * nextWidth));
+            }
+        }
 
     }
 
-    private void paintBlock(Color color) {
+    private void paintBlock() {
         StyledDocument doc = gamePane.getStyledDocument();
         SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j] == 1) {
-                    StyleConstants.setForeground(blockAttributeSet, color);
+                if (visualBoard[i][j] > 1) {
+                    StyleConstants.setForeground(blockAttributeSet, colorMap.get(visualBoard[i][j]));
                     doc.setCharacterAttributes(
-                            (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, true);
-                }
-                if (colorBoard[i][j] > 1) {
-                    StyleConstants.setForeground(blockAttributeSet, colorMap.get(colorBoard[i][j]));
-                    doc.setCharacterAttributes(
-                            (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
+                            (visualBoard[i].length + 4) + i * (visualBoard[i].length + 3) + j, 1,
                             blockAttributeSet, true);
                 }
             }
@@ -386,6 +409,16 @@ public class GameController {
     }
 
     // 주어진 board에 Block을 놓아주는 메소드
+    private void placeBlock(int[][] board, int[][] visualBoard, Block block, int x, int y) {
+        for (int j = 0; j < block.getHeight(); j++) {
+            for (int i = 0; i < block.getWidth(); i++) {
+                board[y + j][x + i] += block.getShape(i, j);
+                visualBoard[y + j][x + i] += block.getVisualShape(i, j);
+            }
+        }
+    }
+
+    // 주어진 board에 Block을 놓아주는 메소드(오버로딩)
     private void placeBlock(int[][] board, Block block, int x, int y) {
         for (int j = 0; j < block.getHeight(); j++) {
             for (int i = 0; i < block.getWidth(); i++) {
@@ -398,8 +431,10 @@ public class GameController {
     private void eraseBlock(int[][] board, Block block) {
         for (int i = x; i < x + block.getWidth(); i++) {
             for (int j = y; j < y + block.getHeight(); j++) {
-                if (board[j][i] == 1)
+                if (board[j][i] == 1) {
                     board[j][i] = 0;
+                    visualBoard[j][i] = 0;
+                }
             }
         }
     }
@@ -412,8 +447,8 @@ public class GameController {
         }
         eraseBlock(board, currentBlock);
         y++;
-        placeBlock(board, currentBlock, x, y);
-        showCurrent(board, currentBlock);
+        placeBlock(board, visualBoard, currentBlock, x, y);
+        showCurrent(visualBoard, currentBlock);
 
         gamePane.revalidate();
         gamePane.repaint();
@@ -453,7 +488,7 @@ public class GameController {
                 break;
             }
         }
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
     }
 
     public void moveRight() {
@@ -466,7 +501,7 @@ public class GameController {
             if (checkBlockCollision())
                 x--;
         }
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
     }
 
     public void moveLeft() {
@@ -479,22 +514,29 @@ public class GameController {
             if (checkBlockCollision())
                 x++;
         }
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
     }
 
     public void moveRotate() {
         eraseBlock(board, currentBlock);
         testRotation();
         showCurrent(boardBuffer, blockBuffer);
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
     }
 
     /* SRS기반 회전 점검 */
     private void testRotation() {
         // 아예 돌리기 전 x,y 좌표
+        int rotateState = blockBuffer.getRotateCount();
+        if (rotateState == Block.DO_NOT_ROTATE_STATE)
+            return;
+        else if (rotateState == Block.OBLOCK_ROTATE_STATE) {
+            currentBlock.rotate();
+            blockBuffer.copyBlock(currentBlock);
+            return;
+        }
         int xBeforeRotate = x;
         int yBeforeRotate = y;
-        int rotateState = blockBuffer.getRotateCount();
         blockBuffer.rotate();
         rotateMap.get(rotateState).run(); // 순서 유의 (rotate전의 rotateCount를 보고 Anchor를 옮겼음)
         int xBuffer = x;
@@ -589,7 +631,7 @@ public class GameController {
         int fullyLines = 0;
         int startindex = -1;
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
-            int sum = Arrays.stream(board[i]).reduce(0, (a, b) -> a + b);
+            int sum = Arrays.stream(board[i]).sum();
             if (sum > 19) {
                 startindex = i;
                 fullyLines++;
@@ -599,22 +641,16 @@ public class GameController {
         if (fullyLines > 0) {
             startindex = startindex - fullyLines + 1;
             launchDeleteAnimation(startindex, fullyLines);
+            delay -= delay > 250 ? 12 - 2 * diffMode % 2 : 0;
+            score += 25;
+            showScore();
         }
-
-        if (diffMode == 1)
-            delay -= 8;
-        else if (diffMode == 2)
-            delay -= 12;
-        else
-            delay -= 10;
-        score += 25;
-        showScore();
         return existFullyLine;
     }
 
     // 줄삭제 애니메이션
     private void launchDeleteAnimation(int index, int lines) {
-        gameTimer.stop();
+        stopGameDelayTimer();
         gamePane.removeKeyListener(gameKeyListener);
         Timer aniTimer;
         int count = 0;
@@ -635,7 +671,7 @@ public class GameController {
         });
         aniTimer.setRepeats(false);
         aniTimer.start();
-        startGameTimer(totaldelay + 10);
+        startGameDelayTimer(totaldelay + delay);
 
     }
 
@@ -654,13 +690,14 @@ public class GameController {
 
     // 바닥 도달시
     private void lockDelay() {
+        if (gameMode == 1) {
+            if (currentBlock.getIdentifynumber() == Block.WEIGHTBLOCK_IDENTIFY_NUMBER)
+                ifIsweightBlock(board, visualBoard, currentBlock);
+        }
+        copyBoard(board, boardBuffer);
         fixBoard();
-        eraseBlock(board, currentBlock);
         if (!clearLine())
             takeOutNextBlock();
-
-        gamePane.revalidate();
-        gamePane.repaint();
     }
 
     // 다음 블록 놓기
@@ -668,12 +705,11 @@ public class GameController {
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
         nextBlock = getRandomBlock(diffMode, 0);
-        initZeroBoard(nextBoard); // nextBoard 초기화
-        placeBlock(nextBoard, nextBlock, nextBlockX, nextBlockY);
         drawNextBlock();
         x = 3;
         y = 0;
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
+        drawGameBoard();
         if (checkBlockCollision()) {
             // gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
             gameOverText.setVisible(true); // Game Over 글자를 나타냄
@@ -696,19 +732,30 @@ public class GameController {
         }
     }
 
+    /* 아이템블록 구현 메소드 */
+    // 무게추
+    private void ifIsweightBlock(int[][] board, int[][] visualBoard, Block block) {
+        int yTemp = GameView.BORDER_HEIGHT - block.getHeight();
+        for (int j = 0; j < GameView.BORDER_HEIGHT; j++) {
+            for (int i = 0; i < block.getWidth(); i++) {
+                board[j][x + i] = 0;
+                visualBoard[j][x + i] = 0;
+            }
+        }
+        placeBlock(board, visualBoard, block, x, yTemp);
+    }
+
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
-        nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
         x = 3;
         y = 0;
         currentBlock = getRandomBlock(diffMode, 0);
         blockBuffer = getRandomBlock(diffMode, 0);
         nextBlock = getRandomBlock(diffMode, 1);
 
-        placeBlock(board, currentBlock, x, y);
+        placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
-        placeBlock(nextBoard, nextBlock, nextBlockX, nextBlockY);
         drawNextBlock();
     }
 
@@ -722,7 +769,7 @@ public class GameController {
             System.exit(0);
         } else if (inputValue == -1) {
             // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작)
-            gameTimer.restart();
+            gameDelayTimer.restart();
             restart();
         }
         // 그 외에는 중단된 상태에서 재시작
@@ -806,8 +853,12 @@ public class GameController {
         private void initLeftKey() {
             for (Component comp : gameView.getSelectDiffPane().getComponents())
                 gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
+            gameKeyMap.put(new KeyPair(leftKey, gameView.getEasyBtn()),
+                    () -> gameView.getHardBtn().requestFocus(true));
             for (Component comp : gameView.getSelectModePane().getComponents())
                 gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
+            gameKeyMap.put(new KeyPair(leftKey, gameView.getGeneralModeBtn()),
+                    () -> gameView.getTimeAttackBtn().requestFocus(true));
             gameKeyMap.put(new KeyPair(leftKey, gamePane), () -> {
                 moveLeft();
                 drawGameBoard();
@@ -817,9 +868,12 @@ public class GameController {
         private void initRightKey() {
             for (Component comp : gameView.getSelectDiffPane().getComponents())
                 gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            // gameKeyMap.put(new KeyPair(rightKey, gameView.get), )
+            gameKeyMap.put(new KeyPair(rightKey, gameView.getHardBtn()),
+                    () -> gameView.getEasyBtn().requestFocus(true));
             for (Component comp : gameView.getSelectModePane().getComponents())
                 gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
+            gameKeyMap.put(new KeyPair(rightKey, gameView.getTimeAttackBtn()),
+                    () -> gameView.getGeneralModeBtn().requestFocus(true));
             gameKeyMap.put(new KeyPair(rightKey, gamePane), () -> {
                 moveRight();
                 drawGameBoard();
@@ -835,17 +889,17 @@ public class GameController {
             gameKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
                 diffMode = 1;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameTimer(delay);
+                startGameDelayTimer(delay);
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
                 diffMode = 0;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameTimer(delay);
+                startGameDelayTimer(delay);
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
                 diffMode = 2;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameTimer(delay);
+                startGameDelayTimer(delay);
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
                 gameMode = 0;
@@ -905,8 +959,8 @@ public class GameController {
         int[][] copy = new int[index][GameView.BORDER_WIDTH];
         copyBoard(board, copy);
         pasteLines(copy, board);
-        copyBoard(colorBoard, copy);
-        pasteLines(copy, colorBoard);
+        copyBoard(visualBoard, copy);
+        pasteLines(copy, visualBoard);
     }
 
     private void copyBoard(int[][] copy, int[][] paste) {
@@ -919,8 +973,10 @@ public class GameController {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 1) {
-                    colorBoard[i][j] = currentBlock.getIndentifynumber();
                     board[i][j] = 2;
+                    if (visualBoard[i][j] == Block.ONELINEBLOCK_IDENTIFY_NUMBER)
+                        board[i][j] = 20;
+                    visualBoard[i][j] = currentBlock.getIdentifynumber();
                 }
                 // else if (board[i][j] == 3) {
                 // board[i][j] = 2;
@@ -929,7 +985,8 @@ public class GameController {
         }
     }
 
-    public void stopTimer() {
+    public void stopGameDelayTimer() {
+        gameDelayTimer.stop();
         gameTimer.stop();
     }
 
@@ -946,5 +1003,9 @@ public class GameController {
 
     private void showScore() {
         gameView.getScorePane().setText(String.format("%d", score));
+    }
+
+    private void showTime() {
+        gameView.getTimePane().setText(String.format("%d", gameTime));
     }
 }

@@ -50,7 +50,7 @@ public class GameControllerTest {
         int TBlockCount = 0;
         int OBlockCount = 0;
         for (int i = 0; i < 3600000; i++) {
-            Block randomBlock = gameController.getRandomBlock(1);
+            Block randomBlock = gameController.getRandomBlock(1, 0);
             if (randomBlock instanceof IBlock)
                 IBlockCount++;
             else if (randomBlock instanceof JBlock)
@@ -86,7 +86,7 @@ public class GameControllerTest {
         int TBlockCount = 0;
         int OBlockCount = 0;
         for (int i = 0; i < 4100000; i++) {
-            Block randomBlock = gameController.getRandomBlock(2);
+            Block randomBlock = gameController.getRandomBlock(2, 0);
             if (randomBlock instanceof IBlock)
                 IBlockCount++;
             else if (randomBlock instanceof JBlock)
@@ -132,7 +132,7 @@ public class GameControllerTest {
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
-        testAllView.getGameView().getGamePane().setText("");
+        testAllView.getGameView().getGameBoardPane().setText("");
         frame.stopTimer();
         frame.dispose();
     }

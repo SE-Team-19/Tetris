@@ -11,10 +11,14 @@ public class GameView extends JPanel {
     public static final int BORDER_WIDTH = 10;
     public static final char BORDER_CHAR = 'X';
     public static final char BLOCK_CHAR = 'O';
+    public static final char NULL_CHAR = ' ';
+    public static final char BOMB_CHAR = 'B';
+    public static final char ONELINE_CHAR = 'L';
 
     private JTextPane gameBoardPane;
     private JTextPane nextBlockPane;
     private JTextPane scorePane;
+    private JTextPane timePane;
     private JPanel gameDisplayPane;
     private JPanel selectModePane;
     private JPanel selectDiffPane;
@@ -60,7 +64,7 @@ public class GameView extends JPanel {
         gameBoardPane = new JTextPane();
         gameBoardPane.setBackground(Color.BLACK);
         gameBoardPane.setEditable(false);
-        // gamePane.setEnabled(false);
+        // gameBoardPane.setEnabled(false);
         CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
                 BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gameBoardPane.setBorder(border);
@@ -69,15 +73,23 @@ public class GameView extends JPanel {
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
         nextBlockPane.setBorder(border);
+        nextBlockPane.setFocusable(false);
         // nextBlockPane.setEnabled(false);
 
         JPanel infoPane = new JPanel();
+        infoPane.setFocusable(false);
         scorePane = new JTextPane();
         scorePane.setEditable(false);
+        scorePane.setFocusable(false);
+
+        timePane = new JTextPane();
+        timePane.setEditable(false);
+        timePane.setFocusable(false);
 
         infoPane.setLayout(new GridLayout(3, 0, 0, 0));
         infoPane.add(nextBlockPane);
         infoPane.add(scorePane);
+        infoPane.add(timePane);
 
         gameDisplayPane.add(gameBoardPane);
         gameDisplayPane.add(infoPane);
@@ -153,6 +165,10 @@ public class GameView extends JPanel {
 
     public JTextPane getScorePane() {
         return this.scorePane;
+    }
+
+    public JTextPane getTimePane() {
+        return this.timePane;
     }
 
     public JButton getEasyBtn() {

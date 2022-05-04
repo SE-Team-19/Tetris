@@ -3,7 +3,6 @@ package tetris.model;
 import java.awt.Rectangle;
 import java.util.List;
 
-
 public class Setting {
 
     private int displayMode;
