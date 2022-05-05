@@ -11,7 +11,7 @@ public abstract class Block {
     protected Color blindColor;
     protected int identifynumber;
     protected int rotateCount;
-    protected List<int[]> xyList;
+    protected List<int[]> coordiList;
     protected Random rnd = new Random();
     public static final int FIRST_ROTATE_STATE = 0;
     public static final int SECOND_ROTATE_STATE = 1;
@@ -24,6 +24,7 @@ public abstract class Block {
     public static final int OBLOCK_ROTATE_STATE = 8;
     public static final int DO_NOT_ROTATE_STATE = -1;
     public static final int NULL_IDENTIFY_NUMBER = 0;
+    public static final int SHADOW_IDENTIFIY_NUMBER = 1;
     public static final int IBLOCK_IDENTIFY_NUMBER = 2;
     public static final int JBLOCK_IDENTIFY_NUMBER = 3;
     public static final int LBLOCK_IDENTIFY_NUMBER = 4;
@@ -46,6 +47,7 @@ public abstract class Block {
         this.shape = copyShape(src.getShape());
         this.visualShape = copyShape(src.getVisualShape());
         this.color = src.getColor();
+        this.coordiList = src.getCoordiList();
         this.identifynumber = src.getIdentifynumber();
         this.rotateCount = src.rotateCount;
         this.blindColor = src.blindColor;
@@ -64,13 +66,13 @@ public abstract class Block {
     protected void initVisualShapeAndXYList(int id) {
         int length = shape.length;
         int width = shape[0].length;
-        xyList = new ArrayList<>();
+        coordiList = new LinkedList<>();
         visualShape = new int[length][width];
         for (int j = 0; j < length; j++) {
             for (int i = 0; i < width; i++) {
                 if (shape[j][i] > 0) {
                     visualShape[j][i] = id;
-                    xyList.add(new int[] { i, j });
+                    coordiList.add(new int[] { i, j });
                 } else
                     visualShape[j][i] = 0;
             }
@@ -78,7 +80,7 @@ public abstract class Block {
     }
 
     protected void attachL() {
-        int[] index = xyList.get(rnd.nextInt(xyList.size()));
+        int[] index = coordiList.get(rnd.nextInt(coordiList.size()));
         visualShape[index[1]][index[0]] = ONELINEBLOCK_IDENTIFY_NUMBER;
     }
 
@@ -96,6 +98,10 @@ public abstract class Block {
 
     public int getVisualShape(int x, int y) {
         return visualShape[y][x];
+    }
+
+    public List<int[]> getCoordiList() {
+        return this.coordiList;
     }
 
     public Color getColor() {
@@ -136,6 +142,9 @@ public abstract class Block {
         int length = shape.length;
         int width = shape[0].length;
 
+        List<int[]> rotateCoordiList = new LinkedList<>();
+        coordiList.forEach(e -> rotateCoordiList.add(new int[] { length - 1 - e[1], e[0] }));
+        coordiList = rotateCoordiList;
         int[][] rotate = new int[width][length];
         int[][] visualrotate = new int[width][length];
         for (int row = 0; row < length; row++) {
@@ -148,6 +157,7 @@ public abstract class Block {
         visualShape = visualrotate;
         if (rotateCount != OBLOCK_ROTATE_STATE)
             plusRotateCount();
+
     }
 
     private void plusRotateCount() {
