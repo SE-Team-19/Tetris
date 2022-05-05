@@ -8,10 +8,10 @@ public class IBlock extends Block {
         initIBlock();
     }
 
-    public IBlock(boolean isAttachL) {
+    public IBlock(boolean isAttachItem) {
         initIBlock();
-        if (isAttachL)
-            attachL();
+        if (isAttachItem)
+            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
     }
 
     private void initIBlock() {

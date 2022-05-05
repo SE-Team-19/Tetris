@@ -8,10 +8,10 @@ public class ZBlock extends Block {
         initZBlock();
     }
 
-    public ZBlock(boolean isAttachL) {
+    public ZBlock(boolean isAttachItem) {
         initZBlock();
-        if (isAttachL)
-            attachL();
+        if (isAttachItem)
+            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
     }
 
     private void initZBlock() {

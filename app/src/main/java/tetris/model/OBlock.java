@@ -8,10 +8,10 @@ public class OBlock extends Block {
         initOBlock();
     }
 
-    public OBlock(boolean isAttachL) {
+    public OBlock(boolean isAttachItem) {
         initOBlock();
-        if (isAttachL)
-            attachL();
+        if (isAttachItem)
+            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
     }
 
     private void initOBlock() {

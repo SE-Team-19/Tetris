@@ -3,7 +3,6 @@ package tetris.view;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
-import javax.swing.text.*;
 
 public class GameView extends JPanel {
 
@@ -12,8 +11,9 @@ public class GameView extends JPanel {
     public static final char BORDER_CHAR = 'X';
     public static final char BLOCK_CHAR = 'O';
     public static final char NULL_CHAR = ' ';
-    public static final char BOMB_CHAR = 'B';
+    public static final char BOMB_CHAR = 'T';
     public static final char ONELINE_CHAR = 'L';
+    public static final char GHOST_CHAR = 'G';
 
     private JTextPane gameBoardPane;
     private JTextPane nextBlockPane;

@@ -13,10 +13,10 @@ public class JBlock extends Block {
         initVisualShapeAndXYList(identifynumber);
     }
 
-    public JBlock(boolean isAttachL) {
+    public JBlock(boolean isAttachItem) {
         initJBlock();
-        if (isAttachL)
-            attachL();
+        if (isAttachItem)
+            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
     }
 
     private void initJBlock() {
