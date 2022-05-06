@@ -18,6 +18,7 @@ public class GameController {
     private static final int LOCK_DELAY_TIME = 500;
     private static final int BOARD_START_HEIGHT = 5;
     private static final int BOARD_END_HEIGHT = GameView.BORDER_HEIGHT + BOARD_START_HEIGHT;
+    private static final int BOARD_HEIGHT = BOARD_END_HEIGHT - BOARD_START_HEIGHT;
     private static final int BOARD_WIDTH = GameView.BORDER_WIDTH;
     private static final int START_X = 3;
     private static final int START_Y = BOARD_START_HEIGHT - 1;
@@ -37,11 +38,14 @@ public class GameController {
     private int[][] visualBoard;
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
+    private int[][] attackLineBoard;
+    private Stack<int[]> attackLinesStack;
 
     private int x;
     private int y;
     private int ghostY;
     private int score; // game 점수와 관련된 변수
+    private int attackLines;
 
     private String userName;
 
@@ -49,9 +53,11 @@ public class GameController {
     private ScoreView scoreView = ScoreView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
+    private JTextPane attackLinePane;
     private JLabel gameOverText; // 게임 종료를 나타내주는 문구
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
+    private SimpleAttributeSet attackBoardAttributeSet;
     private Container contentPane;
     KeyListener gameKeyListener;
 
@@ -78,6 +84,8 @@ public class GameController {
         board = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         boardBuffer = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         visualBoard = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
+        attackLineBoard = new int[BOARD_HEIGHT][BOARD_WIDTH];
+        attackLinesStack = new Stack<>();
         currentBlock = getRandomBlock(diffMode, 0);
         blockBuffer = getRandomBlock(diffMode, 0);
         nextBlock = getRandomBlock(diffMode, 10);
@@ -87,6 +95,7 @@ public class GameController {
 
         gamePane = gameView.getGameBoardPane();
         nextBlockPane = gameView.getNextBlockPane();
+        attackLinePane = gameView.getAttackLinePane();
 
         initBlockCharMap();
         initColorMap();
@@ -97,9 +106,11 @@ public class GameController {
 
         boardAttributeSet = new SimpleAttributeSet();
         nextBoardAttributeSet = new SimpleAttributeSet();
+        attackBoardAttributeSet = new SimpleAttributeSet();
 
         setAttributeSet(boardAttributeSet);
         setAttributeSet(nextBoardAttributeSet);
+        setAttributeSet(attackBoardAttributeSet);
 
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
@@ -284,19 +295,19 @@ public class GameController {
             int block = random.nextInt(8);
             switch (block) {
                 case 0:
-                    return new IBlock(true);
+                    return new IBlock();
                 case 1:
                     return new JBlock();
                 case 2:
-                    return new LBlock(true);
+                    return new LBlock();
                 case 3:
                     return new ZBlock();
                 case 4:
-                    return new SBlock(true);
+                    return new SBlock();
                 case 5:
                     return new TBlock();
                 case 6:
-                    return new OBlock(true);
+                    return new OBlock();
                 default:
                     return new IBlock();
             }
@@ -628,6 +639,68 @@ public class GameController {
         return false;
     }
 
+    // 삭제줄 복사 메소드
+    private void drawAttackLine(int lines) {
+
+        if (attackLines > (BOARD_HEIGHT) / 2)
+            return;
+
+        // 만일 이번에 들어오는 줄로 공격할 줄이 10개를 넘어선다면
+        if (attackLines + lines > 10)
+            lines = 10 - attackLines;
+
+        System.out.println("현재스택 사이즈: " + attackLinesStack.size());
+
+        // 먼저 이미 공격 줄이 있다면 미리 스택에 넣어두고
+        if (attackLines > 0) {
+            for (int i = BOARD_HEIGHT - attackLines; i < BOARD_HEIGHT; i++)
+                attackLinesStack.push(attackLineBoard[i]);
+        }
+
+        // 공격할 줄을 만들고 (구멍을 만드는 과정)
+        int[][] temp = new int[4][BOARD_WIDTH];
+        for (int j = 3; j > 3 - lines; j--) {
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                temp[j][i] = 2;
+            }
+        }
+        placeBlock(temp, currentBlock, x, 4 - currentBlock.getHeight());
+        showCurrent(temp, currentBlock);
+
+        // 구멍난 공격줄을 stack에 넣어주고
+        for (int j = 0; j < 4; j++) {
+            System.out.println("합: " + Arrays.stream(temp[j]).sum());
+            if (Arrays.stream(temp[j]).sum() > 20) {
+                attackLinesStack.push(Arrays.stream(temp[j]).map(e -> e % 3).toArray());
+            }
+
+        }
+
+        // stack에서 공격할 줄을 board에 넣어준다.
+        System.out.println(attackLinesStack.peek());
+        int size = attackLinesStack.size();
+        for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1
+                - size; i--) {
+            attackLineBoard[i] = Arrays.copyOf(attackLinesStack.pop(), BOARD_WIDTH);
+        }
+
+        // 그리고 그걸 attackLinePane에 표현한다.
+        System.out.println("attack!");
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < BOARD_HEIGHT; j++) {
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                sb.append(blockCharMap.get(attackLineBoard[j][i]));
+            }
+            sb.append("\n");
+        }
+        attackLinePane.setText(sb.toString());
+        StyleConstants.setFontSize(attackBoardAttributeSet, 20);
+
+        StyledDocument doc = attackLinePane.getStyledDocument();
+        doc.setParagraphAttributes(0, doc.getLength(), attackBoardAttributeSet, false);
+        attackLines += lines;
+    }
+
     // 블럭 줄삭제
     private boolean clearLine() {
         boolean existFullyLine = false;
@@ -643,6 +716,7 @@ public class GameController {
         }
         if (fullyLines > 0) {
             startindex = startindex - fullyLines + 1;
+            drawAttackLine(fullyLines);
             launchDeleteLineAnimation(startindex, fullyLines);
             delay -= delay > 250 ? 12 - 2 * diffMode % 2 : 0;
             score += 25;

@@ -17,11 +17,12 @@ public class GameView extends JPanel {
 
     private JTextPane gameBoardPane;
     private JTextPane nextBlockPane;
+    private JTextPane attackLinePane;
     private JTextPane scorePane;
     private JTextPane timePane;
-    private JPanel gameDisplayPane;
-    private JPanel selectModePane;
-    private JPanel selectDiffPane;
+    private JPanel gameDisplayPanel;
+    private JPanel selectModePanel;
+    private JPanel selectDiffPanel;
     private JButton easyBtn;
     private JButton normalBtn;
     private JButton hardBtn;
@@ -54,17 +55,16 @@ public class GameView extends JPanel {
 
         super.setLayout(new GridLayout(1, 1, 0, 0));
 
-        super.add(selectModePane);
+        super.add(selectModePanel);
     }
 
     private void initGameDisplayPane() {
-        gameDisplayPane = new JPanel();
-        gameDisplayPane.setLayout(new GridLayout(1, 2, 0, 0));
+        gameDisplayPanel = new JPanel();
+        gameDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
 
         gameBoardPane = new JTextPane();
         gameBoardPane.setBackground(Color.BLACK);
         gameBoardPane.setEditable(false);
-        // gameBoardPane.setEnabled(false);
         CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
                 BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         gameBoardPane.setBorder(border);
@@ -74,7 +74,12 @@ public class GameView extends JPanel {
         nextBlockPane.setBackground(Color.BLACK);
         nextBlockPane.setBorder(border);
         nextBlockPane.setFocusable(false);
-        // nextBlockPane.setEnabled(false);
+
+        attackLinePane = new JTextPane();
+        attackLinePane.setEditable(false);
+        attackLinePane.setBackground(Color.BLACK);
+        attackLinePane.setBorder(border);
+        attackLinePane.setFocusable(false);
 
         JPanel infoPane = new JPanel();
         infoPane.setFocusable(false);
@@ -86,13 +91,14 @@ public class GameView extends JPanel {
         timePane.setEditable(false);
         timePane.setFocusable(false);
 
-        infoPane.setLayout(new GridLayout(3, 0, 0, 0));
-        infoPane.add(nextBlockPane);
-        infoPane.add(scorePane);
-        infoPane.add(timePane);
+        infoPane.setLayout(new GridLayout(1, 0, 0, 0));
+        // infoPane.add(nextBlockPane);
+        // infoPane.add(scorePane);
+        // infoPane.add(timePane);
+        infoPane.add(attackLinePane);
 
-        gameDisplayPane.add(gameBoardPane);
-        gameDisplayPane.add(infoPane);
+        gameDisplayPanel.add(gameBoardPane);
+        gameDisplayPanel.add(infoPane);
     }
 
     public JDialog getGameOverDialog() {
@@ -113,29 +119,29 @@ public class GameView extends JPanel {
     }
 
     private void initSelcetModePane() {
-        selectModePane = new JPanel();
-        selectModePane.setLayout(new GridLayout(0, 3, 0, 0));
+        selectModePanel = new JPanel();
+        selectModePanel.setLayout(new GridLayout(0, 3, 0, 0));
 
         generalModeBtn = initAndSetName("generalModeBtn", new JButton("일반모드"));
         itemModeBtn = initAndSetName("itemModeBtn", new JButton("아이템모드"));
         timeAttackBtn = initAndSetName("timeAttackBtn", new JButton("시간제한모드"));
 
-        selectModePane.add(generalModeBtn);
-        selectModePane.add(itemModeBtn);
-        selectModePane.add(timeAttackBtn);
+        selectModePanel.add(generalModeBtn);
+        selectModePanel.add(itemModeBtn);
+        selectModePanel.add(timeAttackBtn);
     }
 
     private void initSelectDiffPane() {
-        selectDiffPane = new JPanel();
-        selectDiffPane.setLayout(new GridLayout(0, 3, 0, 0));
+        selectDiffPanel = new JPanel();
+        selectDiffPanel.setLayout(new GridLayout(0, 3, 0, 0));
 
         easyBtn = initAndSetName("generalModeBtn", new JButton("Easy"));
         normalBtn = initAndSetName("itemModeBtn", new JButton("Normal"));
         hardBtn = initAndSetName("timeAttackBtn", new JButton("Hard"));
 
-        selectDiffPane.add(easyBtn);
-        selectDiffPane.add(normalBtn);
-        selectDiffPane.add(hardBtn);
+        selectDiffPanel.add(easyBtn);
+        selectDiffPanel.add(normalBtn);
+        selectDiffPanel.add(hardBtn);
     }
 
     private <T extends JComponent> T initAndSetName(String name, T comp) {
@@ -144,15 +150,15 @@ public class GameView extends JPanel {
     }
 
     public JPanel getGameDisplayPane() {
-        return this.gameDisplayPane;
+        return this.gameDisplayPanel;
     }
 
     public JPanel getSelectDiffPane() {
-        return this.selectDiffPane;
+        return this.selectDiffPanel;
     }
 
     public JPanel getSelectModePane() {
-        return this.selectModePane;
+        return this.selectModePanel;
     }
 
     public JTextPane getGameBoardPane() {
@@ -161,6 +167,10 @@ public class GameView extends JPanel {
 
     public JTextPane getNextBlockPane() {
         return this.nextBlockPane;
+    }
+
+    public JTextPane getAttackLinePane() {
+        return this.attackLinePane;
     }
 
     public JTextPane getScorePane() {
