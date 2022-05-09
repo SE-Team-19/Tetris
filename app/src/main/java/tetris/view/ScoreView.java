@@ -14,7 +14,6 @@ public class ScoreView extends JPanel {
     private JLabel rankingTitle;
     private List<List<String>> rankingList;
 
-    /* SingleTone 패턴 */
     private ScoreView() {
         initComponents();
         initView();
@@ -27,8 +26,6 @@ public class ScoreView extends JPanel {
     public static ScoreView getInstance() {
         return LazyHolder.INSTANCE;
     }
-
-    /***********************************************/
 
     private void initView() {
         GridBagLayout gridBag = new GridBagLayout();

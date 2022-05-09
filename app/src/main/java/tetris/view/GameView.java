@@ -64,10 +64,10 @@ public class GameView extends JPanel {
         super.add(infoPane);
     }
 
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
-    }
+    // private <T extends JComponent> T initAndSetName(String name, T comp) {
+    // comp.setName(name);
+    // return comp;
+    // }
 
     public JTextPane getGamePane() {
         return this.gamePane;

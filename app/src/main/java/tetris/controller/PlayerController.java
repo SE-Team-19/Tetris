@@ -15,9 +15,6 @@ public class PlayerController {
 
     public PlayerController() {
         playerList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            playerList.add(new Player("없음", 0, "없음"));
-        }
     }
 
     public void addPlayer(String name, int score, String difficulty) {

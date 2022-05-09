@@ -3,7 +3,6 @@ package tetris.view;
 import javax.swing.*;
 import static javax.swing.SwingConstants.CENTER;
 
-import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Component;
 
@@ -32,47 +31,34 @@ public class MainView extends JPanel {
 
     private void initView() {
         buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(4, 0, 0, 0));
 
-        startBtn = initAndSetName("startBtn", new JButton("Game Start"));
-        settingBtn = initAndSetName("settingBtn", new JButton("Settings"));
-        scoreBoardBtn = initAndSetName("scoreBoardBtn", new JButton("Scoreboard"));
-        exitBtn = initAndSetName("exitBtn", new JButton("Exit"));
-        deleteKeyBinding(startBtn, settingBtn, scoreBoardBtn, exitBtn);
+        startBtn = initButton("startBtn", new JButton("Game Start"));
+        settingBtn = initButton("settingBtn", new JButton("Settings"));
+        scoreBoardBtn = initButton("scoreBoardBtn", new JButton("Scoreboard"));
+        exitBtn = initButton("exitBtn", new JButton("Exit"));
 
-        buttonList = new ArrayList<>();
-        buttonList.add(startBtn);
-        buttonList.add(settingBtn);
-        buttonList.add(scoreBoardBtn);
-        buttonList.add(exitBtn);
+        buttonList = new ArrayList<>(Arrays.asList(
+                startBtn, settingBtn, scoreBoardBtn, exitBtn));
 
-        addAButton(buttonList, buttonPanel);
+        for (JButton button : buttonList) {
+            buttonPanel.add(button);
+        }
 
-        JLabel appName = new JLabel("Tetris");
-        appName.setHorizontalAlignment(CENTER);
+        JLabel titleLabel = new JLabel("Tetris");
+        titleLabel.setHorizontalAlignment(CENTER);
 
         super.setLayout(new GridLayout(2, 0, 0, 0));
-        super.add(appName);
+        super.add(titleLabel);
         super.add(buttonPanel);
     }
 
-    private void addAButton(ArrayList<JButton> buttons, Container container) {
-        buttonPanel.setLayout(new GridLayout(buttons.size(), 0, 0, 0));
-        for (JButton button : buttons) {
-            button.setAlignmentX(Component.CENTER_ALIGNMENT);
-            container.add(button);
-        }
-    }
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
+    private JButton initButton(String name, JButton comp) {
         comp.setName(name);
+        comp.setAlignmentX(Component.CENTER_ALIGNMENT);
+        comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
         return comp;
     }
-
-    private void deleteKeyBinding(JComponent... comps) {
-        for (JComponent comp : comps)
-            comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
-    }
-
 
     public List<JButton> getButtonList() {
         return this.buttonList;

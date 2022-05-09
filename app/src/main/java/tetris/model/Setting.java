@@ -1,27 +1,22 @@
 package tetris.model;
 
-import java.awt.Rectangle;
-import java.util.List;
-
-
 public class Setting {
 
     private int displayMode;
-    private List<Rectangle> displayList;
     private boolean colorBlindMode;
-    private int moveLeftKey;
-    private int moveRightKey;
-    private int moveDownKey;
+    private int leftKey;
+    private int rightKey;
+    private int downKey;
     private int rotateKey;
     private int stackKey;
 
-    public Setting(int displayMode, boolean colorBlindMode, int moveLeftKey, int moveRightKey,
-            int moveDownKey, int rotateKey, int stackKey) {
+    public Setting(int displayMode, boolean colorBlindMode, int leftKey, int rightKey,
+            int downKey, int rotateKey, int stackKey) {
         this.displayMode = displayMode;
         this.colorBlindMode = colorBlindMode;
-        this.moveLeftKey = moveLeftKey;
-        this.moveRightKey = moveRightKey;
-        this.moveDownKey = moveDownKey;
+        this.leftKey = leftKey;
+        this.rightKey = rightKey;
+        this.downKey = downKey;
         this.rotateKey = rotateKey;
         this.stackKey = stackKey;
     }
@@ -34,14 +29,6 @@ public class Setting {
         this.displayMode = displayMode;
     }
 
-    public List<Rectangle> getDisplayList() {
-        return this.displayList;
-    }
-
-    public void setDisplayList(List<Rectangle> displayList) {
-        this.displayList = displayList;
-    }
-
     public boolean isColorBlindMode() {
         return this.colorBlindMode;
     }
@@ -50,28 +37,28 @@ public class Setting {
         this.colorBlindMode = colorBlindMode;
     }
 
-    public int getMoveLeftKey() {
-        return this.moveLeftKey;
+    public int getLeftKey() {
+        return this.leftKey;
     }
 
-    public void setMoveLeftKey(int moveLeftKey) {
-        this.moveLeftKey = moveLeftKey;
+    public void setLeftKey(int leftKey) {
+        this.leftKey = leftKey;
     }
 
-    public int getMoveRightKey() {
-        return this.moveRightKey;
+    public int getRightKey() {
+        return this.rightKey;
     }
 
-    public void setMoveRightKey(int moveRightKey) {
-        this.moveRightKey = moveRightKey;
+    public void setRightKey(int rightKey) {
+        this.rightKey = rightKey;
     }
 
-    public int getMoveDownKey() {
-        return this.moveDownKey;
+    public int getDownKey() {
+        return this.downKey;
     }
 
-    public void setMoveDownKey(int moveDownKey) {
-        this.moveDownKey = moveDownKey;
+    public void setdownKey(int downKey) {
+        this.downKey = downKey;
     }
 
     public int getRotateKey() {

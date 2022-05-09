@@ -4,16 +4,13 @@ import static tetris.view.GameView.BORDER_HEIGHT;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
-import javax.swing.*;
-import javax.swing.text.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
 
-import tetris.controller.*;
+import javax.swing.*;
+import javax.swing.Timer;
+import javax.swing.text.*;
+
 import tetris.model.*;
 import tetris.view.*;
 
@@ -21,25 +18,27 @@ public class GameController {
 
     private static final int NEXT_BOARD_HEIGHT = 5;
     private static final int NEXT_BOARD_WIDTH = 4;
-    private static final int ANIMATION_CODE = 20;
+    // private static final int ANIMATION_CODE = 20;
 
     private Timer timer;
     private int delay;
     private int mode;
+
     private Block currentBlock;
     private Block nextBlock;
     private Block blockBuffer;
+    private Deque<Block> blockDeque;
 
     private int[][] colorBoard;
-    private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
+    private int[][] board;
     private int[][] boardBuffer;
     private int[][] nextBoard;
 
     private int x = 3;
     private int y = 0;
-    private int nextBlockX = 0; // warning: 시작 위치 조절
+    private int nextBlockX = 0;
     private int nextBlockY = 0;
-    private int score; // game 점수와 관련된 변수
+    private int score;
 
     private String userName;
 
@@ -47,7 +46,7 @@ public class GameController {
     private ScoreView scoreView = ScoreView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextTetrisBlockPane;
-    private JLabel gameOverText; // 게임 종료를 나타내주는 문구
+    private JLabel gameOverLabel;
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
     private Container contentPane;
@@ -62,18 +61,22 @@ public class GameController {
         this.setting = setting;
         this.contentPane = contentPane;
         this.playerController = playerController;
+
         isColorBlindMode = setting.isColorBlindMode();
-        KeyListener gameKeyListener = new GameKeyListener();
-        gameView.addKeyListener(gameKeyListener);
+        gameView.addKeyListener(new GameKeyListener());
 
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         boardBuffer = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         colorBoard = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
-        currentBlock = getRandomBlock(mode);
-        blockBuffer = getRandomBlock(mode);
-        nextBlock = getRandomBlock(mode);
-        gameOverText = new JLabel("Game Over");
+
+        blockDeque = new ArrayDeque<>();
+        generateBlockRandomizer(mode);
+        blockBuffer = blockDeque.getFirst();
+        currentBlock = blockDeque.removeFirst();
+        nextBlock = blockDeque.removeFirst();
+
+        gameOverLabel = new JLabel("Game Over");
         getSelectModeDialog().setVisible(true);
 
         colorMap = new HashMap<>();
@@ -96,7 +99,6 @@ public class GameController {
             colorMap.put(new ZBlock().getIndentifynumber(), new ZBlock().getColor());
         }
 
-        // gamePane 위치 조정
         gamePane = gameView.getGamePane();
         nextTetrisBlockPane = gameView.getNextBlockPane();
 
@@ -108,8 +110,6 @@ public class GameController {
         drawGameBoard();
         drawNextBlock();
 
-        // placeAccumulatedBlock(); // collision add
-
         nextTetrisBlockPane.repaint();
         nextTetrisBlockPane.revalidate();
 
@@ -120,8 +120,8 @@ public class GameController {
         pane.add(to);
         pane.remove(from);
         focus(to);
-        contentPane.revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
-        contentPane.repaint(); // component 변화 후 JFrame 새로고침(component 색 등의 성질 적용) */
+        contentPane.revalidate();
+        contentPane.repaint();
     }
 
     private void focus(Container to) {
@@ -140,7 +140,6 @@ public class GameController {
             drawGameBoard();
             delay -= delay > 250 ? 5 : 0;
             timer.setDelay(delay);
-            showCurrnent();
         });
         timer.start();
     }
@@ -165,86 +164,33 @@ public class GameController {
         StyleConstants.setLineSpacing(nextBoardAttributeSet, -0.5f);
     }
 
-    private class Pair<K, V> {
+    public void generateBlockRandomizer(int mode) {
+        Block jBlock = new JBlock();
+        Block lBlock = new LBlock();
+        Block zBlock = new ZBlock();
+        Block sBlock = new SBlock();
+        Block tBlock = new TBlock();
+        Block oBlock = new OBlock();
+        Block iBlock = new IBlock();
 
-        K block;
-        V weight;
-
-        public Pair(K block, V weight) {
-            this.block = block;
-            this.weight = weight;
-        }
-    }
-
-    public Block getRandomBlock(int mode) {
-        // normal mode
-        if (mode == 0) {
-            Random random = new Random(System.currentTimeMillis());
-            int block = random.nextInt(7);
-            switch (block) {
-                case 0:
-                    return new IBlock();
-                case 1:
-                    return new JBlock();
-                case 2:
-                    return new LBlock();
-                case 3:
-                    return new ZBlock();
-                case 4:
-                    return new SBlock();
-                case 5:
-                    return new TBlock();
-                case 6:
-                    return new OBlock();
-                default:
-                    return new IBlock();
-            }
+        List<Block> randomBlockList = new ArrayList<>();
+        List<Block> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+        for (int i = 0; i < 5; i++) {
+            randomBlockList.addAll(blockList);
         }
 
         // easy mode
         if (mode == 1) {
-            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
-                    new Pair<>(new JBlock(), 5 / 36d),
-                    new Pair<>(new LBlock(), 5 / 36d),
-                    new Pair<>(new ZBlock(), 5 / 36d),
-                    new Pair<>(new SBlock(), 5 / 36d),
-                    new Pair<>(new TBlock(), 5 / 36d),
-                    new Pair<>(new OBlock(), 5 / 36d),
-                    new Pair<>(new IBlock(), 6 / 36d));
-
-            double pivot = Math.random();
-            double acc = 0;
-            for (Pair<? extends Block, Double> pair : candidates) {
-                acc += pair.weight;
-
-                if (pivot <= acc) {
-                    return pair.block;
-                }
-            }
+            randomBlockList.add(iBlock);
         }
 
         // hard mode
-        if (mode == 2) {
-            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
-                    new Pair<>(new JBlock(), 6 / 41d),
-                    new Pair<>(new LBlock(), 6 / 41d),
-                    new Pair<>(new ZBlock(), 6 / 41d),
-                    new Pair<>(new SBlock(), 6 / 41d),
-                    new Pair<>(new TBlock(), 6 / 41d),
-                    new Pair<>(new OBlock(), 6 / 41d),
-                    new Pair<>(new IBlock(), 5 / 41d));
-
-            double pivot = Math.random();
-            double acc = 0;
-            for (Pair<? extends Block, Double> pair : candidates) {
-                acc += pair.weight;
-
-                if (pivot <= acc) {
-                    return pair.block;
-                }
-            }
+        else if (mode == 2) {
+            randomBlockList.addAll(Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock));
         }
-        return new IBlock();
+
+        Collections.shuffle(randomBlockList);
+        blockDeque.addAll(randomBlockList);
     }
 
     public void drawGameBoard() {
@@ -257,7 +203,7 @@ public class GameController {
             sb.append(GameView.BORDER_CHAR);
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] > 0) {
-                    sb.append(GameView.BLOCK_CHAR); // currentBlock 의 모양을 그려준다.
+                    sb.append(GameView.BLOCK_CHAR);
                 } else {
                     sb.append(" ");
                 }
@@ -284,7 +230,7 @@ public class GameController {
         for (int i = 0; i < nextBoard.length; i++) {
             for (int j = 0; j < nextBoard[i].length; j++) {
                 if (nextBoard[i][j] == 1) {
-                    sb.append(GameView.BLOCK_CHAR); // nextBlock 의 모양을 그려준다.
+                    sb.append(GameView.BLOCK_CHAR);
                 } else {
                     sb.append(" ");
                 }
@@ -326,12 +272,12 @@ public class GameController {
                             (colorBoard[i].length + 4) + i * (colorBoard[i].length + 3) + j, 1,
                             blockAttributeSet, false);
                 }
-                if (board[i][j] == ANIMATION_CODE) {
-                    StyleConstants.setForeground(blockAttributeSet, color);
-                    doc.setCharacterAttributes(
-                            (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
-                            blockAttributeSet, true);
-                }
+                // if (board[i][j] == ANIMATION_CODE) {
+                // StyleConstants.setForeground(blockAttributeSet, color);
+                // doc.setCharacterAttributes(
+                // (board[i].length + 4) + i * (board[i].length + 3) + j, 1,
+                // blockAttributeSet, true);
+                // }
             }
         }
     }
@@ -380,14 +326,17 @@ public class GameController {
     }
 
     protected void moveDown() {
-
         if (!checkBottom()) {
             fixBoard();
             eraseCurrentBlock();
             clearLine();
             currentBlock = nextBlock;
             blockBuffer.copyBlock(currentBlock);
-            nextBlock = getRandomBlock(mode);
+
+            if (blockDeque.isEmpty()) {
+                generateBlockRandomizer(mode);
+            }
+            nextBlock = blockDeque.removeFirst();
             eraseNextBlock();
             placeNextBlock();
             drawNextBlock();
@@ -396,8 +345,7 @@ public class GameController {
             placeCurrentBlock();
             if (checkBlockCollision()) {
                 timer.stop();
-                // gameView.add(gameOverText); // 이 부분 정상적으로 잘 뜨는지 확인해야 함
-                gameOverText.setVisible(true); // Game Over 글자를 나타냄
+                gameOverLabel.setVisible(true);
                 getGameOverDialog().setVisible(true);
                 String difficulty = "normal";
                 if (mode == 1)
@@ -413,7 +361,7 @@ public class GameController {
                                 Integer.toString(player.getScore()), player.getDifficulty()))));
                 scoreView.initRankingPane();
                 scoreView.fillScoreBoard(userName);
-                transitView(contentPane, scoreView, gameView);
+                // transitView(contentPane, scoreView, gameView);
             }
             gamePane.revalidate();
             gamePane.repaint();
@@ -496,7 +444,6 @@ public class GameController {
         }
     }
 
-    // Block이 바닥에 닿는지 확인
     public boolean checkBottom() {
         if (y == GameView.BORDER_HEIGHT - currentBlock.getHeight())
             return false;
@@ -514,7 +461,6 @@ public class GameController {
         return true;
     }
 
-    // Block끼리 충돌하는지 확인
     private boolean checkBlockCollision() {
         saveBoardBuffer();
         placeBufferBlock();
@@ -528,7 +474,6 @@ public class GameController {
         return false;
     }
 
-    // Block이 경계를 넘는지 확인
     private boolean ifBlockOutOfBounds() {
         if (x + blockBuffer.getWidth() > GameView.BORDER_WIDTH
                 || y + blockBuffer.getHeight() > GameView.BORDER_HEIGHT)
@@ -537,7 +482,6 @@ public class GameController {
             return false;
     }
 
-    // 블럭 줄삭제
     private void clearLine() {
         for (int i = 0; i < GameView.BORDER_HEIGHT; i++) {
             int sum = Arrays.stream(board[i]).reduce(0, (a, b) -> a + b);
@@ -556,15 +500,14 @@ public class GameController {
         showScore();
     }
 
-    // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
         board = new int[BORDER_HEIGHT][GameView.BORDER_WIDTH];
         nextBoard = new int[NEXT_BOARD_HEIGHT][NEXT_BOARD_WIDTH];
         x = 3;
         y = 0;
-        currentBlock = getRandomBlock(mode);
-        blockBuffer = getRandomBlock(mode);
-        nextBlock = getRandomBlock(mode);
+        // currentBlock = getRandomBlock(mode);
+        // blockBuffer = getRandomBlock(mode);
+        // nextBlock = getRandomBlock(mode);
 
         placeCurrentBlock();
         drawGameBoard();
@@ -572,29 +515,24 @@ public class GameController {
         drawNextBlock();
     }
 
-    // ESC 키를 누를 경우 게임 메세지를 출력
     public void showESCMessage() {
         int inputValue = JOptionPane.showConfirmDialog(gameView, "Do you want to end the game?",
                 "Option", JOptionPane.YES_NO_OPTION);
 
         if (inputValue == JOptionPane.YES_OPTION) {
-            // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
             System.exit(0);
         } else if (inputValue == -1) {
-            // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작)
             timer.restart();
             restart();
         }
-        // 그 외에는 중단된 상태에서 재시작
     }
 
     public class GameKeyListener extends KeyAdapter {
-        int moveRightKey = setting.getMoveRightKey();
-        int moveLeftKey = setting.getMoveLeftKey();
+        int rightKey = setting.getRightKey();
+        int leftKey = setting.getLeftKey();
         int rotateKey = setting.getRotateKey();
         int stackKey = setting.getStackKey();
 
-        // 한 번에 블록이 떨어지는 메소드 구현(SPACE BAR)
         private void dropDown() {
             if (currentBlock == null) {
                 return;
@@ -636,10 +574,10 @@ public class GameController {
         @Override
         public void keyPressed(KeyEvent e) {
             int keyCode = e.getKeyCode();
-            if (keyCode == moveRightKey) {
+            if (keyCode == rightKey) {
                 moveRight();
                 drawGameBoard();
-            } else if (keyCode == moveLeftKey) {
+            } else if (keyCode == leftKey) {
                 moveLeft();
                 drawGameBoard();
             } else if (keyCode == rotateKey) {
@@ -706,8 +644,7 @@ public class GameController {
     }
 
     public JDialog getGameOverDialog() {
-        JFrame frame = new JFrame();
-        JDialog gameOverDialog = new JDialog(frame, "이름을 입력하세요", true);
+        JDialog gameOverDialog = new JDialog(new JFrame(), "이름을 입력하세요", true);
         gameOverDialog.setBounds(0, 0, 300, 200);
         gameOverDialog.setLocationRelativeTo(null);
         JPanel pane = new JPanel();
@@ -723,8 +660,7 @@ public class GameController {
     }
 
     public JDialog getSelectModeDialog() {
-        JFrame frame = new JFrame();
-        JDialog selectModeDialog = new JDialog(frame, "이름을 입력하세요", true);
+        JDialog selectModeDialog = new JDialog(new JFrame(), "이름을 입력하세요", true);
         selectModeDialog.setBounds(0, 0, 300, 200);
         selectModeDialog.setLocationRelativeTo(null);
         JPanel pane = new JPanel();
@@ -755,16 +691,15 @@ public class GameController {
     }
 
     private class DialogKeyEventListener extends KeyAdapter {
-        int moveRightKey = setting.getMoveRightKey();
-        int moveLeftKey = setting.getMoveLeftKey();
+        int rightKey = setting.getRightKey();
+        int leftKey = setting.getLeftKey();
         int stackKey = setting.getStackKey();
 
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == moveLeftKey) // 여기에 setting 키를 대입해 주세요
-            {
+            if (e.getKeyCode() == leftKey) {
                 e.getComponent().transferFocusBackward();
-            } else if (e.getKeyCode() == moveRightKey) {
+            } else if (e.getKeyCode() == rightKey) {
                 e.getComponent().transferFocus();
             } else if (e.getKeyCode() == stackKey) {
                 ((JButton) e.getComponent()).doClick();
@@ -776,18 +711,11 @@ public class GameController {
         timer.stop();
     }
 
-    private void showCurrnent() {
-        System.out.println("블록현황 x:" + x + " y:" + y + " width" + currentBlock.getWidth() + "height"
-                + currentBlock.getHeight());
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                System.out.print(board[i][j]);
-            }
-            System.out.println();
-        }
-    }
-
     private void showScore() {
         gameView.getScorePane().setText(String.format("%d", score));
+    }
+
+    public Deque<Block> getBlockDeque() {
+        return this.blockDeque;
     }
 }

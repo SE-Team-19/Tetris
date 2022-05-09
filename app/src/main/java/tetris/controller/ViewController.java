@@ -8,24 +8,23 @@ import java.util.Timer;
 import java.util.*;
 
 import tetris.view.*;
+import static tetris.view.SettingView.KEY_CHANGE_MESSAGE;
 
 public class ViewController extends JFrame {
 
     private Container contentPane;
     private HashMap<JButton, Container> viewMap;
-    private transient Map<KeyPair, PressedKeyEvent> mainMap;
+    private transient Map<KeyPair, PressedKeyEvent> mainViewKeyMap;
     private transient Map<KeyPair, PressedKeyEvent> settingMap;
-    private transient InitMainMap initMainMap;
-    private transient InitSettingMap initSettingMap;
+    private transient SettingViewKeyMap initSettingMap;
     private transient Timer refresh;
-    private transient TimerTask task;
 
     boolean settingFlag;
 
-    private MainView mainView;
-    private GameView gameView;
-    private ScoreView scoreView;
-    private SettingView settingView;
+    private MainView mainView = MainView.getInstance();
+    private GameView gameView = GameView.getInstance();
+    private ScoreView scoreView = ScoreView.getInstance();
+    private SettingView settingView = SettingView.getInstance();
 
     private transient PlayerController playerController = new PlayerController();
     private transient SettingController settingController = new SettingController();
@@ -33,45 +32,36 @@ public class ViewController extends JFrame {
 
     public ViewController() {
         initJFrame();
-        initViewAndController();
         initView();
-        addEventListener();
-    }
 
-    private void initViewAndController() {
-        mainView = MainView.getInstance();
-        gameView = GameView.getInstance();
-        scoreView = ScoreView.getInstance();
-        settingView = SettingView.getInstance();
-        settingController = new SettingController();
-        playerController = new PlayerController();
+        initMainViewKeyMap();
+        addEventListener();
     }
 
     private void initJFrame() {
         super.setTitle("Team 19 Tetris");
-        super.setResizable(false); // 창의 크기 조정 가능 여부
-        setDefaultCloseOperation(EXIT_ON_CLOSE); // 창을 닫으면 더 이상 실행(run)되지 않는다
-        resizeJFrame();
+        super.setResizable(false);
         super.setVisible(true);
-        contentPane = super.getContentPane(); // contentPane 부르기
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        resizeJFrame();
+        contentPane = super.getContentPane();
     }
 
     private void resizeJFrame() {
-        super.setBounds(settingController.getScreenSize());
+        super.setBounds(settingController.getDisplaySize());
         super.setLocationRelativeTo(null);
     }
 
     private void initView() {
-        // View Mapping
         viewMap = new HashMap<>();
         viewMap.put(mainView.getStartBtn(), gameView);
         viewMap.put(mainView.getScoreBoardBtn(), scoreView);
         viewMap.put(mainView.getSettingBtn(), settingView);
 
-        contentPane.setLayout(new GridLayout(1, 0, 0, 0)); // Frame의 레이아웃 방식을 설정, row 1
+        contentPane.setLayout(new GridLayout(1, 0, 0, 0));
         contentPane.add(mainView);
 
-        task = new TimerTask() {
+        TimerTask task = new TimerTask() {
             public void run() {
                 revalidate();
                 repaint();
@@ -86,21 +76,20 @@ public class ViewController extends JFrame {
     }
 
     private void initMainView() {
-        initMainMap = new InitMainMap();
+        mainViewKeyMap = new HashMap<>();
     }
 
     private void initSettingView() {
         int upKey = settingController.getRotateKey();
-        int downKey = settingController.getMoveDownKey();
-        int leftKey = settingController.getMoveLeftKey();
-        int rightKey = settingController.getMoveRightKey();
+        int downKey = settingController.getDownKey();
+        int leftKey = settingController.getLeftKey();
+        int rightKey = settingController.getRightKey();
         int stackKey = settingController.getStackKey();
 
-        settingView.setDisplayComboBox(settingController.getDisplayList(),
-                settingController.getDisplayMode());
+        settingView.setDisplayModeComboBox(settingController.getDisplayMode());
         settingView.setIsColorBlindBtn(settingController.isColorBlindMode());
 
-        initSettingMap = new InitSettingMap(upKey, downKey, leftKey, rightKey, stackKey);
+        initSettingMap = new SettingViewKeyMap(upKey, downKey, leftKey, rightKey, stackKey);
         initSettingMap.initAllKey();
         settingView.initKetLabels(upKey, downKey, leftKey, rightKey, stackKey);
     }
@@ -121,50 +110,41 @@ public class ViewController extends JFrame {
     }
 
     private void addMainViewEventListener() {
-        MainKeyListener mainKeyEventListner = new MainKeyListener();
+        MainViewKeyListener mainViewKeyListner = new MainViewKeyListener();
         mainView.getStartBtn().requestFocus();
-        for (Component buttonComp : mainView.getButtonPanel().getComponents()) {
-            AbstractButton button = (AbstractButton) buttonComp;
+        for (JButton button : mainView.getButtonList()) {
             if (button == mainView.getExitBtn()) {
                 button.addActionListener(e -> System.exit(0));
-                button.addKeyListener(mainKeyEventListner);
+                button.addKeyListener(mainViewKeyListner);
                 continue;
             }
             button.addActionListener(
-                    e -> transitView(contentPane, viewMap.get(e.getSource()), mainView));
-            buttonComp.addKeyListener(mainKeyEventListner);
+                    e -> transitView(viewMap.get(e.getSource()), mainView));
+            button.addKeyListener(mainViewKeyListner);
         }
     }
 
     private void addSettingViewEventListener() {
-        SettingKeyListner settingEventListner = new SettingKeyListner();
+        SettingViewKeyListner settingViewKeyListner = new SettingViewKeyListner();
 
-        settingView.getReturnSettingToMainBtn()
-                .addActionListener(e -> transitView(contentPane, mainView, settingView));
-        for (Component viewComp : settingView.getComponents()) {
-            if (viewComp instanceof JPanel) {
-                for (Component panelComp : ((JPanel) viewComp).getComponents()) {
-                    panelComp.addKeyListener(settingEventListner);
-                }
-            }
-            if (viewComp.getClass().equals(JLabel.class))
-                continue;
-            viewComp.addKeyListener(settingEventListner);
+        settingView.getExitBtn()
+                .addActionListener(e -> transitView(mainView, settingView));
+        for (Component comp : settingView.getComponentList()) {
+            comp.addKeyListener(settingViewKeyListner);
         }
     }
 
     private void addScoreViewEventListener() {
         scoreView.getReturnScoreToMainBtn()
-                .addActionListener(e -> transitView(contentPane, mainView, scoreView));
+                .addActionListener(e -> transitView(mainView, scoreView));
     }
 
-    // 전환함수
-    private void transitView(Container pane, Container to, Container from) {
-        pane.add(to);
-        pane.remove(from);
+    private void transitView(Container to, Container from) {
+        contentPane.add(to);
+        contentPane.remove(from);
         focus(to);
-        revalidate(); // component 변화 후 JFrame 새로고침(component 변화 적용) */
-        repaint(); // component 변화 후 JFrame 새로고침(component 색 등의 성질 적용) */
+        revalidate();
+        repaint();
     }
 
     private void focus(Container to) {
@@ -175,60 +155,12 @@ public class ViewController extends JFrame {
             gameController = new GameController(settingController.getSetting(), playerController, contentPane);
             gameView.requestFocus();
         } else if (to.equals(settingView)) {
-            settingView.getReturnSettingToMainBtn().requestFocus();
+            settingView.getExitBtn().requestFocus();
         }
     }
 
-    private class InitMainMap {
-
-        int upKey;
-        int downKey;
-        int stackKey;
-
-        private InitMainMap() {
-            resetMap();
-            initAllKey();
-        }
-
-        private void loadSetting() {
-            upKey = settingController.getRotateKey();
-            downKey = settingController.getMoveDownKey();
-            stackKey = settingController.getStackKey();
-        }
-
-        private void initAllKey() {
-            loadSetting();
-            initUpKey(upKey);
-            initDownKey(downKey);
-            initStackKey(stackKey);
-        }
-
-        private void resetMap() {
-            mainMap = new HashMap<>();
-        }
-
-        private void initUpKey(int upKey) {
-            for (Component comp : mainView.getButtonPanel().getComponents()) {
-                mainMap.put(new KeyPair(upKey, comp), comp::transferFocusBackward);
-            }
-        }
-
-        private void initDownKey(int downKey) {
-            for (Component comp : mainView.getButtonPanel().getComponents())
-                mainMap.put(new KeyPair(downKey, comp), comp::transferFocus);
-        }
-
-        private void initStackKey(int stackKey) {
-            for (Component comp : mainView.getButtonPanel().getComponents())
-                mainMap.put(new KeyPair(stackKey, comp),
-                        () -> transitView(contentPane, viewMap.get(comp), mainView));
-            mainMap.put(new KeyPair(stackKey, mainView.getExitBtn()), () -> System.exit(0));
-        }
-
-    }
-
-    private class InitSettingMap {
-        JComboBox<String> displayComboBox = settingView.getDisplayComboBox();
+    private class SettingViewKeyMap {
+        JComboBox<String> displayModeComboBox = settingView.getDisplayModeComboBox();
         Map<JToggleButton, KeyMapping> btnmap;
         int keyBuffer;
         int upKey;
@@ -238,7 +170,7 @@ public class ViewController extends JFrame {
         int stackKey;
         List<Integer> keyList;
 
-        private InitSettingMap(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
+        private SettingViewKeyMap(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
             resetMap();
             this.upKey = upKey;
             this.downKey = downKey;
@@ -247,11 +179,11 @@ public class ViewController extends JFrame {
             this.stackKey = stackKey;
             initKeyList();
             btnmap = new HashMap<>();
-            btnmap.put(settingView.getSetUpKeyBtn(), this::setUpKey);
-            btnmap.put(settingView.getSetDownKeyBtn(), this::setDownKey);
-            btnmap.put(settingView.getSetLeftKeyBtn(), this::setLeftKey);
-            btnmap.put(settingView.getSetRightKeyBtn(), this::setRightKey);
-            btnmap.put(settingView.getSetStackKeyBtn(), this::setStackKey);
+            btnmap.put(settingView.getUpKeyBtn(), this::setUpKey);
+            btnmap.put(settingView.getDownKeyBtn(), this::setDownKey);
+            btnmap.put(settingView.getLeftKeyBtn(), this::setLeftKey);
+            btnmap.put(settingView.getRightKeyBtn(), this::setRightKey);
+            btnmap.put(settingView.getStackKeyBtn(), this::setStackKey);
             initAllKey();
         }
 
@@ -281,11 +213,10 @@ public class ViewController extends JFrame {
             for (Component comp : settingView.getComponents()) {
                 settingMap.put(new KeyPair(upKey, comp), comp::transferFocusBackward);
             }
-            settingMap.put(new KeyPair(upKey, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
+            settingMap.put(new KeyPair(upKey, displayModeComboBox), () -> {
+                int a = displayModeComboBox.getSelectedIndex();
+                displayModeComboBox.setSelectedIndex((3 - (a % 4)) - ((1 + a) % 3));
+                displayModeComboBox.hidePopup();
             });
         }
 
@@ -293,19 +224,16 @@ public class ViewController extends JFrame {
             for (Component comp : settingView.getComponents()) {
                 settingMap.put(new KeyPair(downKey, comp), comp::transferFocus);
             }
-            settingMap.put(new KeyPair(downKey, displayComboBox), () -> {
-                displayComboBox.setSelectedIndex((displayComboBox.getSelectedIndex() + 1)
-                        % settingController.getDisplayList().size());
-                displayComboBox.hidePopup();
+            settingMap.put(new KeyPair(downKey, displayModeComboBox), () -> {
+                displayModeComboBox.setSelectedIndex((displayModeComboBox.getSelectedIndex() + 1)
+                        % 3);
+                displayModeComboBox.hidePopup();
             });
         }
 
         private void initStackKey(int stackKey) {
-            String inputMessage = settingView.getInputMessage();
-
-            /* StackKey */
-            settingMap.put(new KeyPair(stackKey, settingView.getReturnSettingToMainBtn()), () -> {
-                transitView(contentPane, mainView, settingView);
+            settingMap.put(new KeyPair(stackKey, settingView.getExitBtn()), () -> {
+                transitView(mainView, settingView);
                 settingView.setInitKeyBtnsFocusable(false);
                 settingView.setSettingBtnsFocusable(true);
                 settingView.setInitKeyBtnsFocusable(false);
@@ -316,81 +244,81 @@ public class ViewController extends JFrame {
                 settingController.setColorBlindMode(!isColorBlind);
                 settingController.saveSetting();
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetDisplayBtn()), () -> {
-                displayComboBox.setFocusable(true);
-                displayComboBox.requestFocus();
+            settingMap.put(new KeyPair(stackKey, settingView.getEnterDisplayMenuBtn()), () -> {
+                displayModeComboBox.setFocusable(true);
+                displayModeComboBox.requestFocus();
             });
-            settingMap.put(new KeyPair(stackKey, displayComboBox), () -> {
-                displayComboBox.setFocusable(false);
-                settingController.setDisplayMode(displayComboBox.getSelectedIndex());
+            settingMap.put(new KeyPair(stackKey, displayModeComboBox), () -> {
+                displayModeComboBox.setFocusable(false);
+                settingController.setDisplayMode(displayModeComboBox.getSelectedIndex());
                 settingController.saveSetting();
                 resizeJFrame();
-                settingView.getSetDisplayBtn().requestFocus();
+                settingView.getEnterDisplayMenuBtn().requestFocus();
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getInitKeyBtn()), () -> {
+            settingMap.put(new KeyPair(stackKey, settingView.getEnterKeyMenuBtn()), () -> {
                 settingView.setInitKeyBtnsFocusable(true);
                 settingView.setSettingBtnsFocusable(false);
-                settingView.getInitKeyGridReturnBtn().requestFocus();
-                settingView.getInitKeyBtn().doClick(100);
+                settingView.getExitKeyMenuBtn().requestFocus();
+                settingView.getEnterKeyMenuBtn().doClick(100);
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getInitKeyGridReturnBtn()), () -> {
+            settingMap.put(new KeyPair(stackKey, settingView.getExitKeyMenuBtn()), () -> {
                 settingView.setInitKeyBtnsFocusable(false);
                 settingView.setSettingBtnsFocusable(true);
-                settingView.getInitKeyBtn().requestFocus();
-                settingView.getInitKeyGridReturnBtn().doClick(100);
+                settingView.getEnterKeyMenuBtn().requestFocus();
+                settingView.getExitKeyMenuBtn().doClick(100);
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getInitMenuBtn()), () -> {
-                settingView.setInitSettingBtnsFocusable(true);
+            settingMap.put(new KeyPair(stackKey, settingView.getEnterResetMenuBtn()), () -> {
+                settingView.setResetSettingBtnsFocusable(true);
                 settingView.setSettingBtnsFocusable(false);
-                settingView.getInitReturnBtn().requestFocus();
-                settingView.getInitMenuBtn().doClick(100);
+                settingView.getExitResetMenuBtn().requestFocus();
+                settingView.getEnterResetMenuBtn().doClick(100);
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getInitReturnBtn()), () -> {
-                settingView.setInitSettingBtnsFocusable(false);
+            settingMap.put(new KeyPair(stackKey, settingView.getExitResetMenuBtn()), () -> {
+                settingView.setResetSettingBtnsFocusable(false);
                 settingView.setSettingBtnsFocusable(true);
-                settingView.getInitMenuBtn().requestFocus();
-                settingView.getInitReturnBtn().doClick(100);
+                settingView.getEnterResetMenuBtn().requestFocus();
+                settingView.getExitResetMenuBtn().doClick(100);
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getInitSettingBtn()), () -> {
+            settingMap.put(new KeyPair(stackKey, settingView.getResetSettingBtn()), () -> {
                 settingController.resetSetting();
                 initSettingView();
                 initJFrame();
-                settingView.getReturnSettingToMainBtn().requestFocus();
-                settingView.getInitSettingBtn().doClick(100);
+                settingView.getExitBtn().requestFocus();
+                settingView.getResetSettingBtn().doClick(100);
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetUpKeyBtn()), () -> {
-                settingView.getUpKeyLabel().setText(inputMessage);
+            settingMap.put(new KeyPair(stackKey, settingView.getUpKeyBtn()), () -> {
+                settingView.getUpKeyLabel().setText(KEY_CHANGE_MESSAGE);
                 settingView.getUpKeyLabel().setForeground(Color.RED);
-                settingView.getSetUpKeyBtn().setSelected(true);
+                settingView.getUpKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = upKey;
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetDownKeyBtn()), () -> {
-                settingView.getDownKeyLabel().setText(inputMessage);
+            settingMap.put(new KeyPair(stackKey, settingView.getDownKeyBtn()), () -> {
+                settingView.getDownKeyLabel().setText(KEY_CHANGE_MESSAGE);
                 settingView.getDownKeyLabel().setForeground(Color.RED);
-                settingView.getSetDownKeyBtn().setSelected(true);
+                settingView.getDownKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = downKey;
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetLeftKeyBtn()), () -> {
-                settingView.getLeftKeyLabel().setText(inputMessage);
+            settingMap.put(new KeyPair(stackKey, settingView.getLeftKeyBtn()), () -> {
+                settingView.getLeftKeyLabel().setText(KEY_CHANGE_MESSAGE);
                 settingView.getLeftKeyLabel().setForeground(Color.RED);
-                settingView.getSetLeftKeyBtn().setSelected(true);
+                settingView.getLeftKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = leftKey;
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetRightKeyBtn()), () -> {
-                settingView.getRightKeyLabel().setText(inputMessage);
+            settingMap.put(new KeyPair(stackKey, settingView.getRightKeyBtn()), () -> {
+                settingView.getRightKeyLabel().setText(KEY_CHANGE_MESSAGE);
                 settingView.getRightKeyLabel().setForeground(Color.RED);
-                settingView.getSetRightKeyBtn().setSelected(true);
+                settingView.getRightKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = rightKey;
             });
-            settingMap.put(new KeyPair(stackKey, settingView.getSetStackKeyBtn()), () -> {
-                if (!settingView.getSetStackKeyBtn().isSelected()) {
-                    settingView.getStackKeyLabel().setText(inputMessage);
+            settingMap.put(new KeyPair(stackKey, settingView.getStackKeyBtn()), () -> {
+                if (!settingView.getStackKeyBtn().isSelected()) {
+                    settingView.getStackKeyLabel().setText(KEY_CHANGE_MESSAGE);
                     settingView.getStackKeyLabel().setForeground(Color.RED);
-                    settingView.getSetStackKeyBtn().setSelected(true);
+                    settingView.getStackKeyBtn().setSelected(true);
                     settingFlag = true;
                     keyBuffer = stackKey;
                 }
@@ -398,30 +326,30 @@ public class ViewController extends JFrame {
         }
 
         private void initLeftKey(int leftKey) {
-            for (Component comp : settingView.getInitKeyGridPane().getComponents()) {
+            for (Component comp : settingView.getKeyMenuPanel().getComponents()) {
                 if (!(comp.getClass().equals(JLabel.class))) {
                     settingMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
                 }
             }
-            for (Component comp : settingView.getInitSettingPane().getComponents()) {
+            for (Component comp : settingView.getResetMenuPanel().getComponents()) {
                 settingMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
             }
         }
 
         private void initRightKey(int rightKey) {
-            for (Component comp : settingView.getInitKeyGridPane().getComponents()) {
+            for (Component comp : settingView.getKeyMenuPanel().getComponents()) {
                 if (!(comp.getClass().equals(JLabel.class))) {
                     settingMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
                 }
             }
 
-            for (Component comp : settingView.getInitSettingPane().getComponents()) {
+            for (Component comp : settingView.getResetMenuPanel().getComponents()) {
                 settingMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
             }
         }
 
         private void setKeyByToggleButton(JToggleButton btn, int key) {
-            btnmap.get(btn).domapping(key);
+            btnmap.get(btn).mapping(key);
         }
 
         private void setUpKey(int upKey) {
@@ -429,30 +357,30 @@ public class ViewController extends JFrame {
             settingController.setRotateKey(upKey);
             resetMap();
             initAllKey();
-            initMainMap.initAllKey();
+            initMainViewKeyMap();
         }
 
         private void setDownKey(int downKey) {
             this.downKey = downKey;
-            settingController.setMoveDownKey(downKey);
+            settingController.setdownKey(downKey);
             resetMap();
             initAllKey();
         }
 
         private void setLeftKey(int leftKey) {
             this.leftKey = leftKey;
-            settingController.setMoveLeftKey(leftKey);
+            settingController.setLeftKey(leftKey);
             resetMap();
             initAllKey();
-            initMainMap.initAllKey();
+            initMainViewKeyMap();
         }
 
         private void setRightKey(int rightKey) {
             this.rightKey = rightKey;
-            settingController.setMoveRightKey(rightKey);
+            settingController.setRightKey(rightKey);
             resetMap();
             initAllKey();
-            initMainMap.initAllKey();
+            initMainViewKeyMap();
         }
 
         private void setStackKey(int stackKey) {
@@ -460,7 +388,7 @@ public class ViewController extends JFrame {
             settingController.setStackKey(stackKey);
             resetMap();
             initAllKey();
-            initMainMap.initAllKey();
+            initMainViewKeyMap();
         }
 
         private boolean checkKeyOverlap(int key) {
@@ -504,20 +432,39 @@ public class ViewController extends JFrame {
 
     @FunctionalInterface
     private interface KeyMapping {
-        void domapping(int key);
+        void mapping(int key);
     }
 
-    private class MainKeyListener extends KeyAdapter {
+    private void initMainViewKeyMap() {
+        mainViewKeyMap = new HashMap<>();
+        int upKey = settingController.getRotateKey();
+        int downKey = settingController.getDownKey();
+        int stackKey = settingController.getStackKey();
+        for (Component comp : mainView.getButtonPanel().getComponents()) {
+            mainViewKeyMap.put(new KeyPair(upKey, comp), comp::transferFocusBackward);
+        }
+        for (Component comp : mainView.getButtonPanel().getComponents()) {
+            mainViewKeyMap.put(new KeyPair(downKey, comp), comp::transferFocus);
+        }
+        for (Component comp : mainView.getButtonPanel().getComponents()) {
+            mainViewKeyMap.put(new KeyPair(stackKey, comp),
+                    () -> transitView(viewMap.get(comp), mainView));
+        }
+        mainViewKeyMap.put(new KeyPair(stackKey, mainView.getExitBtn()), () -> System.exit(0));
+    }
+
+    private class MainViewKeyListener extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
             KeyPair key = new KeyPair(e.getKeyCode(), e.getComponent());
-            if (mainMap.containsKey(key))
-                mainMap.get(key).isKeyPressed();
+            if (mainViewKeyMap.containsKey(key)) {
+                mainViewKeyMap.get(key).isKeyPressed();
+            }
         }
     }
 
-    private class SettingKeyListner extends KeyAdapter {
+    private class SettingViewKeyListner extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
