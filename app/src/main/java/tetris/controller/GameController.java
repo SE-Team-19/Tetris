@@ -23,6 +23,7 @@ public class GameController {
     private static final int START_X = 3;
     private static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
+    private static final int MAX_BLOCK_HEIGHT = 4;
 
     private Timer gameDelayTimer;
     private Timer gameTimer;
@@ -39,13 +40,15 @@ public class GameController {
     private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
     private int[][] attackLineBoard;
-    private Stack<int[]> attackLinesStack;
+    private Deque<Integer> blockDeque;
+    private Deque<int[]> attackLinesDeque;
 
     private int x;
     private int y;
     private int ghostY;
     private int score; // game 점수와 관련된 변수
     private int attackLines;
+    private int scoreLines;
 
     private String userName;
 
@@ -85,10 +88,8 @@ public class GameController {
         boardBuffer = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         visualBoard = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         attackLineBoard = new int[BOARD_HEIGHT][BOARD_WIDTH];
-        attackLinesStack = new Stack<>();
-        currentBlock = getRandomBlock(diffMode, 0);
-        blockBuffer = getRandomBlock(diffMode, 0);
-        nextBlock = getRandomBlock(diffMode, 10);
+        attackLinesDeque = new ArrayDeque<>();
+        blockDeque = new ArrayDeque<>();
         gameOverText = new JLabel("Game Over");
         x = START_X;
         y = START_Y;
@@ -112,11 +113,17 @@ public class GameController {
         setAttributeSet(nextBoardAttributeSet);
         setAttributeSet(attackBoardAttributeSet);
 
+    }
+
+    private void startGame() {
+        generateBlockRandomizer(diffMode);
+        blockBuffer = getBlock(blockDeque.getFirst());
+        currentBlock = getBlock(blockDeque.removeFirst());
+        nextBlock = getBlock(blockDeque.removeFirst());
+
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
         drawNextBlock();
-
-        // placeAccumulatedBlock(); // collision add
 
         nextBlockPane.repaint();
         nextBlockPane.revalidate();
@@ -126,6 +133,7 @@ public class GameController {
         gameTime = 0;
 
         showScore();
+        startGameDelayTimer(delay);
     }
 
     private void initBlockCharMap() {
@@ -151,24 +159,24 @@ public class GameController {
         colorMap.put(Block.GHOST_IDENTIFIY_NUMBER, new Color(200, 200, 200));
         colorMap.put(Block.BOMBBLOCK_IDENTIFY_NUMBER, Color.RED);
         if (isColorBlindMode) {
-            colorMap.put(new IBlock().getIdentifynumber(), new IBlock().getBlindColor());
-            colorMap.put(new JBlock().getIdentifynumber(), new JBlock().getBlindColor());
-            colorMap.put(new LBlock().getIdentifynumber(), new LBlock().getBlindColor());
-            colorMap.put(new OBlock().getIdentifynumber(), new OBlock().getBlindColor());
-            colorMap.put(new SBlock().getIdentifynumber(), new SBlock().getBlindColor());
-            colorMap.put(new TBlock().getIdentifynumber(), new TBlock().getBlindColor());
-            colorMap.put(new ZBlock().getIdentifynumber(), new ZBlock().getBlindColor());
-            colorMap.put(new WeightBlock().getIdentifynumber(), new WeightBlock().getBlindColor());
+            colorMap.put(Block.IBLOCK_IDENTIFY_NUMBER, new IBlock().getBlindColor());
+            colorMap.put(Block.JBLOCK_IDENTIFY_NUMBER, new JBlock().getBlindColor());
+            colorMap.put(Block.LBLOCK_IDENTIFY_NUMBER, new LBlock().getBlindColor());
+            colorMap.put(Block.OBLOCK_IDENTIFY_NUMBER, new OBlock().getBlindColor());
+            colorMap.put(Block.SBLOCK_IDENTIFY_NUMBER, new SBlock().getBlindColor());
+            colorMap.put(Block.TBLOCK_IDENTIFY_NUMBER, new TBlock().getBlindColor());
+            colorMap.put(Block.ZBLOCK_IDENTIFY_NUMBER, new ZBlock().getBlindColor());
+            colorMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, new WeightBlock().getBlindColor());
 
         } else {
-            colorMap.put(new IBlock().getIdentifynumber(), new IBlock().getColor());
-            colorMap.put(new JBlock().getIdentifynumber(), new JBlock().getColor());
-            colorMap.put(new LBlock().getIdentifynumber(), new LBlock().getColor());
-            colorMap.put(new OBlock().getIdentifynumber(), new OBlock().getColor());
-            colorMap.put(new SBlock().getIdentifynumber(), new SBlock().getColor());
-            colorMap.put(new TBlock().getIdentifynumber(), new TBlock().getColor());
-            colorMap.put(new ZBlock().getIdentifynumber(), new ZBlock().getColor());
-            colorMap.put(new WeightBlock().getIdentifynumber(), new WeightBlock().getColor());
+            colorMap.put(Block.IBLOCK_IDENTIFY_NUMBER, new IBlock().getColor());
+            colorMap.put(Block.JBLOCK_IDENTIFY_NUMBER, new JBlock().getColor());
+            colorMap.put(Block.LBLOCK_IDENTIFY_NUMBER, new LBlock().getColor());
+            colorMap.put(Block.OBLOCK_IDENTIFY_NUMBER, new OBlock().getColor());
+            colorMap.put(Block.SBLOCK_IDENTIFY_NUMBER, new SBlock().getColor());
+            colorMap.put(Block.TBLOCK_IDENTIFY_NUMBER, new TBlock().getColor());
+            colorMap.put(Block.ZBLOCK_IDENTIFY_NUMBER, new ZBlock().getColor());
+            colorMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, new WeightBlock().getColor());
         }
     }
 
@@ -277,87 +285,53 @@ public class GameController {
         StyleConstants.setLineSpacing(attributeSet, -0.5f);
     }
 
-    private class Pair<K, V> {
+    public void generateBlockRandomizer(int mode) {
+        int jBlock = Block.JBLOCK_IDENTIFY_NUMBER;
+        int lBlock = Block.LBLOCK_IDENTIFY_NUMBER;
+        int zBlock = Block.ZBLOCK_IDENTIFY_NUMBER;
+        int sBlock = Block.SBLOCK_IDENTIFY_NUMBER;
+        int tBlock = Block.TBLOCK_IDENTIFY_NUMBER;
+        int oBlock = Block.OBLOCK_IDENTIFY_NUMBER;
+        int iBlock = Block.IBLOCK_IDENTIFY_NUMBER;
 
-        K block;
-        V weight;
-
-        public Pair(K block, V weight) {
-            this.block = block;
-            this.weight = weight;
-        }
-    }
-
-    public Block getRandomBlock(int mode, int seed) {
-        // normal mode
-        if (mode == 0) {
-            Random random = new Random(System.currentTimeMillis() + seed);
-            int block = random.nextInt(8);
-            switch (block) {
-                case 0:
-                    return new IBlock();
-                case 1:
-                    return new JBlock();
-                case 2:
-                    return new LBlock();
-                case 3:
-                    return new ZBlock();
-                case 4:
-                    return new SBlock();
-                case 5:
-                    return new TBlock();
-                case 6:
-                    return new OBlock();
-                default:
-                    return new IBlock();
-            }
+        List<Integer> randomBlockList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
         }
 
         // easy mode
         if (mode == 1) {
-            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
-                    new Pair<>(new JBlock(), 5 / 36d),
-                    new Pair<>(new LBlock(), 5 / 36d),
-                    new Pair<>(new ZBlock(), 5 / 36d),
-                    new Pair<>(new SBlock(), 5 / 36d),
-                    new Pair<>(new TBlock(), 5 / 36d),
-                    new Pair<>(new OBlock(), 5 / 36d),
-                    new Pair<>(new IBlock(), 6 / 36d));
-
-            double pivot = Math.random();
-            double acc = 0;
-            for (Pair<? extends Block, Double> pair : candidates) {
-                acc += pair.weight;
-
-                if (pivot <= acc) {
-                    return pair.block;
-                }
-            }
+            randomBlockList.add(iBlock);
         }
 
         // hard mode
-        if (mode == 2) {
-            List<Pair<? extends Block, Double>> candidates = Arrays.asList(
-                    new Pair<>(new JBlock(), 6 / 41d),
-                    new Pair<>(new LBlock(), 6 / 41d),
-                    new Pair<>(new ZBlock(), 6 / 41d),
-                    new Pair<>(new SBlock(), 6 / 41d),
-                    new Pair<>(new TBlock(), 6 / 41d),
-                    new Pair<>(new OBlock(), 6 / 41d),
-                    new Pair<>(new IBlock(), 5 / 41d));
-
-            double pivot = Math.random();
-            double acc = 0;
-            for (Pair<? extends Block, Double> pair : candidates) {
-                acc += pair.weight;
-
-                if (pivot <= acc) {
-                    return pair.block;
-                }
-            }
+        else if (mode == 2) {
+            randomBlockList.addAll(Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock));
         }
+        blockDeque.addAll(randomBlockList);
+    }
 
-        return new IBlock();
+    private Block getBlock(int id) {
+        switch (id) {
+            case Block.IBLOCK_IDENTIFY_NUMBER:
+                return new IBlock();
+            case Block.JBLOCK_IDENTIFY_NUMBER:
+                return new JBlock();
+            case Block.LBLOCK_IDENTIFY_NUMBER:
+                return new LBlock();
+            case Block.OBLOCK_IDENTIFY_NUMBER:
+                return new OBlock();
+            case Block.SBLOCK_IDENTIFY_NUMBER:
+                return new SBlock();
+            case Block.TBLOCK_IDENTIFY_NUMBER:
+                return new TBlock();
+            case Block.ZBLOCK_IDENTIFY_NUMBER:
+                return new ZBlock();
+            default:
+                return new IBlock();
+        }
     }
 
     public void drawGameBoard() {
@@ -611,7 +585,6 @@ public class GameController {
                 if (boardBuffer[y + j][x + i] > 2) {
                     System.out.println("충돌발생");
                     return true;
-
                 }
             }
         }
@@ -621,7 +594,7 @@ public class GameController {
     // Block이 경계를 넘는지 확인
     private boolean ifBlockOutOfBounds(int x, int y) {
         boolean flag = false;
-        if (x < 0 || y < 0) { // 왼쪽 위 아래 경게 확인 (다만 saftyRotate 함수에서 보니까 의미 없을 수도 )
+        if (x < 0 || y < 0) { // 왼쪽 위 아래 경게 확인
             flag = true;
             return flag;
         } else if (x + blockBuffer.getWidth() > BOARD_WIDTH
@@ -649,43 +622,39 @@ public class GameController {
         if (attackLines + lines > 10)
             lines = 10 - attackLines;
 
-        System.out.println("현재스택 사이즈: " + attackLinesStack.size());
+        System.out.println("현재스택 사이즈: " + attackLinesDeque.size());
 
         // 먼저 이미 공격 줄이 있다면 미리 스택에 넣어두고
         if (attackLines > 0) {
             for (int i = BOARD_HEIGHT - attackLines; i < BOARD_HEIGHT; i++)
-                attackLinesStack.push(attackLineBoard[i]);
+                attackLinesDeque.push(attackLineBoard[i]);
         }
 
         // 공격할 줄을 만들고 (구멍을 만드는 과정)
-        int[][] temp = new int[4][BOARD_WIDTH];
+        int[][] temp = new int[MAX_BLOCK_HEIGHT][BOARD_WIDTH];
         for (int j = 3; j > 3 - lines; j--) {
             for (int i = 0; i < BOARD_WIDTH; i++) {
                 temp[j][i] = 2;
             }
         }
-        placeBlock(temp, currentBlock, x, 4 - currentBlock.getHeight());
+        placeBlock(temp, currentBlock, x, MAX_BLOCK_HEIGHT - currentBlock.getHeight());
         showCurrent(temp, currentBlock);
 
-        // 구멍난 공격줄을 stack에 넣어주고
-        for (int j = 0; j < 4; j++) {
-            System.out.println("합: " + Arrays.stream(temp[j]).sum());
+        // 구멍난 공격줄을 stack에 넣어주고 4-> 테트리미노 블록개수
+        for (int j = 0; j < MAX_BLOCK_HEIGHT; j++) {
             if (Arrays.stream(temp[j]).sum() > 20) {
-                attackLinesStack.push(Arrays.stream(temp[j]).map(e -> e % 3).toArray());
+                attackLinesDeque.push(Arrays.stream(temp[j]).map(e -> e % 3).toArray());
             }
-
         }
 
         // stack에서 공격할 줄을 board에 넣어준다.
-        System.out.println(attackLinesStack.peek());
-        int size = attackLinesStack.size();
+        int size = attackLinesDeque.size();
         for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1
                 - size; i--) {
-            attackLineBoard[i] = Arrays.copyOf(attackLinesStack.pop(), BOARD_WIDTH);
+            attackLineBoard[i] = Arrays.copyOf(attackLinesDeque.pop(), BOARD_WIDTH);
         }
 
         // 그리고 그걸 attackLinePane에 표현한다.
-        System.out.println("attack!");
         StringBuilder sb = new StringBuilder();
         for (int j = 0; j < BOARD_HEIGHT; j++) {
             for (int i = 0; i < BOARD_WIDTH; i++) {
@@ -888,7 +857,10 @@ public class GameController {
         }
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
-        nextBlock = getRandomBlock(diffMode, 0);
+        if (blockDeque.isEmpty()) {
+            generateBlockRandomizer(diffMode);
+        }
+        nextBlock = getBlock(blockDeque.removeFirst());
         drawNextBlock();
         x = START_X;
         y = START_Y;
@@ -919,9 +891,11 @@ public class GameController {
         board = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         x = START_X;
         y = START_Y;
-        currentBlock = getRandomBlock(diffMode, 0);
-        blockBuffer = getRandomBlock(diffMode, 0);
-        nextBlock = getRandomBlock(diffMode, 1);
+        blockDeque = new ArrayDeque<>();
+        generateBlockRandomizer(diffMode);
+        blockBuffer = getBlock(blockDeque.getFirst());
+        currentBlock = getBlock(blockDeque.removeFirst());
+        nextBlock = getBlock(blockDeque.removeFirst());
 
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
@@ -1065,17 +1039,17 @@ public class GameController {
             gameKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
                 diffMode = 1;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameDelayTimer(delay);
+                startGame();
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
                 diffMode = 0;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameDelayTimer(delay);
+                startGame();
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
                 diffMode = 2;
                 transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
-                startGameDelayTimer(delay);
+                startGame();
             });
             gameKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
                 gameMode = 0;

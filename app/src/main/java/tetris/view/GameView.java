@@ -91,10 +91,10 @@ public class GameView extends JPanel {
         timePane.setEditable(false);
         timePane.setFocusable(false);
 
-        infoPane.setLayout(new GridLayout(1, 0, 0, 0));
-        // infoPane.add(nextBlockPane);
-        // infoPane.add(scorePane);
-        // infoPane.add(timePane);
+        infoPane.setLayout(new GridLayout(4, 0, 0, 0));
+        infoPane.add(nextBlockPane);
+        infoPane.add(scorePane);
+        infoPane.add(timePane);
         infoPane.add(attackLinePane);
 
         gameDisplayPanel.add(gameBoardPane);
