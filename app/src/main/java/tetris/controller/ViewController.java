@@ -8,6 +8,8 @@ import java.util.Timer;
 import java.util.*;
 
 import tetris.view.*;
+import tetris.view.MasterView.JToggleButton;
+import tetris.view.MasterView.JLabel;
 
 public class ViewController extends JFrame {
 
@@ -331,57 +333,52 @@ public class ViewController extends JFrame {
                 settingView.setInitKeyBtnsFocusable(true);
                 settingView.setSettingBtnsFocusable(false);
                 settingView.getInitKeyGridReturnBtn().requestFocus();
-                settingView.getInitKeyBtn().doClick(100);
             });
             settingMap.put(new KeyPair(stackKey, settingView.getInitKeyGridReturnBtn()), () -> {
                 settingView.setInitKeyBtnsFocusable(false);
                 settingView.setSettingBtnsFocusable(true);
                 settingView.getInitKeyBtn().requestFocus();
-                settingView.getInitKeyGridReturnBtn().doClick(100);
             });
             settingMap.put(new KeyPair(stackKey, settingView.getInitMenuBtn()), () -> {
                 settingView.setInitSettingBtnsFocusable(true);
                 settingView.setSettingBtnsFocusable(false);
                 settingView.getInitReturnBtn().requestFocus();
-                settingView.getInitMenuBtn().doClick(100);
             });
             settingMap.put(new KeyPair(stackKey, settingView.getInitReturnBtn()), () -> {
                 settingView.setInitSettingBtnsFocusable(false);
                 settingView.setSettingBtnsFocusable(true);
                 settingView.getInitMenuBtn().requestFocus();
-                settingView.getInitReturnBtn().doClick(100);
             });
             settingMap.put(new KeyPair(stackKey, settingView.getInitSettingBtn()), () -> {
                 settingController.resetSetting();
                 initSettingView();
                 initJFrame();
                 settingView.getReturnSettingToMainBtn().requestFocus();
-                settingView.getInitSettingBtn().doClick(100);
             });
             settingMap.put(new KeyPair(stackKey, settingView.getSetUpKeyBtn()), () -> {
                 settingView.getUpKeyLabel().setText(inputMessage);
-                settingView.getUpKeyLabel().setForeground(Color.RED);
+                settingView.getUpKeyLabel().setForeground(MasterView.WARNING_FONT_COLOR);
                 settingView.getSetUpKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = upKey;
             });
             settingMap.put(new KeyPair(stackKey, settingView.getSetDownKeyBtn()), () -> {
                 settingView.getDownKeyLabel().setText(inputMessage);
-                settingView.getDownKeyLabel().setForeground(Color.RED);
+                settingView.getDownKeyLabel().setForeground(MasterView.WARNING_FONT_COLOR);
                 settingView.getSetDownKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = downKey;
             });
             settingMap.put(new KeyPair(stackKey, settingView.getSetLeftKeyBtn()), () -> {
                 settingView.getLeftKeyLabel().setText(inputMessage);
-                settingView.getLeftKeyLabel().setForeground(Color.RED);
+                settingView.getLeftKeyLabel().setForeground(MasterView.WARNING_FONT_COLOR);
                 settingView.getSetLeftKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = leftKey;
             });
             settingMap.put(new KeyPair(stackKey, settingView.getSetRightKeyBtn()), () -> {
                 settingView.getRightKeyLabel().setText(inputMessage);
-                settingView.getRightKeyLabel().setForeground(Color.RED);
+                settingView.getRightKeyLabel().setForeground(MasterView.WARNING_FONT_COLOR);
                 settingView.getSetRightKeyBtn().setSelected(true);
                 settingFlag = true;
                 keyBuffer = rightKey;
@@ -389,7 +386,7 @@ public class ViewController extends JFrame {
             settingMap.put(new KeyPair(stackKey, settingView.getSetStackKeyBtn()), () -> {
                 if (!settingView.getSetStackKeyBtn().isSelected()) {
                     settingView.getStackKeyLabel().setText(inputMessage);
-                    settingView.getStackKeyLabel().setForeground(Color.RED);
+                    settingView.getStackKeyLabel().setForeground(MasterView.WARNING_FONT_COLOR);
                     settingView.getSetStackKeyBtn().setSelected(true);
                     settingFlag = true;
                     keyBuffer = stackKey;
@@ -532,8 +529,7 @@ public class ViewController extends JFrame {
                     } else {
                         initSettingMap.setKeyByToggleButton(x, pressedKey);
                         setKeymap.get(x).setText(KeyEvent.getKeyText(pressedKey));
-                        setKeymap.get(x).setForeground(Color.BLACK);
-                        x.doClick();
+                        setKeymap.get(x).setForeground(MasterView.BASIC_FONT_COLOR);
                         settingFlag = false;
                     }
                 });

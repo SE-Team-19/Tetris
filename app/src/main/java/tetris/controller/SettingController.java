@@ -21,7 +21,7 @@ public class SettingController {
 
     private void initSetting() {
         List<Rectangle> displayList = new ArrayList<>();
-        displayList.add(new Rectangle(0, 0, 366, 342));
+        displayList.add(new Rectangle(0, 0, 1366, 768));
         displayList.add(new Rectangle(0, 0, 380, 350));
         displayList.add(new Rectangle(0, 0, 640, 960));
         setting = new Setting(0, false, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN,

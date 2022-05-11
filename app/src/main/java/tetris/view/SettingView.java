@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-public class SettingView extends JPanel {
+public class SettingView extends MasterView {
 
     private JComboBox<String> displayComboBox;
     private JButton returnSettingToMainBtn;
@@ -52,11 +52,13 @@ public class SettingView extends JPanel {
         initSetKeyGrid();
         initSettingGrid();
 
+        super.setBackground(Color.BLACK);
+
         GridBagLayout gridBag = new GridBagLayout();
-        gridBag.columnWidths = new int[] {0, 0, 0};
-        gridBag.rowHeights = new int[] {0, 0, 0, 0, 0, 0};
-        gridBag.columnWeights = new double[] {1.0, 0.2, Double.MIN_VALUE};
-        gridBag.rowWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+        gridBag.columnWidths = new int[] { 0, 0, 0 };
+        gridBag.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+        gridBag.columnWeights = new double[] { 1.0, 0.2, Double.MIN_VALUE };
+        gridBag.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
         super.setLayout(gridBag);
         super.add(setDisplayBtn, addGridBagComponents(1, 0));
         super.add(initKeyBtn, addGridBagComponents(1, 1));
@@ -124,47 +126,19 @@ public class SettingView extends JPanel {
         isColorBlindLabel = initAndSetName("isColorBlindLabel", new JLabel("색맹모드"));
     }
 
-    private void deleteKeyBinding(JComponent... comps) {
-        for (JComponent comp : comps)
-            comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
-    }
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
-    }
-
     private void setFocusableComponents(boolean bool, JComponent... comp) {
         for (JComponent c : comp) {
             c.setFocusable(bool);
         }
     }
 
-    private void addGridBagComponents(Container pane, JComponent comp, int x, int y) {
-        GridBagConstraints gridBag = new GridBagConstraints();
-        gridBag.insets = new Insets(0, 0, 0, 0);
-        gridBag.gridx = x;
-        gridBag.gridy = y;
-        gridBag.fill = GridBagConstraints.BOTH;
-        pane.add(comp, gridBag);
-    }
-
-    private GridBagConstraints addGridBagComponents(int x, int y) {
-        GridBagConstraints gridBag = new GridBagConstraints();
-        gridBag.insets = new Insets(0, 0, 0, 0);
-        gridBag.gridx = x;
-        gridBag.gridy = y;
-        gridBag.fill = GridBagConstraints.BOTH;
-        return gridBag;
-    }
-
     private void initSetKeyGrid() {
         initKeyGridPane = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0};
-        gbl.rowHeights = new int[] {0, 0, 0};
-        gbl.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 0.1, Double.MIN_VALUE};
-        gbl.rowWeights = new double[] {1.0, 1.0, Double.MIN_VALUE};
+        gbl.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gbl.rowHeights = new int[] { 0, 0, 0 };
+        gbl.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 0.1, Double.MIN_VALUE };
+        gbl.rowWeights = new double[] { 1.0, 1.0, Double.MIN_VALUE };
         initKeyGridPane.setLayout(gbl);
         setInitKeyBtnsFocusable(false);
 
@@ -191,10 +165,10 @@ public class SettingView extends JPanel {
     private void initSettingGrid() {
         initSettingPane = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[] {0, 0, 0, 0};
-        gbl.rowHeights = new int[] {0, 0};
-        gbl.columnWeights = new double[] {1.0, 0.5, 1.0, Double.MIN_VALUE};
-        gbl.rowWeights = new double[] {1.0, Double.MIN_VALUE};
+        gbl.columnWidths = new int[] { 0, 0, 0, 0 };
+        gbl.rowHeights = new int[] { 0, 0 };
+        gbl.columnWeights = new double[] { 1.0, 0.5, 1.0, Double.MIN_VALUE };
+        gbl.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
         initSettingPane.setLayout(gbl);
         setInitSettingBtnsFocusable(false);
 
@@ -315,7 +289,6 @@ public class SettingView extends JPanel {
     public String getInputMessage() {
         return this.inputMessage;
     }
-
 
     public void setInitKeyBtnsFocusable(boolean bool) {
         setFocusableComponents(bool, setUpKeyBtn, setDownKeyBtn, setLeftKeyBtn, setRightKeyBtn,

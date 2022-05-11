@@ -3,13 +3,12 @@ package tetris.view;
 import javax.swing.*;
 import static javax.swing.SwingConstants.CENTER;
 
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Component;
 
 import java.util.*;
 
-public class MainView extends JPanel {
+public class MainView extends MasterView {
 
     private JPanel buttonPanel;
     private JButton startBtn;
@@ -54,25 +53,6 @@ public class MainView extends JPanel {
         super.add(appName);
         super.add(buttonPanel);
     }
-
-    private void addAButton(ArrayList<JButton> buttons, Container container) {
-        buttonPanel.setLayout(new GridLayout(buttons.size(), 0, 0, 0));
-        for (JButton button : buttons) {
-            button.setAlignmentX(Component.CENTER_ALIGNMENT);
-            container.add(button);
-        }
-    }
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
-    }
-
-    private void deleteKeyBinding(JComponent... comps) {
-        for (JComponent comp : comps)
-            comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
-    }
-
 
     public List<JButton> getButtonList() {
         return this.buttonList;

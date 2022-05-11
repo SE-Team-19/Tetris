@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 
-public class GameView extends JPanel {
+public class GameView extends MasterView {
 
     public static final int BORDER_HEIGHT = 20;
     public static final int BORDER_WIDTH = 10;
@@ -30,9 +30,6 @@ public class GameView extends JPanel {
     private JButton generalModeBtn;
     private JButton timeAttackBtn;
 
-    // private SimpleAttributeSet boardAttributeSet;
-    // private SimpleAttributeSet nextBoardAttributeSet;
-
     private GameView() {
         initGameDisplayPane();
         initSelcetModePane();
@@ -41,17 +38,15 @@ public class GameView extends JPanel {
     }
 
     private static class LazyHolder {
-        private static GameView INSTANCE = new GameView();
+        private static GameView instance = new GameView();
     }
 
     public static GameView getInstance() {
-        return LazyHolder.INSTANCE;
+        return LazyHolder.instance;
     }
 
     private void initView() {
         setFocusable(true);
-        // setBoardAttributeSet();
-        // setNextBoardAttributeSet();
 
         super.setLayout(new GridLayout(1, 1, 0, 0));
 
@@ -142,11 +137,6 @@ public class GameView extends JPanel {
         selectDiffPanel.add(easyBtn);
         selectDiffPanel.add(normalBtn);
         selectDiffPanel.add(hardBtn);
-    }
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
     }
 
     public JPanel getGameDisplayPane() {

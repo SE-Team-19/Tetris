@@ -7,9 +7,9 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class ScoreView extends JPanel {
+public class ScoreView extends MasterView {
 
-    private JButton returnScoreToMainBtn;
+    private AbstractButton returnScoreToMainBtn;
     private JPanel rankingPane;
     private JLabel rankingTitle;
     private List<List<String>> rankingList;
@@ -98,27 +98,7 @@ public class ScoreView extends JPanel {
         rankingPane.revalidate();
     }
 
-    /* GridBaglayout에 간편하게 넣기 위한 함수들 (overloading) */
-    private GridBagConstraints addGridBagComponents(int x, int y) {
-        GridBagConstraints gridBag = new GridBagConstraints();
-        gridBag.insets = new Insets(0, 0, 0, 0);
-        gridBag.gridx = x;
-        gridBag.gridy = y;
-        gridBag.fill = GridBagConstraints.BOTH;
-        return gridBag;
-    }
-
-    private void addGridBagComponents(Container pane, JComponent comp, int x, int y) {
-        GridBagConstraints gridBag = addGridBagComponents(x, y);
-        pane.add(comp, gridBag);
-    }
-
     /**********************************************************/
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
-    }
 
     public void fillScoreBoard() {
         ListIterator<List<String>> iter = rankingList.listIterator();
@@ -154,7 +134,7 @@ public class ScoreView extends JPanel {
         this.rankingList = new ArrayList<>();
     }
 
-    public JButton getReturnScoreToMainBtn() {
+    public AbstractButton getReturnScoreToMainBtn() {
         return this.returnScoreToMainBtn;
     }
 
