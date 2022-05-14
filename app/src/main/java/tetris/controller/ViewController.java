@@ -32,8 +32,6 @@ public class ViewController extends JFrame {
     private transient GameController gameController;
     private transient BattleModeController battleModeController;
 
-    //private static int playerNumber = 1;
-
     public ViewController() {
         initJFrame();
         initView();
@@ -173,16 +171,13 @@ public class ViewController extends JFrame {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
             refresh.cancel();
-            //playerNumber = 1;
             gameController = new GameController(settingController.getSetting(), playerController, contentPane);
             gameView.getGeneralModeBtn().requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getExitBtn().requestFocus();
         } else if (to.equals(battleModeView)) {
             refresh.cancel();
-            //playerNumber = 2;
-            //battleModeController = new BattleModeController(playerController, contentPane);
-            battleModeController = new BattleModeController(playerController, contentPane);
+            battleModeController = new BattleModeController();
             battleModeView.getGeneralModeBtn().requestFocus();
         }
     }

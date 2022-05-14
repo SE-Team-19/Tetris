@@ -1,5 +1,6 @@
 package tetris.view;
 
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.CompoundBorder;
@@ -175,6 +176,8 @@ public class BattleModeView extends JPanel {
         selectBattleModePanel.add(timeAttackBtn);
     }
 
+
+
     private <T extends JComponent> T initAndSetName(String name, T comp) {
         comp.setName(name);
         return comp;
@@ -219,7 +222,6 @@ public class BattleModeView extends JPanel {
     public JTextPane getPlayerTwoTimePane() {
         return playerTwoTimePane;
     }
-
 
     public JPanel getBattleModeDisplayPane() {
         return this.battleModeDisplayPanel;
