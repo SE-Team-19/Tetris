@@ -8,12 +8,6 @@ public class TBlock extends Block {
         initTBlock();
     }
 
-    public TBlock(boolean isAttachItem) {
-        initTBlock();
-        if (isAttachItem)
-            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
-    }
-
     private void initTBlock() {
         shape = new int[][] { { 0, 1, 0 }, { 1, 1, 1 } };
         color = Color.CYAN;

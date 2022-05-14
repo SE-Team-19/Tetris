@@ -11,6 +11,7 @@ public class WeightBlock extends Block {
         identifynumber = WEIGHTBLOCK_IDENTIFY_NUMBER;
         rotateCount = DO_NOT_ROTATE_STATE;
         initVisualShapeAndXYList(identifynumber);
+        attachItemID = WEIGHTBLOCK_IDENTIFY_NUMBER;
     }
 
 }

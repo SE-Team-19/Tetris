@@ -109,11 +109,11 @@ public class ScoreView extends MasterView {
         }
     }
 
-    public void fillScoreBoard(String UserName) {
+    public void fillScoreBoard(String userName) {
         ListIterator<List<String>> iter = rankingList.listIterator();
         int i = 0;
         while (iter.hasNext() && i < 10) {
-            addRankInfo(rankingPane, iter.next(), i, UserName);
+            addRankInfo(rankingPane, iter.next(), i, userName);
             i++;
         }
     }

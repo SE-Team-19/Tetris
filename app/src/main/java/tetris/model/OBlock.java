@@ -8,12 +8,6 @@ public class OBlock extends Block {
         initOBlock();
     }
 
-    public OBlock(boolean isAttachItem) {
-        initOBlock();
-        if (isAttachItem)
-            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
-    }
-
     private void initOBlock() {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };
         color = Color.YELLOW;

@@ -23,6 +23,8 @@ public class GameView extends MasterView {
     private JPanel gameDisplayPanel;
     private JPanel selectModePanel;
     private JPanel selectDiffPanel;
+    private JPanel gameOverPanel;
+    private JTextField inputName;
     private JButton easyBtn;
     private JButton normalBtn;
     private JButton hardBtn;
@@ -34,6 +36,7 @@ public class GameView extends MasterView {
         initGameDisplayPane();
         initSelcetModePane();
         initSelectDiffPane();
+        initGameOverPanel();
         initView();
     }
 
@@ -96,21 +99,14 @@ public class GameView extends MasterView {
         gameDisplayPanel.add(infoPane);
     }
 
-    public JDialog getGameOverDialog() {
-        JFrame frame = new JFrame();
-        JDialog gameOverDialog = new JDialog(frame, "이름을 입력하세요", true);
-        gameOverDialog.setBounds(0, 0, 300, 200);
-        gameOverDialog.setLocationRelativeTo(null);
-        JPanel pane = new JPanel();
-        pane.setLayout(new GridLayout(1, 1, 0, 0));
-        JTextField inputName = new JTextField();
-        inputName.addActionListener(e -> {
-            // userName = inputName.getText();
-            gameOverDialog.dispose();
-        });
-        pane.add(inputName);
-        gameOverDialog.setContentPane(pane);
-        return gameOverDialog;
+    private void initGameOverPanel() {
+        gameOverPanel = new JPanel();
+        gameOverPanel.setLayout(new GridLayout(2, 1, 0, 0));
+        gameOverPanel.add(new JLabel("이름을 입력해주세요!"));
+        inputName = new JTextField();
+        inputName.setBackground(BASIC_BACKGROUND_COLOR);
+        inputName.setForeground(BASIC_FONT_COLOR);
+        gameOverPanel.add(inputName);
     }
 
     private void initSelcetModePane() {
@@ -193,5 +189,13 @@ public class GameView extends MasterView {
 
     public JButton getTimeAttackBtn() {
         return this.timeAttackBtn;
+    }
+
+    public JPanel getGameOverPanel() {
+        return this.gameOverPanel;
+    }
+
+    public JTextField getInputName() {
+        return this.inputName;
     }
 }

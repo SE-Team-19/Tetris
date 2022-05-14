@@ -1,7 +1,8 @@
 package tetris.view;
 
 import javax.swing.*;
-import javax.swing.SwingConstants;
+import javax.swing.plaf.metal.MetalToggleButtonUI;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -53,6 +54,10 @@ public class MasterView extends JPanel {
     }
 
     public class JButton extends javax.swing.JButton {
+        public JButton() {
+            super();
+        }
+
         public JButton(String label) {
             super(label);
             super.setBackground(BASIC_BACKGROUND_COLOR);
@@ -94,7 +99,14 @@ public class MasterView extends JPanel {
                     e.getComponent().setForeground(BASIC_FONT_COLOR);
                 }
             });
+            super.setUI(new MetalToggleButtonUI() {
+                @Override
+                protected Color getSelectColor() {
+                    return BASIC_BACKGROUND_COLOR;
+                }
+            });
         }
+
     }
 
     public class JLabel extends javax.swing.JLabel {

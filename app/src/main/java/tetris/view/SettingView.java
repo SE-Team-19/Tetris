@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
+import javax.swing.plaf.basic.*;
 
 public class SettingView extends MasterView {
 
@@ -81,8 +82,6 @@ public class SettingView extends MasterView {
         initMenuBtn = initAndSetName("initMenuBtn", new JButton("점수초기화"));
         isColorBlindBtn = initAndSetName("isColorBlindBtn", new JToggleButton("OFF"));
         returnSettingToMainBtn = initAndSetName("returnSettingToMainBtn", new JButton("메인메뉴로"));
-        deleteKeyBinding(setDisplayBtn, initKeyBtn, initMenuBtn, isColorBlindBtn,
-                returnSettingToMainBtn);
 
         /* 키 초기화 버튼과 라벨 */
         setUpKeyBtn = initAndSetName("setUpKeyBtn", new JToggleButton("UP"));
@@ -90,7 +89,6 @@ public class SettingView extends MasterView {
         setLeftKeyBtn = initAndSetName("setLeftKeyBtn", new JToggleButton("LEFT"));
         setRightKeyBtn = initAndSetName("setRightKeyBtn", new JToggleButton("RIGHT"));
         setStackKeyBtn = initAndSetName("setStackKeyBtn", new JToggleButton("STACK"));
-        deleteKeyBinding(setUpKeyBtn, setDownKeyBtn, setLeftKeyBtn, setRightKeyBtn, setStackKeyBtn);
         initKeyGridReturnBtn = initAndSetName("initKeyGridReturnBtn", new JButton("Return"));
 
         upKeyLabel = initAndSetName("upKeyLabel", new JLabel("방향키:위"));
@@ -112,6 +110,20 @@ public class SettingView extends MasterView {
         displayComboBox = initAndSetName("displayComboBox", new JComboBox<>());
         displayComboBox.setFocusable(false);
         displayComboBox.setPopupVisible(false);
+        displayComboBox.setBackground(BASIC_BACKGROUND_COLOR);
+        displayComboBox.setForeground(BASIC_FONT_COLOR);
+        displayComboBox.setFont(new Font(BASIC_FONT_FAMILY, Font.BOLD, BASIC_FONT_SIZE));
+        displayComboBox.setUI(new BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                return new JButton() {
+                    @Override
+                    public int getWidth() {
+                        return 0;
+                    }
+                };
+            }
+        });
 
         /* JcomboBox의 기본 키 바인딩(아래키)을 삭제하는 메소드 */
         InputMap im = displayComboBox.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);

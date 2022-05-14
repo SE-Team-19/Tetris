@@ -120,11 +120,28 @@ public abstract class Block {
         }
     }
 
-    protected void attachItem(int itemID) {
+    private void attachItem(int itemID) {
         int[] index = coordiList.get(rnd.nextInt(coordiList.size()));
         visualShape[index[1]][index[0]] = itemID;
         itemCoordinate = new int[] { index[0], index[1] };
         attachItemID = itemID;
+    }
+
+    public void makeItemBlock() {
+        int randomNumber = rnd.nextInt(3);
+        switch (randomNumber) {
+            case 0:
+                copyBlock(new WeightBlock());
+                return;
+            case 1:
+                attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
+                return;
+            case 2:
+                attachItem(ONELINEBLOCK_IDENTIFY_NUMBER);
+                return;
+            default:
+                copyBlock(new WeightBlock());
+        }
     }
 
     public int[][] getShape() {

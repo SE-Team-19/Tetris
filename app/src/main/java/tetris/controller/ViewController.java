@@ -530,6 +530,7 @@ public class ViewController extends JFrame {
                         initSettingMap.setKeyByToggleButton(x, pressedKey);
                         setKeymap.get(x).setText(KeyEvent.getKeyText(pressedKey));
                         setKeymap.get(x).setForeground(MasterView.BASIC_FONT_COLOR);
+                        x.setSelected(false);
                         settingFlag = false;
                     }
                 });
