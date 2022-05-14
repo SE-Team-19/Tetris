@@ -2,6 +2,7 @@ package tetris.view;
 
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.border.CompoundBorder;
 
 public class BattleModeView extends JPanel {
 
@@ -14,16 +15,30 @@ public class BattleModeView extends JPanel {
     public static final char ONELINE_CHAR = 'L';
     public static final char GHOST_CHAR = 'G';
 
+    private JTextPane playerOneGameBoardPane;
+    private JTextPane playerOneNextBlockPane;
+    private JTextPane playerOneAttackLinePane;
+    private JTextPane playerOneScorePane;
+    private JTextPane playerOneTimePane;
+    private JTextPane playerTwoGameBoardPane;
+    private JTextPane playerTwoNextBlockPane;
+    private JTextPane playerTwoAttackLinePane;
+    private JTextPane playerTwoScorePane;
+    private JTextPane playerTwoTimePane;
+
     private JPanel selectBattleModePanel;
-    private JPanel BattleModeDisplayPanel;
-    private JButton itemModeBtn;
+    private JPanel battleModeDisplayPanel;
+
     private JButton generalModeBtn;
+    private JButton itemModeBtn;
     private JButton timeAttackBtn;
 
-    private PlayerOneView playerOneView;
-    private PlayerTwoView playerTwoView;
+    //private PlayerOneView playerOneView;
+    //private PlayerTwoView playerTwoView;
 
     private BattleModeView() {
+        initBattleGameDisplayPane();
+        initSelectBattleModePane();
         initView();
     }
 
@@ -36,20 +51,98 @@ public class BattleModeView extends JPanel {
     }
 
     private void initView() {
-        initBattleGameDisplayPane();
-        initSelectBattleModePane();
+        setFocusable(true);
+
+        super.setLayout(new GridLayout(1, 2, 0, 0));
+        super.add(selectBattleModePanel);
     }
 
     private void initBattleGameDisplayPane() {
-        // 이 부분을 PlayerOneView, PlayerTwoView 에서 끌어 온다.
-        BattleModeDisplayPanel = new JPanel();
-        BattleModeDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
+        battleModeDisplayPanel = new JPanel();
+        battleModeDisplayPanel.setLayout(new GridLayout(1, 4, 0, 0));
 
+        /* Player One */
+        playerOneGameBoardPane = new JTextPane();
+        playerOneGameBoardPane.setBackground(Color.BLACK);
+        playerOneGameBoardPane.setEditable(false);
+        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+            BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+        playerOneGameBoardPane.setBorder(border);
+
+        playerOneNextBlockPane = new JTextPane();
+        playerOneNextBlockPane.setEditable(false);
+        playerOneNextBlockPane.setBackground(Color.BLACK);
+        playerOneNextBlockPane.setBorder(border);
+        playerOneNextBlockPane.setFocusable(false);
+
+        playerOneAttackLinePane = new JTextPane();
+        playerOneAttackLinePane.setEditable(false);
+        playerOneAttackLinePane.setBackground(Color.BLACK);
+        playerOneAttackLinePane.setBorder(border);
+        playerOneAttackLinePane.setFocusable(false);
+
+        JPanel infoOnePane = new JPanel();
+        infoOnePane.setFocusable(false);
+        playerOneScorePane = new JTextPane();
+        playerOneScorePane.setEditable(false);
+        playerOneScorePane.setFocusable(false);
+
+        playerOneTimePane = new JTextPane();
+        playerOneTimePane.setEditable(false);
+        playerOneTimePane.setFocusable(false);
+
+        infoOnePane.setLayout(new GridLayout(4, 0, 0, 0));
+        infoOnePane.add(playerOneNextBlockPane);
+        infoOnePane.add(playerOneScorePane);
+        infoOnePane.add(playerOneTimePane);
+        infoOnePane.add(playerOneAttackLinePane);
+
+        /* Player Two */
+        playerTwoGameBoardPane = new JTextPane();
+        playerTwoGameBoardPane.setBackground(Color.BLACK);
+        playerTwoGameBoardPane.setEditable(false);
+         /*CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
+            BorderFactory.createLineBorder(Color.DARK_GRAY, 5)); */
+        playerTwoGameBoardPane.setBorder(border);
+
+        playerTwoNextBlockPane = new JTextPane();
+        playerTwoNextBlockPane.setEditable(false);
+        playerTwoNextBlockPane.setBackground(Color.BLACK);
+        playerTwoNextBlockPane.setBorder(border);
+        playerTwoNextBlockPane.setFocusable(false);
+
+        playerTwoAttackLinePane = new JTextPane();
+        playerTwoAttackLinePane.setEditable(false);
+        playerTwoAttackLinePane.setBackground(Color.BLACK);
+        playerTwoAttackLinePane.setBorder(border);
+        playerTwoAttackLinePane.setFocusable(false);
+
+        JPanel infoTwoPane = new JPanel();
+        infoTwoPane.setFocusable(false);
+        playerTwoScorePane = new JTextPane();
+        playerTwoScorePane.setEditable(false);
+        playerTwoScorePane.setFocusable(false);
+
+        playerTwoTimePane = new JTextPane();
+        playerTwoTimePane.setEditable(false);
+        playerTwoTimePane.setFocusable(false);
+
+        infoTwoPane.setLayout(new GridLayout(4, 0, 0, 0));
+        infoTwoPane.add(playerOneNextBlockPane);
+        infoTwoPane.add(playerOneScorePane);
+        infoTwoPane.add(playerOneTimePane);
+        infoTwoPane.add(playerOneAttackLinePane);
+
+        battleModeDisplayPanel.add(playerOneGameBoardPane);
+        battleModeDisplayPanel.add(infoOnePane);
+        battleModeDisplayPanel.add(playerTwoGameBoardPane);
+        battleModeDisplayPanel.add(infoTwoPane);
+
+        /* 이 부분을 PlayerOneView, PlayerTwoView 에서 끌어 온다.
         playerOneView = PlayerOneView.getInstance();
         playerTwoView = PlayerTwoView.getInstance();
-
         BattleModeDisplayPanel.add(playerOneView);
-        BattleModeDisplayPanel.add(playerTwoView);
+        BattleModeDisplayPanel.add(playerTwoView); */
     }
 
     public JDialog getGameOverDialog() {
@@ -87,16 +180,61 @@ public class BattleModeView extends JPanel {
         return comp;
     }
 
+    public JTextPane getPlayerOneGameBoardPane() {
+        return playerOneGameBoardPane;
+    }
+
+    public JTextPane getPlayerOneNextBlockPane() {
+        return playerOneNextBlockPane;
+    }
+
+    public JTextPane getPlayerOneAttackLinePane() {
+        return playerOneAttackLinePane;
+    }
+
+    public JTextPane getPlayerOneScorePane() {
+        return playerOneScorePane;
+    }
+
+    public JTextPane getPlayerOneTimePane() {
+        return playerOneTimePane;
+    }
+
+    public JTextPane getPlayerTwoGameBoardPane() {
+        return playerTwoGameBoardPane;
+    }
+
+    public JTextPane getPlayerTwoNextBlockPane() {
+        return playerTwoNextBlockPane;
+    }
+
+    public JTextPane getPlayerTwoAttackLinePane() {
+        return playerTwoAttackLinePane;
+    }
+
+    public JTextPane getPlayerTwoScorePane() {
+        return playerTwoScorePane;
+    }
+
+    public JTextPane getPlayerTwoTimePane() {
+        return playerTwoTimePane;
+    }
+
+
+    public JPanel getBattleModeDisplayPane() {
+        return this.battleModeDisplayPanel;
+    }
+
     public JPanel getSelectBattleModePane() {
         return this.selectBattleModePanel;
     }
 
-    public JButton getItemModeBtn() {
-        return this.itemModeBtn;
-    }
-
     public JButton getGeneralModeBtn() {
         return this.generalModeBtn;
+    }
+
+    public JButton getItemModeBtn() {
+        return this.itemModeBtn;
     }
 
     public JButton getTimeAttackBtn() {
