@@ -73,6 +73,7 @@ public class PlayerOneController {
     private Setting setting;
     private boolean isColorBlindMode;
     private PlayerController playerController;
+    private Boolean startFlag = false;   // BattleModeController 에서 사용하기 위해 추가
 
     public PlayerOneController(Setting setting, PlayerController playerController, Container contentPane) {
         this.setting = setting;
@@ -272,7 +273,14 @@ public class PlayerOneController {
             showTime();
         });
         gameTimer.start();
+        startFlag = true;     // BattleModeController 에서 사용하기 위해 추가
     }
+
+    public boolean getStartFlag() {
+        return this.startFlag;
+    }
+
+
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 20);

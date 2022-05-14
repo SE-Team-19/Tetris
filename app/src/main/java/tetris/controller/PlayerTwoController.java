@@ -73,6 +73,7 @@ public class PlayerTwoController {
     private Setting setting;
     private boolean isColorBlindMode;
     private PlayerController playerController;
+    private Boolean startFlag = false;   // BattleModeController 에서 사용하기 위해 추가
 
     public PlayerTwoController(Setting setting, PlayerController playerController, Container contentPane) {
         this.setting = setting;
@@ -272,7 +273,13 @@ public class PlayerTwoController {
             showTime();
         });
         gameTimer.start();
+        startFlag = true;     // BattleModeController 에서 사용하기 위해 추가
     }
+
+    public boolean getStartFlag() {
+        return this.startFlag;
+    }
+
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 20);
@@ -414,11 +421,16 @@ public class PlayerTwoController {
 
     // board에서 블록을 지워주는 method
     private void eraseBlock(int[][] board, Block block) {
-        block.getCoordiList().forEach(e -> {
-            board[y + e[1]][x + e[0]] = 0;
-            visualBoard[y + e[1]][x + e[0]] = 0;
-            visualBoard[ghostY + e[1]][x + e[0]] = 0;
-        });
+        try {
+            block.getCoordiList().forEach(e -> {
+                board[y + e[1]][x + e[0]] = 0;
+                visualBoard[y + e[1]][x + e[0]] = 0;
+                visualBoard[ghostY + e[1]][x + e[0]] = 0;
+            });
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void moveDown() {
