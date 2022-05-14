@@ -952,6 +952,11 @@ public class GameController {
         int leftKey;
         int rightKey;
         int stackKey;
+        int up2Key;
+        int down2Key;
+        int left2Key;
+        int right2Key;
+        int stack2Key;
 
         private InitGameKeyMap(Setting setting) {
             loadSetting(setting);
@@ -965,6 +970,11 @@ public class GameController {
             this.leftKey = setting.getMoveLeftKey();
             this.rightKey = setting.getMoveRightKey();
             this.stackKey = setting.getStackKey();
+            this.up2Key = setting.getRotate2Key();
+            this.down2Key = setting.getMoveDown2Key();
+            this.left2Key = setting.getMoveLeft2Key();
+            this.right2Key = setting.getMoveRight2Key();
+            this.stack2Key = setting.getStack2Key();
         }
 
         private void initAllKey() {

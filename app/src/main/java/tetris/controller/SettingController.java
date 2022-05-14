@@ -2,7 +2,6 @@ package tetris.controller;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.awt.event.KeyEvent;
 import java.awt.Rectangle;
 import javax.swing.*;
 import java.util.*;
@@ -24,8 +23,7 @@ public class SettingController {
         displayList.add(new Rectangle(0, 0, 366, 342));
         displayList.add(new Rectangle(0, 0, 380, 350));
         displayList.add(new Rectangle(0, 0, 640, 960));
-        setting = new Setting(0, false, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN,
-                KeyEvent.VK_UP, KeyEvent.VK_SPACE);
+        setting = new Setting();
         setting.setDisplayList(displayList);
     }
 
@@ -150,6 +148,56 @@ public class SettingController {
 
     public void setStackKey(int stackKey) {
         setting.setStackKey(stackKey);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getMoveLeft2Key() {
+        return setting.getMoveLeft2Key();
+    }
+
+    public void setMoveLeft2Key(int moveLeft2Key) {
+        setting.setMoveLeft2Key(moveLeft2Key);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getMoveRight2Key() {
+        return setting.getMoveRight2Key();
+    }
+
+    public void setMoveRight2Key(int moveDown2Key) {
+        setting.setMoveRight2Key(moveDown2Key);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getMoveDown2Key() {
+        return setting.getMoveDown2Key();
+    }
+
+    public void setMoveDown2Key(int moveDown2Key) {
+        setting.setMoveDown2Key(moveDown2Key);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getRotate2Key() {
+        return setting.getRotate2Key();
+    }
+
+    public void setRotate2Key(int rotate2Key) {
+        setting.setRotate2Key(rotate2Key);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getStack2Key() {
+        return setting.getStack2Key();
+    }
+
+    public void setStack2Key(int stack2Key) {
+        setting.setStack2Key(stack2Key);
         saveSetting();
         loadSetting();
     }

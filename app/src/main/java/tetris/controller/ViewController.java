@@ -236,6 +236,11 @@ public class ViewController extends JFrame {
         int leftKey;
         int rightKey;
         int stackKey;
+        int up2Key;
+        int down2Key;
+        int left2Key;
+        int right2Key;
+        int stack2Key;
         List<Integer> keyList;
 
         private InitSettingMap(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
@@ -252,6 +257,12 @@ public class ViewController extends JFrame {
             btnmap.put(settingView.getSetLeftKeyBtn(), this::setLeftKey);
             btnmap.put(settingView.getSetRightKeyBtn(), this::setRightKey);
             btnmap.put(settingView.getSetStackKeyBtn(), this::setStackKey);
+
+            // btnmap.put(settingView.getSetUp2KeyBtn(), this::setUp2Key);
+            // btnmap.put(settingView.getSetDown2KeyBtn(), this::setDown2Key);
+            // btnmap.put(settingView.getSetLeft2KeyBtn(), this::setLeft2Key);
+            // btnmap.put(settingView.getSetRight2KeyBtn(), this::setRight2Key);
+            // btnmap.put(settingView.getSetStack2KeyBtn(), this::setStack2Key);
             initAllKey();
         }
 
@@ -262,6 +273,12 @@ public class ViewController extends JFrame {
             initLeftKey(leftKey);
             initRightKey(rightKey);
             initStackKey(stackKey);
+
+            initUp2Key(up2Key);
+            initDown2Key(down2Key);
+            initLeft2Key(left2Key);
+            initRight2Key(right2Key);
+            initStack2Key(stack2Key);
         }
 
         private void initKeyList() {
@@ -395,6 +412,47 @@ public class ViewController extends JFrame {
                     keyBuffer = stackKey;
                 }
             });
+            // settingMap.put(new KeyPair(stackKey, settingView.getSetUp2KeyBtn()), () -> {
+            // settingView.getUpKeyLabel().setText(inputMessage);
+            // settingView.getUpKeyLabel().setForeground(Color.RED);
+            // settingView.getSetUpKeyBtn().setSelected(true);
+            // settingFlag = true;
+            // keyBuffer = upKey;
+            // });
+            // settingMap.put(new KeyPair(stackKey, settingView.getSetDown2KeyBtn()), () ->
+            // {
+            // settingView.getDownKeyLabel().setText(inputMessage);
+            // settingView.getDownKeyLabel().setForeground(Color.RED);
+            // settingView.getSetDownKeyBtn().setSelected(true);
+            // settingFlag = true;
+            // keyBuffer = downKey;
+            // });
+            // settingMap.put(new KeyPair(stackKey, settingView.getSetLeft2KeyBtn()), () ->
+            // {
+            // settingView.getLeftKeyLabel().setText(inputMessage);
+            // settingView.getLeftKeyLabel().setForeground(Color.RED);
+            // settingView.getSetLeftKeyBtn().setSelected(true);
+            // settingFlag = true;
+            // keyBuffer = leftKey;
+            // });
+            // settingMap.put(new KeyPair(stackKey, settingView.getSetRight2KeyBtn()), () ->
+            // {
+            // settingView.getRightKeyLabel().setText(inputMessage);
+            // settingView.getRightKeyLabel().setForeground(Color.RED);
+            // settingView.getSetRightKeyBtn().setSelected(true);
+            // settingFlag = true;
+            // keyBuffer = rightKey;
+            // });
+            // settingMap.put(new KeyPair(stackKey, settingView.getSetStack2KeyBtn()), () ->
+            // {
+            // if (!settingView.getSetStackKeyBtn().isSelected()) {
+            // settingView.getStackKeyLabel().setText(inputMessage);
+            // settingView.getStackKeyLabel().setForeground(Color.RED);
+            // settingView.getSetStackKeyBtn().setSelected(true);
+            // settingFlag = true;
+            // keyBuffer = stackKey;
+            // }
+            // });
         }
 
         private void initLeftKey(int leftKey) {
@@ -422,6 +480,51 @@ public class ViewController extends JFrame {
 
         private void setKeyByToggleButton(JToggleButton btn, int key) {
             btnmap.get(btn).domapping(key);
+        }
+
+        private void initUp2Key(int up2Key) {
+            settingMap.put(new KeyPair(up2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initDown2Key(int down2Key) {
+            settingMap.put(new KeyPair(down2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initLeft2Key(int left2Key) {
+            settingMap.put(new KeyPair(left2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initRight2Key(int right2Key) {
+            settingMap.put(new KeyPair(right2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initStack2Key(int stack2Key) {
+            settingMap.put(new KeyPair(stack2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
         }
 
         private void setUpKey(int upKey) {
@@ -458,6 +561,45 @@ public class ViewController extends JFrame {
         private void setStackKey(int stackKey) {
             this.stackKey = stackKey;
             settingController.setStackKey(stackKey);
+            resetMap();
+            initAllKey();
+            initMainMap.initAllKey();
+        }
+
+        private void setUp2Key(int up2Key) {
+            this.up2Key = up2Key;
+            settingController.setRotateKey(up2Key);
+            resetMap();
+            initAllKey();
+            initMainMap.initAllKey();
+        }
+
+        private void setDown2Key(int down2Key) {
+            this.down2Key = down2Key;
+            settingController.setMoveDownKey(down2Key);
+            resetMap();
+            initAllKey();
+        }
+
+        private void setLeft2Key(int left2Key) {
+            this.left2Key = left2Key;
+            settingController.setMoveLeftKey(left2Key);
+            resetMap();
+            initAllKey();
+            initMainMap.initAllKey();
+        }
+
+        private void setRight2Key(int right2Key) {
+            this.right2Key = right2Key;
+            settingController.setMoveRightKey(right2Key);
+            resetMap();
+            initAllKey();
+            initMainMap.initAllKey();
+        }
+
+        private void setStack2Key(int stack2Key) {
+            this.stack2Key = stack2Key;
+            settingController.setStackKey(stack2Key);
             resetMap();
             initAllKey();
             initMainMap.initAllKey();
