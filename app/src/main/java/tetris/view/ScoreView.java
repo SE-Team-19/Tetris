@@ -7,13 +7,14 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class ScoreView extends JPanel {
+public class ScoreView extends MasterView {
 
-    private JButton returnScoreToMainBtn;
+    private AbstractButton returnScoreToMainBtn;
     private JPanel rankingPane;
     private JLabel rankingTitle;
     private List<List<String>> rankingList;
 
+    /* SingleTone 패턴 */
     private ScoreView() {
         initComponents();
         initView();
@@ -26,6 +27,8 @@ public class ScoreView extends JPanel {
     public static ScoreView getInstance() {
         return LazyHolder.INSTANCE;
     }
+
+    /***********************************************/
 
     private void initView() {
         GridBagLayout gridBag = new GridBagLayout();
@@ -85,34 +88,17 @@ public class ScoreView extends JPanel {
         i++;
         for (String a : array) {
             JLabel user = new JLabel(a);
-            if (a.equals(userName))
+            if (a.equals(userName)) {
                 user.setBackground(Color.BLUE);
+            }
             addGridBagComponents(pane, user, i, y);
             i++;
         }
-    }
-
-    /* GridBaglayout에 간편하게 넣기 위한 함수들 (overloading) */
-    private GridBagConstraints addGridBagComponents(int x, int y) {
-        GridBagConstraints gridBag = new GridBagConstraints();
-        gridBag.insets = new Insets(0, 0, 0, 0);
-        gridBag.gridx = x;
-        gridBag.gridy = y;
-        gridBag.fill = GridBagConstraints.BOTH;
-        return gridBag;
-    }
-
-    private void addGridBagComponents(Container pane, JComponent comp, int x, int y) {
-        GridBagConstraints gridBag = addGridBagComponents(x, y);
-        pane.add(comp, gridBag);
+        rankingPane.repaint();
+        rankingPane.revalidate();
     }
 
     /**********************************************************/
-
-    private <T extends JComponent> T initAndSetName(String name, T comp) {
-        comp.setName(name);
-        return comp;
-    }
 
     public void fillScoreBoard() {
         ListIterator<List<String>> iter = rankingList.listIterator();
@@ -123,11 +109,11 @@ public class ScoreView extends JPanel {
         }
     }
 
-    public void fillScoreBoard(String UserName) {
+    public void fillScoreBoard(String userName) {
         ListIterator<List<String>> iter = rankingList.listIterator();
         int i = 0;
         while (iter.hasNext() && i < 10) {
-            addRankInfo(rankingPane, iter.next(), i, UserName);
+            addRankInfo(rankingPane, iter.next(), i, userName);
             i++;
         }
     }
@@ -148,7 +134,7 @@ public class ScoreView extends JPanel {
         this.rankingList = new ArrayList<>();
     }
 
-    public JButton getReturnScoreToMainBtn() {
+    public AbstractButton getReturnScoreToMainBtn() {
         return this.returnScoreToMainBtn;
     }
 

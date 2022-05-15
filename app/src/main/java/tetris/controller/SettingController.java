@@ -1,10 +1,12 @@
 package tetris.controller;
 
-import java.awt.Rectangle;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
 import javax.swing.*;
+import java.util.*;
+
 import com.google.gson.*;
 
 import tetris.model.Setting;
@@ -19,18 +21,31 @@ public class SettingController {
     }
 
     private void initSetting() {
-        setting = new Setting(
-                0,
-                false,
-                KeyEvent.VK_LEFT,
-                KeyEvent.VK_RIGHT,
-                KeyEvent.VK_DOWN,
+        List<Rectangle> displayList = new ArrayList<>();
+        displayList.add(new Rectangle(0, 0, 1366, 768));
+        displayList.add(new Rectangle(0, 0, 380, 350));
+        displayList.add(new Rectangle(0, 0, 640, 960));
+        setting = new Setting(0, false, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN,
                 KeyEvent.VK_UP, KeyEvent.VK_SPACE);
+        setting.setDisplayList(displayList);
+
     }
 
     public void resetSetting() {
         initSetting();
-        loadSetting();
+        saveSetting();
+    }
+
+    public Rectangle getScreenSize() {
+        int displayMode = setting.getDisplayMode();
+        List<Rectangle> displayList = setting.getDisplayList();
+        if (!displayList.get(displayMode).isEmpty()) {
+            return displayList.get(displayMode);
+        } else if (!displayList.get(0).isEmpty()) {
+            return displayList.get(0);
+        } else {
+            return new Rectangle(0, 0, 360, 240);
+        }
     }
 
     public void saveSetting() {
@@ -41,8 +56,9 @@ public class SettingController {
             gson.toJson(setting, sw);
 
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(), "Setting.json 파일을 저장하는데 실패하였습니다.",
-                    "Failed to save Setting.json", JOptionPane.ERROR_MESSAGE);
+            System.out.println(e);
+            JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 저장하는데 실패하였습니다.",
+                    "File cannot save error", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
     }
@@ -56,11 +72,11 @@ public class SettingController {
                 setting = gson.fromJson(br, Setting.class);
                 break;
 
-            } catch (IOException e) {
+            } catch (FileNotFoundException | NullPointerException e) {
                 saveSetting();
-            } catch (NullPointerException e) {
-                JOptionPane.showMessageDialog(new JFrame(), "Setting.json 파일을 불러오는데 실패하였습니다.",
-                        "Failed to load Setting.json", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 불러오는데 실패하였습니다.",
+                        "File Not Found error", JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
         }
@@ -70,24 +86,16 @@ public class SettingController {
         return setting;
     }
 
-    public Rectangle getDisplaySize() {
-        switch (getDisplayMode()) {
-            case 0:
-                return new Rectangle(0, 0, 366, 342);
-            case 1:
-                return new Rectangle(0, 0, 380, 350);
-            case 2:
-            default:
-                return new Rectangle(0, 0, 640, 960);
-        }
+    public void setDisplayMode(int displayMode) {
+        setting.setDisplayMode(displayMode);
     }
 
     public int getDisplayMode() {
         return setting.getDisplayMode();
     }
 
-    public void setDisplayMode(int displayMode) {
-        setting.setDisplayMode(displayMode);
+    public List<Rectangle> getDisplayList() {
+        return setting.getDisplayList();
     }
 
     public boolean isColorBlindMode() {
@@ -98,31 +106,32 @@ public class SettingController {
         setting.setColorBlindMode(colorBlindMode);
     }
 
-    public int getLeftKey() {
-        return setting.getLeftKey();
+    public int getMoveLeftKey() {
+        return setting.getMoveLeftKey();
     }
 
-    public void setLeftKey(int leftKey) {
-        setting.setLeftKey(leftKey);
-        saveSetting();
-    }
-
-    public int getRightKey() {
-        return setting.getRightKey();
-    }
-
-    public void setRightKey(int downKey) {
-        setting.setRightKey(downKey);
+    public void setMoveLeftKey(int moveLeftKey) {
+        setting.setMoveLeftKey(moveLeftKey);
         saveSetting();
         loadSetting();
     }
 
-    public int getDownKey() {
-        return setting.getDownKey();
+    public int getMoveRightKey() {
+        return setting.getMoveRightKey();
     }
 
-    public void setdownKey(int downKey) {
-        setting.setdownKey(downKey);
+    public void setMoveRightKey(int moveDownKey) {
+        setting.setMoveRightKey(moveDownKey);
+        saveSetting();
+        loadSetting();
+    }
+
+    public int getMoveDownKey() {
+        return setting.getMoveDownKey();
+    }
+
+    public void setMoveDownKey(int moveDownKey) {
+        setting.setMoveDownKey(moveDownKey);
         saveSetting();
         loadSetting();
     }

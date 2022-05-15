@@ -3,12 +3,12 @@ package tetris.view;
 import javax.swing.*;
 import static javax.swing.SwingConstants.CENTER;
 
+import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Component;
 
 import java.util.*;
 
-public class MainView extends JPanel {
+public class MainView extends MasterView {
 
     private JPanel buttonPanel;
     private JButton startBtn;
@@ -31,33 +31,27 @@ public class MainView extends JPanel {
 
     private void initView() {
         buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(4, 0, 0, 0));
 
-        startBtn = initButton("startBtn", new JButton("Game Start"));
-        settingBtn = initButton("settingBtn", new JButton("Settings"));
-        scoreBoardBtn = initButton("scoreBoardBtn", new JButton("Scoreboard"));
-        exitBtn = initButton("exitBtn", new JButton("Exit"));
+        startBtn = initAndSetName("startBtn", new JButton("Game Start"));
+        settingBtn = initAndSetName("settingBtn", new JButton("Settings"));
+        scoreBoardBtn = initAndSetName("scoreBoardBtn", new JButton("Scoreboard"));
+        exitBtn = initAndSetName("exitBtn", new JButton("Exit"));
+        deleteKeyBinding(startBtn, settingBtn, scoreBoardBtn, exitBtn);
 
-        buttonList = new ArrayList<>(Arrays.asList(
-                startBtn, settingBtn, scoreBoardBtn, exitBtn));
+        buttonList = new ArrayList<>();
+        buttonList.add(startBtn);
+        buttonList.add(settingBtn);
+        buttonList.add(scoreBoardBtn);
+        buttonList.add(exitBtn);
 
-        for (JButton button : buttonList) {
-            buttonPanel.add(button);
-        }
+        addAButton(buttonList, buttonPanel);
 
-        JLabel titleLabel = new JLabel("Tetris");
-        titleLabel.setHorizontalAlignment(CENTER);
+        JLabel appName = new JLabel("Tetris");
+        appName.setHorizontalAlignment(CENTER);
 
         super.setLayout(new GridLayout(2, 0, 0, 0));
-        super.add(titleLabel);
+        super.add(appName);
         super.add(buttonPanel);
-    }
-
-    private JButton initButton(String name, JButton comp) {
-        comp.setName(name);
-        comp.setAlignmentX(Component.CENTER_ALIGNMENT);
-        comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
-        return comp;
     }
 
     public List<JButton> getButtonList() {

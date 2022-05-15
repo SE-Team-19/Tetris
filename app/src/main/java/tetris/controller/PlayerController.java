@@ -15,6 +15,11 @@ public class PlayerController {
 
     public PlayerController() {
         playerList = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            playerList.add(new Player("없음", 0, "없음"));
+        }
+
     }
 
     public void addPlayer(String name, int score, String difficulty) {
@@ -36,9 +41,10 @@ public class PlayerController {
             gson.toJson(playerList, sw);
 
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(), "Score.json파일 저장하는데 실패하였습니다.",
-                    "Failed to save score.json", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+
+            JOptionPane.showMessageDialog(new JFrame(), "score.json파일 저장에 실패하였습니다.",
+                    "File cannot save error", JOptionPane.ERROR_MESSAGE);
+
         }
     }
 
@@ -56,12 +62,12 @@ public class PlayerController {
                 }
                 break;
 
-            } catch (IOException e) {
+            } catch (FileNotFoundException | NullPointerException e) {
                 savePlayerList();
-            } catch (NullPointerException e) {
-                JOptionPane.showMessageDialog(new JFrame(), "Score.json 파일을 불러오는데 실패하였습니다.",
-                        "Failed to load setting.json", JOptionPane.ERROR_MESSAGE);
-                System.exit(0);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(new JFrame(), "score.json파일을 불러오는데 실패하였습니다.",
+                        "File Not Found error", JOptionPane.ERROR_MESSAGE);
+
             }
         }
     }

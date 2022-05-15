@@ -3,82 +3,200 @@ package tetris.view;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
-import javax.swing.text.*;
 
-public class GameView extends JPanel {
+public class GameView extends MasterView {
 
     public static final int BORDER_HEIGHT = 20;
     public static final int BORDER_WIDTH = 10;
     public static final char BORDER_CHAR = 'X';
     public static final char BLOCK_CHAR = 'O';
+    public static final char NULL_CHAR = ' ';
+    public static final char BOMB_CHAR = 'T';
+    public static final char ONELINE_CHAR = 'L';
+    public static final char GHOST_CHAR = 'G';
 
-    private JTextPane gamePane;
+    private JTextPane gameBoardPane;
     private JTextPane nextBlockPane;
+    private JTextPane attackLinePane;
     private JTextPane scorePane;
-
-    // private SimpleAttributeSet boardAttributeSet;
-    // private SimpleAttributeSet nextBoardAttributeSet;
+    private JTextPane timePane;
+    private JPanel gameDisplayPanel;
+    private JPanel selectModePanel;
+    private JPanel selectDiffPanel;
+    private JPanel gameOverPanel;
+    private JTextField inputName;
+    private JButton easyBtn;
+    private JButton normalBtn;
+    private JButton hardBtn;
+    private JButton itemModeBtn;
+    private JButton generalModeBtn;
+    private JButton timeAttackBtn;
 
     private GameView() {
+        initGameDisplayPane();
+        initSelcetModePane();
+        initSelectDiffPane();
+        initGameOverPanel();
         initView();
     }
 
     private static class LazyHolder {
-        private static GameView INSTANCE = new GameView();
+        private static GameView instance = new GameView();
     }
 
     public static GameView getInstance() {
-        return LazyHolder.INSTANCE;
+        return LazyHolder.instance;
     }
 
     private void initView() {
         setFocusable(true);
-        // setBoardAttributeSet();
-        // setNextBoardAttributeSet();
 
-        super.setLayout(new GridLayout(0, 2, 0, 0));
+        super.setLayout(new GridLayout(1, 1, 0, 0));
 
-        gamePane = new JTextPane();
-        gamePane.setBackground(Color.BLACK);
-        gamePane.setEditable(false);
-        // gamePane.setEnabled(false);
+        super.add(selectModePanel);
+    }
+
+    private void initGameDisplayPane() {
+        gameDisplayPanel = new JPanel();
+        gameDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
+
+        gameBoardPane = new JTextPane();
+        gameBoardPane.setBackground(Color.BLACK);
+        gameBoardPane.setEditable(false);
         CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
                 BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
-        gamePane.setBorder(border);
+        gameBoardPane.setBorder(border);
 
         nextBlockPane = new JTextPane();
         nextBlockPane.setEditable(false);
         nextBlockPane.setBackground(Color.BLACK);
         nextBlockPane.setBorder(border);
-        // nextBlockPane.setEnabled(false);
+        nextBlockPane.setFocusable(false);
+
+        attackLinePane = new JTextPane();
+        attackLinePane.setEditable(false);
+        attackLinePane.setBackground(Color.BLACK);
+        attackLinePane.setBorder(border);
+        attackLinePane.setFocusable(false);
 
         JPanel infoPane = new JPanel();
+        infoPane.setFocusable(false);
         scorePane = new JTextPane();
         scorePane.setEditable(false);
+        scorePane.setFocusable(false);
 
-        infoPane.setLayout(new GridLayout(3, 0, 0, 0));
+        timePane = new JTextPane();
+        timePane.setEditable(false);
+        timePane.setFocusable(false);
+
+        infoPane.setLayout(new GridLayout(4, 0, 0, 0));
         infoPane.add(nextBlockPane);
         infoPane.add(scorePane);
+        infoPane.add(timePane);
+        infoPane.add(attackLinePane);
 
-        super.add(gamePane);
-        super.add(infoPane);
+        gameDisplayPanel.add(gameBoardPane);
+        gameDisplayPanel.add(infoPane);
     }
 
-    // private <T extends JComponent> T initAndSetName(String name, T comp) {
-    // comp.setName(name);
-    // return comp;
-    // }
+    private void initGameOverPanel() {
+        gameOverPanel = new JPanel();
+        gameOverPanel.setLayout(new GridLayout(2, 1, 0, 0));
+        gameOverPanel.add(new JLabel("이름을 입력해주세요!"));
+        inputName = new JTextField();
+        inputName.setBackground(BASIC_BACKGROUND_COLOR);
+        inputName.setForeground(BASIC_FONT_COLOR);
+        gameOverPanel.add(inputName);
+    }
 
-    public JTextPane getGamePane() {
-        return this.gamePane;
+    private void initSelcetModePane() {
+        selectModePanel = new JPanel();
+        selectModePanel.setLayout(new GridLayout(0, 3, 0, 0));
+
+        generalModeBtn = initAndSetName("generalModeBtn", new JButton("일반모드"));
+        itemModeBtn = initAndSetName("itemModeBtn", new JButton("아이템모드"));
+        timeAttackBtn = initAndSetName("timeAttackBtn", new JButton("시간제한모드"));
+
+        selectModePanel.add(generalModeBtn);
+        selectModePanel.add(itemModeBtn);
+        selectModePanel.add(timeAttackBtn);
+    }
+
+    private void initSelectDiffPane() {
+        selectDiffPanel = new JPanel();
+        selectDiffPanel.setLayout(new GridLayout(0, 3, 0, 0));
+
+        easyBtn = initAndSetName("generalModeBtn", new JButton("Easy"));
+        normalBtn = initAndSetName("itemModeBtn", new JButton("Normal"));
+        hardBtn = initAndSetName("timeAttackBtn", new JButton("Hard"));
+
+        selectDiffPanel.add(easyBtn);
+        selectDiffPanel.add(normalBtn);
+        selectDiffPanel.add(hardBtn);
+    }
+
+    public JPanel getGameDisplayPane() {
+        return this.gameDisplayPanel;
+    }
+
+    public JPanel getSelectDiffPane() {
+        return this.selectDiffPanel;
+    }
+
+    public JPanel getSelectModePane() {
+        return this.selectModePanel;
+    }
+
+    public JTextPane getGameBoardPane() {
+        return this.gameBoardPane;
     }
 
     public JTextPane getNextBlockPane() {
         return this.nextBlockPane;
     }
 
+    public JTextPane getAttackLinePane() {
+        return this.attackLinePane;
+    }
+
     public JTextPane getScorePane() {
         return this.scorePane;
+    }
+
+    public JTextPane getTimePane() {
+        return this.timePane;
+    }
+
+    public JButton getEasyBtn() {
+        return this.easyBtn;
+    }
+
+    public JButton getNormalBtn() {
+        return this.normalBtn;
+    }
+
+    public JButton getHardBtn() {
+        return this.hardBtn;
+    }
+
+    public JButton getItemModeBtn() {
+        return this.itemModeBtn;
+    }
+
+    public JButton getGeneralModeBtn() {
+        return this.generalModeBtn;
+    }
+
+    public JButton getTimeAttackBtn() {
+        return this.timeAttackBtn;
+    }
+
+    public JPanel getGameOverPanel() {
+        return this.gameOverPanel;
+    }
+
+    public JTextField getInputName() {
+        return this.inputName;
     }
 
     // public SimpleAttributeSet getBoardAttributeSet() {

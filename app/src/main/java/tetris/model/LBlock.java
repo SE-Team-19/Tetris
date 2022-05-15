@@ -5,9 +5,15 @@ import java.awt.Color;
 public class LBlock extends Block {
 
     public LBlock() {
-        shape = new int[][] { { 1, 0 }, { 1, 0 }, { 1, 1 } };
+        initLBlock();
+    }
+
+    private void initLBlock() {
+        shape = new int[][] { { 0, 0, 1 }, { 1, 1, 1 } };
         color = Color.BLUE;
         blindColor = Color.BLUE;
-        indentifynumber = 4;
+        identifynumber = LBLOCK_IDENTIFY_NUMBER;
+        rotateCount = FIRST_ROTATE_STATE;
+        initVisualShapeAndXYList(identifynumber);
     }
 }
