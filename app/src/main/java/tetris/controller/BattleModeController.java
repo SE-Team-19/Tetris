@@ -1,6 +1,5 @@
 package tetris.controller;
 
-
 import static java.lang.System.currentTimeMillis;
 
 import java.awt.Container;
@@ -64,6 +63,8 @@ public class BattleModeController  {
         playerKeyListener = new PlayerKeyListener();
         addKeyListener(playerKeyListener);
         */
+
+        initialMessage();
     }
 
     // PlayerOne, PlayerTwo 의 방향키를 처음에 알려주는 메시지 작성

@@ -117,7 +117,7 @@ public class PlayerTwoController {
     }
 
     private void startGame() {
-        generateBlockRandomizer(diffMode);
+        generateBlockRandomizer(0);
         blockBuffer = getBlock(blockDeque.getFirst());
         currentBlock = getBlock(blockDeque.removeFirst());
         nextBlock = getBlock(blockDeque.removeFirst());
@@ -1066,14 +1066,17 @@ public class PlayerTwoController {
             gameKeyMap.put(new KeyPair(stackKey, battleModeView.getGeneralModeBtn()), () -> {
                 gameMode = 0;
                 transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
             });
             gameKeyMap.put(new KeyPair(stackKey, battleModeView.getItemModeBtn()), () -> {
                 gameMode = 1;
                 transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
             });
             gameKeyMap.put(new KeyPair(stackKey, battleModeView.getTimeAttackBtn()), () -> {
                 gameMode = 2;
                 transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
             });
         }
     }
