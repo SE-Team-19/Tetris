@@ -7,6 +7,7 @@ import static java.awt.event.KeyEvent.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.AWTException;
+
 import tetris.TestAllView;
 import tetris.TestRobot;
 
@@ -78,6 +79,7 @@ public class GameControllerTest {
 
     @Test
     public void getIBlockLessThan20Pct() {
+
         int IBlockCount = 0;
         int JBlockCount = 0;
         int LBlockCount = 0;
@@ -85,8 +87,10 @@ public class GameControllerTest {
         int SBlockCount = 0;
         int TBlockCount = 0;
         int OBlockCount = 0;
+
         for (int i = 0; i < 4100000; i++) {
             Block randomBlock = gameController.getBlock(0);
+
             if (randomBlock instanceof IBlock)
                 IBlockCount++;
             else if (randomBlock instanceof JBlock)
@@ -136,4 +140,5 @@ public class GameControllerTest {
         frame.stopTimer();
         frame.dispose();
     }
+
 }

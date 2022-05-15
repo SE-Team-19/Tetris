@@ -12,29 +12,22 @@ import java.util.*;
 import tetris.model.*;
 import tetris.view.*;
 
-public class GameController {
+public class PlayerTwoController {
 
     private static final int ANIMATION_INTERVAL = 50;
     private static final int LOCK_DELAY_TIME = 500;
     private static final int BOARD_START_HEIGHT = 5;
-    private static final int BOARD_END_HEIGHT = GameView.BORDER_HEIGHT + BOARD_START_HEIGHT;
+    private static final int BOARD_END_HEIGHT = BattleModeView.BORDER_HEIGHT + BOARD_START_HEIGHT;
     private static final int BOARD_HEIGHT = BOARD_END_HEIGHT - BOARD_START_HEIGHT;
-    private static final int BOARD_WIDTH = GameView.BORDER_WIDTH;
+    private static final int BOARD_WIDTH = BattleModeView.BORDER_WIDTH;
     private static final int START_X = 3;
     private static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
     private static final int MAX_BLOCK_HEIGHT = 4;
-    private static final int EASY_MODE = 1;
-    private static final int NORMAL_MODE = 1;
-    private static final int HARD_MODE = 1;
-    private static final int GENERAL_GAME_MODE = 0;
-    private static final int ITEM_GAME_MODE = 1;
-    private static final int TIME_ATTACK_MODE = 2;
 
     private Timer gameDelayTimer;
     private Timer gameTimer;
     private boolean isBottomFlag;
-    private boolean isItemFlag;
     private int delay;
     private int gameTime;
     private int diffMode; // 난이도 설정
@@ -49,18 +42,17 @@ public class GameController {
     private int[][] attackLineBoard;
     private Deque<Integer> blockDeque;
     private Deque<int[]> attackLinesDeque;
-    private Stack<int[]> attackLinesStack;
 
     private int x;
     private int y;
     private int ghostY;
     private int score; // game 점수와 관련된 변수
     private int attackLines;
-    private int deleteLines;
+    private int scoreLines;
 
     private String userName;
 
-    private GameView gameView = GameView.getInstance();
+    private BattleModeView battleModeView = BattleModeView.getInstance();
     private ScoreView scoreView = ScoreView.getInstance();
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
@@ -81,8 +73,9 @@ public class GameController {
     private Setting setting;
     private boolean isColorBlindMode;
     private PlayerController playerController;
+    private Boolean startFlag = false;   // BattleModeController 에서 사용하기 위해 추가
 
-    public GameController(Setting setting, PlayerController playerController, Container contentPane) {
+    public PlayerTwoController(Setting setting, PlayerController playerController, Container contentPane) {
         this.setting = setting;
         this.contentPane = contentPane;
         this.playerController = playerController;
@@ -102,9 +95,9 @@ public class GameController {
         x = START_X;
         y = START_Y;
 
-        gamePane = gameView.getGameBoardPane();
-        nextBlockPane = gameView.getNextBlockPane();
-        attackLinePane = gameView.getAttackLinePane();
+        gamePane = battleModeView.getPlayerTwoGameBoardPane();
+        nextBlockPane = battleModeView.getPlayerTwoNextBlockPane();
+        attackLinePane = battleModeView.getPlayerTwoAttackLinePane();
 
         initBlockCharMap();
         initColorMap();
@@ -124,7 +117,7 @@ public class GameController {
     }
 
     private void startGame() {
-        generateBlockRandomizer(diffMode);
+        generateBlockRandomizer(0);
         blockBuffer = getBlock(blockDeque.getFirst());
         currentBlock = getBlock(blockDeque.removeFirst());
         nextBlock = getBlock(blockDeque.removeFirst());
@@ -138,36 +131,26 @@ public class GameController {
 
         score = 0;
         delay = 1000;
-        deleteLines = 0;
-        isItemFlag = false;
+        gameTime = 0;
 
         showScore();
-        showTime();
         startGameDelayTimer(delay);
-        if (gameMode == TIME_ATTACK_MODE) {
-            gameTime = 60;
-            startTimeAttack();
-        } else {
-            gameTime = 0;
-            startStopWatch();
-        }
-
     }
 
     private void initBlockCharMap() {
         blockCharMap = new HashMap<>();
-        blockCharMap.put(Block.IBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.JBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.LBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.OBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.SBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.TBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.ZBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.GHOST_IDENTIFIY_NUMBER, GameView.GHOST_CHAR);
-        blockCharMap.put(Block.BOMBBLOCK_IDENTIFY_NUMBER, GameView.BOMB_CHAR);
-        blockCharMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
-        blockCharMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, GameView.ONELINE_CHAR);
-        blockCharMap.put(Block.NULL_IDENTIFY_NUMBER, GameView.NULL_CHAR);
+        blockCharMap.put(Block.IBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.JBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.LBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.OBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.SBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.TBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.ZBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.GHOST_IDENTIFIY_NUMBER, BattleModeView.GHOST_CHAR);
+        blockCharMap.put(Block.BOMBBLOCK_IDENTIFY_NUMBER, BattleModeView.BOMB_CHAR);
+        blockCharMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, BattleModeView.BLOCK_CHAR);
+        blockCharMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, BattleModeView.ONELINE_CHAR);
+        blockCharMap.put(Block.NULL_IDENTIFY_NUMBER, BattleModeView.NULL_CHAR);
     }
 
     private void initColorMap() {
@@ -237,22 +220,22 @@ public class GameController {
          * 음수로 치환해야 한다.)
          */
         wallKickList.add(new ArrayList<>( // 0 >> 1
-                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, -1), new WallKick(0, 2), new WallKick(-1, 2))));
+            Arrays.asList(new WallKick(-1, 0), new WallKick(-1, -1), new WallKick(0, 2), new WallKick(-1, 2))));
         wallKickList.add(new ArrayList<>( // 1 >> 2
-                Arrays.asList(new WallKick(1, 0), new WallKick(1, 1), new WallKick(0, -2), new WallKick(1, -2))));
+            Arrays.asList(new WallKick(1, 0), new WallKick(1, 1), new WallKick(0, -2), new WallKick(1, -2))));
         wallKickList.add(new ArrayList<>( // 2 >> 3
-                Arrays.asList(new WallKick(1, 0), new WallKick(1, -1), new WallKick(0, 2), new WallKick(1, 2))));
+            Arrays.asList(new WallKick(1, 0), new WallKick(1, -1), new WallKick(0, 2), new WallKick(1, 2))));
         wallKickList.add(new ArrayList<>( // 3 >> 0
-                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, 1), new WallKick(0, -2), new WallKick(-1, -2))));
+            Arrays.asList(new WallKick(-1, 0), new WallKick(-1, 1), new WallKick(0, -2), new WallKick(-1, -2))));
         /* IBlock testcase */
         wallKickList.add(new ArrayList<>( // 0 >> 1
-                Arrays.asList(new WallKick(-2, 0), new WallKick(1, 0), new WallKick(-2, 1), new WallKick(1, -2))));
+            Arrays.asList(new WallKick(-2, 0), new WallKick(1, 0), new WallKick(-2, 1), new WallKick(1, -2))));
         wallKickList.add(new ArrayList<>( // 1 >> 2
-                Arrays.asList(new WallKick(-1, 0), new WallKick(2, 0), new WallKick(-1, -2), new WallKick(2, 1))));
+            Arrays.asList(new WallKick(-1, 0), new WallKick(2, 0), new WallKick(-1, -2), new WallKick(2, 1))));
         wallKickList.add(new ArrayList<>( // 2 >> 3
-                Arrays.asList(new WallKick(2, 0), new WallKick(-1, 0), new WallKick(2, -1), new WallKick(-1, 2))));
+            Arrays.asList(new WallKick(2, 0), new WallKick(-1, 0), new WallKick(2, -1), new WallKick(-1, 2))));
         wallKickList.add(new ArrayList<>( // 3 >> 0
-                Arrays.asList(new WallKick(1, 0), new WallKick(-2, 0), new WallKick(1, 2), new WallKick(-2, -1))));
+            Arrays.asList(new WallKick(1, 0), new WallKick(-2, 0), new WallKick(1, 2), new WallKick(-2, -1))));
     }
 
     private void transitView(Container pane, Container to, Container from) {
@@ -266,14 +249,10 @@ public class GameController {
     private void focus(Container to) {
         if (to.equals(scoreView))
             scoreView.getReturnScoreToMainBtn().requestFocus();
-        else if (to.equals(gameView.getSelectDiffPane()))
-            gameView.getEasyBtn().requestFocus();
-        else if (to.equals(gameView.getSelectModePane()))
-            gameView.getGeneralModeBtn().requestFocus();
-        else if (to.equals(gameView.getGameDisplayPane()))
+        else if (to.equals(battleModeView.getSelectBattleModePane()))
+            battleModeView.getGeneralModeBtn().requestFocus();
+        else if (to.equals(battleModeView.getBattleModeDisplayPane()))
             gamePane.requestFocus();
-        else if (to.equals(gameView.getGameOverPanel()))
-            gameView.getInputName().requestFocus();
     }
 
     public void startGameDelayTimer(int startDelay) {
@@ -294,19 +273,13 @@ public class GameController {
             showTime();
         });
         gameTimer.start();
+        startFlag = true;     // BattleModeController 에서 사용하기 위해 추가
     }
 
-    private void startTimeAttack() {
-        gameTimer = new Timer(1000, e -> {
-            gameTime--;
-            showTime();
-            if (gameTime == 0) {
-                showESCMessage();
-                stopGameDelayTimer();
-            }
-        });
-        gameTimer.start();
+    public boolean getStartFlag() {
+        return this.startFlag;
     }
+
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 20);
@@ -345,7 +318,7 @@ public class GameController {
         blockDeque.addAll(randomBlockList);
     }
 
-    public Block getBlock(int id) {
+    private Block getBlock(int id) {
         switch (id) {
             case Block.IBLOCK_IDENTIFY_NUMBER:
                 return new IBlock();
@@ -369,7 +342,7 @@ public class GameController {
     public void drawGameBoard() {
         StringBuilder sb = new StringBuilder();
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
-            sb.append(GameView.BORDER_CHAR);
+            sb.append(BattleModeView.BORDER_CHAR);
         }
         sb.append("\n");
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
@@ -377,12 +350,11 @@ public class GameController {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 sb.append(blockCharMap.get(visualBoard[i][j])); // currentBlock 의 모양을 그려준다.
             }
-            sb.append(GameView.BORDER_CHAR);
+            sb.append(BattleModeView.BORDER_CHAR);
             sb.append("\n");
         }
-
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
-            sb.append(GameView.BORDER_CHAR);
+            sb.append(BattleModeView.BORDER_CHAR);
         }
         gamePane.setText(sb.toString());
 
@@ -424,8 +396,8 @@ public class GameController {
                 if (visualBoard[i][j] > 0) {
                     StyleConstants.setForeground(blockAttributeSet, colorMap.get(visualBoard[i][j]));
                     doc.setCharacterAttributes(
-                            (BOARD_WIDTH + 4) + (i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + j, 1,
-                            blockAttributeSet, false);
+                        (BOARD_WIDTH + 4) + (i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + j, 1,
+                        blockAttributeSet, false);
                 }
             }
         }
@@ -449,11 +421,16 @@ public class GameController {
 
     // board에서 블록을 지워주는 method
     private void eraseBlock(int[][] board, Block block) {
-        block.getCoordiList().forEach(e -> {
-            board[y + e[1]][x + e[0]] = 0;
-            visualBoard[y + e[1]][x + e[0]] = 0;
-            visualBoard[ghostY + e[1]][x + e[0]] = 0;
-        });
+        try {
+            block.getCoordiList().forEach(e -> {
+                board[y + e[1]][x + e[0]] = 0;
+                visualBoard[y + e[1]][x + e[0]] = 0;
+                visualBoard[ghostY + e[1]][x + e[0]] = 0;
+            });
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void moveDown() {
@@ -631,7 +608,7 @@ public class GameController {
             flag = true;
             return flag;
         } else if (x + blockBuffer.getWidth() > BOARD_WIDTH
-                || y + blockBuffer.getHeight() > BOARD_END_HEIGHT)
+            || y + blockBuffer.getHeight() > BOARD_END_HEIGHT)
             flag = true;
         return flag;
     }
@@ -683,7 +660,7 @@ public class GameController {
         // stack에서 공격할 줄을 board에 넣어준다.
         int size = attackLinesDeque.size();
         for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1
-                - size; i--) {
+            - size; i--) {
             attackLineBoard[i] = Arrays.copyOf(attackLinesDeque.pop(), BOARD_WIDTH);
         }
 
@@ -724,7 +701,6 @@ public class GameController {
             score += 25;
             showScore();
         }
-        deleteLines += fullyLines;
         return existFullyLine;
     }
 
@@ -762,8 +738,8 @@ public class GameController {
         StyleConstants.setForeground(blockAttributeSet, color);
         for (int i = 0; i < lines; i++) {
             doc.setCharacterAttributes(
-                    (BOARD_WIDTH + 4) + (index + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3), BOARD_WIDTH,
-                    blockAttributeSet, true);
+                (BOARD_WIDTH + 4) + (index + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3), BOARD_WIDTH,
+                blockAttributeSet, true);
         }
     }
 
@@ -850,13 +826,11 @@ public class GameController {
 
     // 바닥 도달시
     private void lockDelay() {
-        if (isItemFlag) {
-            if (currentBlock.getIdentifynumber() == Block.WEIGHTBLOCK_IDENTIFY_NUMBER) {
+        if (gameMode == 1) {
+            if (currentBlock.getIdentifynumber() == Block.WEIGHTBLOCK_IDENTIFY_NUMBER)
                 ifIsweightBlock(board, visualBoard, currentBlock);
-                isItemFlag = false;
-            } else if (currentBlock.getAttachItemID() == Block.BOMBBLOCK_IDENTIFY_NUMBER) {
+            if (currentBlock.getAttachItemID() == Block.BOMBBLOCK_IDENTIFY_NUMBER) {
                 launchExplosionAnimation();
-                isItemFlag = false;
                 return;
             }
         }
@@ -873,10 +847,23 @@ public class GameController {
     // 다음 블록 놓기
     private void takeOutNextBlock() {
         if (isGameOver()) {
-            stopGameDelayTimer();
-            gameTimer.stop();
-            transitView(gameView, gameView.getGameOverPanel(), gameView.getGameDisplayPane());
-            return;
+            showESCMessage();
+            gameOverText.setVisible(true); // Game Over 글자를 나타냄
+            String difficulty = "normal";
+            if (diffMode == 1)
+                difficulty = "easy";
+            else if (diffMode == 2)
+                difficulty = "hard";
+            playerController.addPlayer(userName, score, difficulty);
+            playerController.savePlayerList();
+            playerController.loadPlayerList();
+            scoreView.initRankingPane();
+            scoreView.resetRankingList();
+            playerController.getPlayerList()
+                .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
+                    Integer.toString(player.getScore()), player.getDifficulty()))));
+            scoreView.fillScoreBoard(userName);
+            transitView(contentPane, scoreView, battleModeView);
         }
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
@@ -884,11 +871,6 @@ public class GameController {
             generateBlockRandomizer(diffMode);
         }
         nextBlock = getBlock(blockDeque.removeFirst());
-        if (gameMode == ITEM_GAME_MODE && deleteLines > 10) {
-            nextBlock.makeItemBlock();
-            deleteLines = 0;
-            isItemFlag = true;
-        }
         drawNextBlock();
         x = START_X;
         y = START_Y;
@@ -914,26 +896,6 @@ public class GameController {
         placeBlock(board, visualBoard, block, x, yTemp);
     }
 
-    // 게임 오버 시 작동 메소드
-    private void saveUserName() {
-        String difficulty = "normal";
-        if (diffMode == EASY_MODE)
-            difficulty = "easy";
-        else if (diffMode == HARD_MODE)
-            difficulty = "hard";
-        userName = gameView.getInputName().getText();
-        playerController.addPlayer(userName, score, difficulty);
-        playerController.savePlayerList();
-        playerController.loadPlayerList();
-        scoreView.initRankingPane();
-        scoreView.resetRankingList();
-        playerController.getPlayerList()
-                .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
-                        Integer.toString(player.getScore()), player.getDifficulty()))));
-        scoreView.fillScoreBoard(userName);
-        transitView(contentPane, scoreView, gameView);
-    }
-
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
         board = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
@@ -952,8 +914,8 @@ public class GameController {
 
     // ESC 키를 누를 경우 게임 메세지를 출력
     public void showESCMessage() {
-        int inputValue = JOptionPane.showConfirmDialog(gameView, "Do you want to end the game?",
-                "Option", JOptionPane.YES_NO_OPTION);
+        int inputValue = JOptionPane.showConfirmDialog(battleModeView, "Do you want to end the game?",
+            "Option", JOptionPane.YES_NO_OPTION);
 
         if (inputValue == JOptionPane.YES_OPTION) {
             // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
@@ -1000,11 +962,6 @@ public class GameController {
         int leftKey;
         int rightKey;
         int stackKey;
-        int up2Key;
-        int down2Key;
-        int left2Key;
-        int right2Key;
-        int stack2Key;
 
         private InitGameKeyMap(Setting setting) {
             loadSetting(setting);
@@ -1014,15 +971,10 @@ public class GameController {
 
         private void loadSetting(Setting setting) {
             this.upKey = setting.getRotateKey();
-            this.downKey = setting.getMoveDownKey();
-            this.leftKey = setting.getMoveLeftKey();
-            this.rightKey = setting.getMoveRightKey();
+            this.downKey = setting.getDownKey();
+            this.leftKey = setting.getLeftKey();
+            this.rightKey = setting.getRightKey();
             this.stackKey = setting.getStackKey();
-            this.up2Key = setting.getRotate2Key();
-            this.down2Key = setting.getMoveDown2Key();
-            this.left2Key = setting.getMoveLeft2Key();
-            this.right2Key = setting.getMoveRight2Key();
-            this.stack2Key = setting.getStack2Key();
         }
 
         private void initAllKey() {
@@ -1031,7 +983,6 @@ public class GameController {
             initLeftKey();
             initRightKey();
             initStackKey();
-            initOtherKeys();
         }
 
         private void resetMap() {
@@ -1053,14 +1004,14 @@ public class GameController {
         }
 
         private void initLeftKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
+            /*for (Component comp : battleModeView.getSelectDiffPane().getComponents())
                 gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getEasyBtn()),
-                    () -> gameView.getHardBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
+            gameKeyMap.put(new KeyPair(leftKey, battleModeView.getEasyBtn()),
+                () -> battleModeView.getHardBtn().requestFocus(true));*/
+            for (Component comp : battleModeView.getSelectBattleModePane().getComponents())
                 gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getGeneralModeBtn()),
-                    () -> gameView.getTimeAttackBtn().requestFocus(true));
+            gameKeyMap.put(new KeyPair(leftKey, battleModeView.getGeneralModeBtn()),
+                () -> battleModeView.getTimeAttackBtn().requestFocus(true));
             gameKeyMap.put(new KeyPair(leftKey, gamePane), () -> {
                 moveLeft();
                 drawGameBoard();
@@ -1068,14 +1019,14 @@ public class GameController {
         }
 
         private void initRightKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
+            /*for (Component comp : gameView.getSelectDiffPane().getComponents())
                 gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
             gameKeyMap.put(new KeyPair(rightKey, gameView.getHardBtn()),
-                    () -> gameView.getEasyBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
+                () -> gameView.getEasyBtn().requestFocus(true));*/
+            for (Component comp : battleModeView.getSelectBattleModePane().getComponents())
                 gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            gameKeyMap.put(new KeyPair(rightKey, gameView.getTimeAttackBtn()),
-                    () -> gameView.getGeneralModeBtn().requestFocus(true));
+            gameKeyMap.put(new KeyPair(rightKey, battleModeView.getTimeAttackBtn()),
+                () -> battleModeView.getGeneralModeBtn().requestFocus(true));
             gameKeyMap.put(new KeyPair(rightKey, gamePane), () -> {
                 moveRight();
                 drawGameBoard();
@@ -1095,43 +1046,38 @@ public class GameController {
                 }
                 // moveDown(); hard drop 적용
             });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
-                diffMode = EASY_MODE;
-                transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
+           /* gameKeyMap.put(new KeyPair(stackKey, battleModeView.getEasyBtn()), () -> {
+                diffMode = 1;
+                transitView(battleModeView, battleModeView.getGameDisplayPane(), battleModeView.getSelectDiffPane());
                 startGame();
             });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
-                diffMode = NORMAL_MODE;
-                transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
+            gameKeyMap.put(new KeyPair(stackKey, battleModeView.getNormalBtn()), () -> {
+                diffMode = 0;
+                transitView(battleModeView, battleModeView.getGameDisplayPane(), battleModeView.getSelectDiffPane());
                 startGame();
             });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
-                diffMode = HARD_MODE;
-                transitView(gameView, gameView.getGameDisplayPane(), gameView.getSelectDiffPane());
+            gameKeyMap.put(new KeyPair(stackKey, battleModeView.getHardBtn()), () -> {
+                diffMode = 2;
+                transitView(battleModeView, battleModeView.getGameDisplayPane(), battleModeView.getSelectDiffPane());
                 startGame();
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameMode = GENERAL_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameMode = ITEM_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameMode = TIME_ATTACK_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-        }
+            });*/
 
-        private void initOtherKeys() {
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, gamePane), () -> {
-                showESCMessage();
+            // 이 부분 검토 필요
+            gameKeyMap.put(new KeyPair(stackKey, battleModeView.getGeneralModeBtn()), () -> {
+                gameMode = 0;
+                transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
             });
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ENTER, gameView.getInputName()), () -> {
-                saveUserName();
+            gameKeyMap.put(new KeyPair(stackKey, battleModeView.getItemModeBtn()), () -> {
+                gameMode = 1;
+                transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
             });
-
+            gameKeyMap.put(new KeyPair(stackKey, battleModeView.getTimeAttackBtn()), () -> {
+                gameMode = 2;
+                transitView(battleModeView, battleModeView.getBattleModeDisplayPane(), battleModeView.getSelectBattleModePane());
+                startGame();
+            });
         }
     }
 
@@ -1147,11 +1093,9 @@ public class GameController {
 
     private void addGameKeyListener() {
         gameKeyListener = new GameKeyListener();
-        for (Component comp : gameView.getSelectDiffPane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectModePane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getGameOverPanel().getComponents())
+        /*for (Component comp : battleModeView.getSelectDiffPane().getComponents())
+            comp.addKeyListener(gameKeyListener);*/
+        for (Component comp : battleModeView.getSelectBattleModePane().getComponents())
             comp.addKeyListener(gameKeyListener);
         gamePane.addKeyListener(gameKeyListener);
     }
@@ -1208,11 +1152,12 @@ public class GameController {
 
     public void stopGameDelayTimer() {
         gameDelayTimer.stop();
+        gameTimer.stop();
     }
 
     private void showCurrent(int[][] board, Block block) {
         System.out.println("블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
-                + block.getHeight() + " rotateCount: " + block.getRotateCount());
+            + block.getHeight() + " rotateCount: " + block.getRotateCount());
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 System.out.print(board[i][j]);
@@ -1222,12 +1167,10 @@ public class GameController {
     }
 
     private void showScore() {
-        gameView.getScorePane().setText(String.format("%d", score));
+        battleModeView.getPlayerTwoScorePane().setText(String.format("%d", score));
     }
 
     private void showTime() {
-        gameView.getTimePane().setText(String.format("%d", gameTime));
+        battleModeView.getPlayerTwoTimePane().setText(String.format("%d", gameTime));
     }
 }
-
-

@@ -34,7 +34,7 @@ public class GameView extends MasterView {
 
     private GameView() {
         initGameDisplayPane();
-        initSelcetModePane();
+        initSelectModePane();
         initSelectDiffPane();
         initGameOverPanel();
         initView();
@@ -109,7 +109,7 @@ public class GameView extends MasterView {
         gameOverPanel.add(inputName);
     }
 
-    private void initSelcetModePane() {
+    private void initSelectModePane() {
         selectModePanel = new JPanel();
         selectModePanel.setLayout(new GridLayout(0, 3, 0, 0));
 

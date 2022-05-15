@@ -26,7 +26,6 @@ public class SettingController {
         displayList.add(new Rectangle(0, 0, 640, 960));
         setting = new Setting();
         setting.setDisplayList(displayList);
-
     }
 
     public void resetSetting() {
