@@ -970,11 +970,11 @@ public class PlayerTwoController {
         }
 
         private void loadSetting(Setting setting) {
-            this.upKey = setting.getRotateKey();
-            this.downKey = setting.getDownKey();
-            this.leftKey = setting.getLeftKey();
-            this.rightKey = setting.getRightKey();
-            this.stackKey = setting.getStackKey();
+            this.upKey = setting.getRotate2Key();
+            this.downKey = setting.getMoveDown2Key();
+            this.leftKey = setting.getMoveLeft2Key();
+            this.rightKey = setting.getMoveRight2Key();
+            this.stackKey = setting.getStack2Key();
         }
 
         private void initAllKey() {

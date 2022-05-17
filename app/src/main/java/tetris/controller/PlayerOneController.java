@@ -967,9 +967,9 @@ public class PlayerOneController {
 
         private void loadSetting(Setting setting) {
             this.upKey = setting.getRotateKey();
-            this.downKey = setting.getDownKey();
-            this.leftKey = setting.getLeftKey();
-            this.rightKey = setting.getRightKey();
+            this.downKey = setting.getMoveDownKey();
+            this.leftKey = setting.getMoveLeftKey();
+            this.rightKey = setting.getMoveRightKey();
             this.stackKey = setting.getStackKey();
         }
 
