@@ -72,7 +72,6 @@ public class SettingView extends MasterView {
 
         GridBagConstraints gblReturnMenuBtn = addGridBagComponents(0, 4);
         gblReturnMenuBtn.gridwidth = 2;
-
         super.add(returnSettingToMainBtn, gblReturnMenuBtn);
     }
 

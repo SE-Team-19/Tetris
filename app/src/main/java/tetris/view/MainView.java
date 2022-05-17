@@ -38,7 +38,7 @@ public class MainView extends MasterView {
         settingBtn = initAndSetName("settingBtn", new JButton("Settings"));
         scoreBoardBtn = initAndSetName("scoreBoardBtn", new JButton("Scoreboard"));
         exitBtn = initAndSetName("exitBtn", new JButton("Exit"));
-        deleteKeyBinding(startBtn, settingBtn, scoreBoardBtn, exitBtn);
+        deleteKeyBinding(startBtn, battleModeBtn, settingBtn, scoreBoardBtn, exitBtn);
 
         buttonList = new ArrayList<>();
         buttonList.add(startBtn);

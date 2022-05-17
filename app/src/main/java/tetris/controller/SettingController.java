@@ -13,7 +13,6 @@ import tetris.model.Setting;
 public class SettingController {
 
     private Setting setting;
-    private List<Rectangle> displayList;
 
     public SettingController() {
         initSetting();
@@ -21,7 +20,7 @@ public class SettingController {
     }
 
     private void initSetting() {
-        displayList = new ArrayList<>();
+        List<Rectangle> displayList = new ArrayList<>();
         displayList.add(new Rectangle(0, 0, 1366, 768));
         displayList.add(new Rectangle(0, 0, 380, 350));
         displayList.add(new Rectangle(0, 0, 640, 960));
@@ -36,7 +35,7 @@ public class SettingController {
 
     public Rectangle getScreenSize() {
         int displayMode = setting.getDisplayMode();
-        //List<Rectangle> displayList = setting.getDisplayList();
+        List<Rectangle> displayList = setting.getDisplayList();
         if (!displayList.get(displayMode).isEmpty()) {
             return displayList.get(displayMode);
         } else if (!displayList.get(0).isEmpty()) {
