@@ -72,6 +72,7 @@ public class ViewController extends JFrame {
         viewMap.put(mainView.getStartBtn(), gameView);
         viewMap.put(mainView.getScoreBoardBtn(), scoreView);
         viewMap.put(mainView.getSettingBtn(), settingView);
+        viewMap.put(mainView.getBattleModeBtn(), battleModeView);
 
         contentPane.setLayout(new GridLayout(1, 0, 0, 0)); // Frame의 레이아웃 방식을 설정, row 1
         contentPane.add(mainView);
@@ -168,6 +169,13 @@ public class ViewController extends JFrame {
     private void addScoreViewEventListener() {
         scoreView.getReturnScoreToMainBtn()
                 .addActionListener(e -> transitView(contentPane, mainView, scoreView));
+        scoreView.getReturnScoreToMainBtn()
+                .addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        transitView(contentPane, mainView, scoreView);
+                    }
+                });
     }
 
     // 전환함수
@@ -184,10 +192,15 @@ public class ViewController extends JFrame {
             mainView.getStartBtn().requestFocus();
         } else if (to.equals(gameView)) {
             // refresh.cancel();
-            gameController = new GameController(settingController.getSetting(), playerController, contentPane);
+            new SingleGameController(settingController.getSetting(), playerController, contentPane);
             gameView.getGeneralModeBtn().requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
+        } else if (to.equals(battleModeView)) {
+            refresh.cancel();
+            new MultiGameController(settingController.getSetting(), playerController, contentPane);
+            gameView.getGeneralModeBtn().requestFocus();
+            // battleModeView.getGeneralModeBtn().requestFocus();
         }
     }
 
@@ -597,33 +610,6 @@ public class ViewController extends JFrame {
             if (key == keyBuffer)
                 return false;
             return keyList.contains(key);
-        }
-    }
-
-    // Key 쌍을 위한 클래스
-    public class KeyPair {
-
-        private final int keyCode;
-        private final Component component;
-
-        public KeyPair(int keyCode, Component component) {
-            this.keyCode = keyCode;
-            this.component = component;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (!(o instanceof KeyPair))
-                return false;
-            KeyPair key = (KeyPair) o;
-            return keyCode == key.keyCode && component == key.component;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(keyCode, component);
         }
     }
 

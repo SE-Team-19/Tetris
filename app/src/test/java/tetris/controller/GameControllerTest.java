@@ -132,7 +132,7 @@ public class GameControllerTest {
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
-        testAllView.getGameView().getGameBoardPane().setText("");
+        testAllView.getGameView().getPlayerOneGameBoardPane().setText("");
         frame.stopTimer();
         frame.dispose();
     }

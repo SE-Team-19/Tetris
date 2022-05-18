@@ -44,6 +44,19 @@ public class MasterView extends JPanel {
         gridBag.insets = new Insets(0, 0, 0, 0);
         gridBag.gridx = x;
         gridBag.gridy = y;
+        gridBag.gridwidth = 1;
+        gridBag.gridheight = 1;
+        gridBag.fill = GridBagConstraints.BOTH;
+        return gridBag;
+    }
+
+    protected GridBagConstraints addGridBagComponents(int x, int y, int width, int height) {
+        GridBagConstraints gridBag = new GridBagConstraints();
+        gridBag.insets = new Insets(0, 0, 0, 0);
+        gridBag.gridx = x;
+        gridBag.gridy = y;
+        gridBag.gridwidth = width;
+        gridBag.gridheight = height;
         gridBag.fill = GridBagConstraints.BOTH;
         return gridBag;
     }

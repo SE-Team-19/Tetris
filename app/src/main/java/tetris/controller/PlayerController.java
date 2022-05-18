@@ -22,10 +22,8 @@ public class PlayerController {
 
     public void addPlayer(String name, int score, String difficulty) {
         playerList.add(new Player(name, score, difficulty));
-        Collections.sort(playerList, (p1, p2) -> Integer.compare(p1.getScore(), p2.getScore()));
-
-        while (playerList.size() > 10)
-            playerList.remove(0);
+        Collections.sort(playerList,
+                Collections.reverseOrder((p1, p2) -> Integer.compare(p1.getScore(), p2.getScore())));
 
         while (playerList.size() < 10) {
             playerList.add(new Player("없음", 0, "없음"));
