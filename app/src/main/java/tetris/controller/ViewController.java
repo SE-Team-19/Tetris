@@ -492,7 +492,7 @@ public class ViewController extends JFrame {
         }
 
         private void setKeyByToggleButton(JToggleButton btn, int key) {
-            btnmap.get(btn).domapping(key);
+            btnmap.get(btn).doMapping(key);
         }
 
         private void initUp2Key(int up2Key) {
@@ -660,7 +660,7 @@ public class ViewController extends JFrame {
 
     @FunctionalInterface
     private interface KeyMapping {
-        void domapping(int key);
+        void doMapping(int key);
     }
 
     private class MainKeyListener extends KeyAdapter {
@@ -699,4 +699,5 @@ public class ViewController extends JFrame {
     public void stopTimer() {
         gameController.stopGameDelayTimer();
     }
+
 }

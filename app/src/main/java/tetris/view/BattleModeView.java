@@ -34,9 +34,6 @@ public class BattleModeView extends JPanel {
     private JButton itemModeBtn;
     private JButton timeAttackBtn;
 
-    //private PlayerOneView playerOneView;
-    //private PlayerTwoView playerTwoView;
-
     private BattleModeView() {
         initBattleGameDisplayPane();
         initSelectBattleModePane();
@@ -129,21 +126,15 @@ public class BattleModeView extends JPanel {
         playerTwoTimePane.setFocusable(false);
 
         infoTwoPane.setLayout(new GridLayout(4, 0, 0, 0));
-        infoTwoPane.add(playerOneNextBlockPane);
-        infoTwoPane.add(playerOneScorePane);
-        infoTwoPane.add(playerOneTimePane);
-        infoTwoPane.add(playerOneAttackLinePane);
+        infoTwoPane.add(playerTwoNextBlockPane);
+        infoTwoPane.add(playerTwoScorePane);
+        infoTwoPane.add(playerTwoTimePane);
+        infoTwoPane.add(playerTwoAttackLinePane);
 
         battleModeDisplayPanel.add(playerOneGameBoardPane);
         battleModeDisplayPanel.add(infoOnePane);
         battleModeDisplayPanel.add(playerTwoGameBoardPane);
         battleModeDisplayPanel.add(infoTwoPane);
-
-        /* 이 부분을 PlayerOneView, PlayerTwoView 에서 끌어 온다.
-        playerOneView = PlayerOneView.getInstance();
-        playerTwoView = PlayerTwoView.getInstance();
-        BattleModeDisplayPanel.add(playerOneView);
-        BattleModeDisplayPanel.add(playerTwoView); */
     }
 
     public JDialog getGameOverDialog() {
@@ -242,5 +233,4 @@ public class BattleModeView extends JPanel {
     public JButton getTimeAttackBtn() {
         return this.timeAttackBtn;
     }
-
 }
