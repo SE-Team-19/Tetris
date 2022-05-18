@@ -121,7 +121,6 @@ public class ViewController extends JFrame {
 
     private void addEventListener() {
         addMainViewEventListener();
-        addBattleModeViewEventListener();
         addSettingViewEventListener();
         addScoreViewEventListener();
     }
@@ -138,22 +137,6 @@ public class ViewController extends JFrame {
             }
             button.addActionListener(
                     e -> transitView(contentPane, viewMap.get(e.getSource()), mainView));
-            buttonComp.addKeyListener(mainKeyEventListener);
-        }
-    }
-
-    private void addBattleModeViewEventListener() {
-        MainKeyListener mainKeyEventListener = new MainKeyListener();
-        mainView.getBattleModeBtn().requestFocus();
-        for (Component buttonComp : mainView.getButtonPanel().getComponents()) {
-            AbstractButton button = (AbstractButton) buttonComp;
-            if (button == mainView.getExitBtn()) {
-                button.addActionListener(e -> System.exit(0));
-                button.addKeyListener(mainKeyEventListener);
-                continue;
-            }
-            button.addActionListener(
-                e -> transitView(contentPane, viewMap.get(e.getSource()), mainView));
             buttonComp.addKeyListener(mainKeyEventListener);
         }
     }
@@ -195,7 +178,7 @@ public class ViewController extends JFrame {
         } else if (to.equals(gameView)) {
             // refresh.cancel();
             gameController = new GameController(settingController.getSetting(), playerController,
-                contentPane);
+                    contentPane);
             gameView.getGeneralModeBtn().requestFocus();
         } else if (to.equals(settingView)) {
             settingView.getReturnSettingToMainBtn().requestFocus();
@@ -248,7 +231,7 @@ public class ViewController extends JFrame {
         private void initStackKey(int stackKey) {
             for (Component comp : mainView.getButtonPanel().getComponents())
                 mainMap.put(new KeyPair(stackKey, comp),
-                    () -> transitView(contentPane, viewMap.get(comp), mainView));
+                        () -> transitView(contentPane, viewMap.get(comp), mainView));
             mainMap.put(new KeyPair(stackKey, mainView.getExitBtn()), () -> System.exit(0));
         }
 
@@ -272,7 +255,7 @@ public class ViewController extends JFrame {
         List<Integer> keyList;
 
         private InitSettingMap(int upKey, int downKey, int leftKey, int rightKey,
-            int stackKey) {
+                int stackKey) {
             resetMap();
             this.upKey = upKey;
             this.downKey = downKey;
@@ -343,7 +326,7 @@ public class ViewController extends JFrame {
             }
             settingMap.put(new KeyPair(downKey, displayComboBox), () -> {
                 displayComboBox.setSelectedIndex((displayComboBox.getSelectedIndex() + 1)
-                    % settingController.getDisplayList().size());
+                        % settingController.getDisplayList().size());
                 displayComboBox.hidePopup();
             });
         }
@@ -353,13 +336,13 @@ public class ViewController extends JFrame {
 
             /* StackKey */
             settingMap.put(new KeyPair(stackKey, settingView.getReturnSettingToMainBtn()),
-                () -> {
-                    transitView(contentPane, mainView, settingView);
+                    () -> {
+                        transitView(contentPane, mainView, settingView);
 
-                    settingView.setInitKeyBtnsFocusable(false);
-                    settingView.setSettingBtnsFocusable(true);
-                    settingView.setInitKeyBtnsFocusable(false);
-                });
+                        settingView.setInitKeyBtnsFocusable(false);
+                        settingView.setSettingBtnsFocusable(true);
+                        settingView.setInitKeyBtnsFocusable(false);
+                    });
             settingMap.put(new KeyPair(stackKey, settingView.getIsColorBlindBtn()), () -> {
                 boolean isColorBlind = settingController.isColorBlindMode();
                 settingView.setIsColorBlindBtn(!isColorBlind);
