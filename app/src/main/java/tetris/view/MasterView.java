@@ -88,6 +88,7 @@ public class MasterView extends JPanel {
             super.setFont(new Font(BASIC_FONT_FAMILY, Font.BOLD, BASIC_FONT_SIZE));
             super.setBorder(BorderFactory.createEmptyBorder());
             super.setFocusPainted(false);
+            super.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
             super.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
