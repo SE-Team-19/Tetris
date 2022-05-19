@@ -4,198 +4,102 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import java.util.List;
 
 import tetris.model.*;
 import tetris.view.*;
 
 public class MultiGameController {
-    private GameView gameView;
-    private ScoreView scoreView;
-    private JTextPane gamePane;
-    private Container contentPane;
 
-    private Map<KeyPair, Runnable> gameKeyMap;
-    GameController player1;
-    GameController player2;
-    private PlayerController playerController;
+    GameController gamePlayer1;
+    GameController gamePlayer2;
+    GameView gameView = GameView.getInstance();
 
-    private int diffMode;
-    private int gameMode;
-    private String userName;
+    private List<Integer> randomBlockList;
 
-    public MultiGameController(Setting setting, PlayerController playerController, Container contentPane) {
-        this.playerController = playerController;
-        this.contentPane = contentPane;
-        scoreView = ScoreView.getInstance();
-        gameView = GameView.getInstance();
-        gamePane = gameView.getPlayerOneGameBoardPane();
-        player1 = new GameController(setting, contentPane, gamePane,
-                gameView.getPlayerOneNextBlockPane(), gameView.getPlayerOneAttackLinePane()) {
+    public MultiGameController() {
+        JTextPane gamepane1 = gameView.getPlayerOneGameBoardPane();
+        JTextPane nextBlockPane1 = gameView.getPlayerOneNextBlockPane();
+        JTextPane attackLinePane1 = gameView.getPlayerOneAttackLinePane();
+        JLabel scoreLabel1 = gameView.getPlayerOneScoreLabel();
+        gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, gamepane1) {
             @Override
             void doAfterGameOver() {
-                player1.endGame();
-                transitView(gameView, gameView.getGameOverPanel(), gameView.getMulitiGameDisplayPane());
+                gameView.add(gameView.getGameOverPanel());
+                gameView.remove(gameView.getSingleGameDisplayPane());
+                gameView.getInputName().requestFocus();
+                gamePlayer1.endGame();
+            }
+
+            @Override
+            void doAfterArriveBottom() {
+                if (blockDeque.size() < 3) {
+                    generateBlockRandomizer(GameController.NORMAL_MODE);
+                    blockDeque.addAll(randomBlockList);
+                }
             }
         };
-        player2 = new GameController(setting, contentPane, gameView.getPlayerTwoGameBoardPane(),
-                gameView.getPlayerTwoNextBlockPane(), gameView.getPlayerTwoAttackLinePane()) {
+        gamePlayer2 = new GameController(gameView.getPlayerTwoGameBoardPane(), gameView.getPlayerTwoNextBlockPane(),
+                gameView.getPlayerTwoAttackLinePane(), gameView.getPlayerTwoScoreLabel(),
+                gameView.getPlayerOneGameBoardPane()) {
             @Override
             void doAfterGameOver() {
-                player1.endGame();
-                transitView(gameView, gameView.getGameOverPanel(), gameView.getMulitiGameDisplayPane());
+                gameView.add(gameView.getGameOverPanel());
+                gameView.remove(gameView.getSingleGameDisplayPane());
+                gameView.getInputName().requestFocus();
+                gamePlayer2.endGame();
+            }
+
+            @Override
+            void doAfterArriveBottom() {
+                if (blockDeque.size() < 3) {
+                    generateBlockRandomizer(GameController.NORMAL_MODE);
+                    blockDeque.addAll(randomBlockList);
+                }
             }
         };
-        new InitGameKeyMap(setting);
-        addMultiGameKeyListener();
     }
 
-    private void addMultiGameKeyListener() {
-        MultiGameKeyListener gameKeyListener = new MultiGameKeyListener();
-        for (Component comp : gameView.getSelectDiffPane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectModePane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getGameOverPanel().getComponents())
-            comp.addKeyListener(gameKeyListener);
+    public void startLocalGame(Setting setting) {
+        generateBlockRandomizer(GameController.NORMAL_MODE);
+
+        gamePlayer1.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
+                setting.getMoveRightKey(), setting.getStackKey());
+        gamePlayer2.setPlayerKeys(setting.getRotate2Key(), setting.getMoveDown2Key(), setting.getMoveLeft2Key(),
+                setting.getMoveRight2Key(), setting.getStack2Key());
+        gamePlayer1.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
+        gamePlayer2.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
     }
 
-    public class MultiGameKeyListener extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            KeyPair key = new KeyPair(e.getKeyCode(), e.getComponent());
-            if (gameKeyMap.containsKey(key))
-                gameKeyMap.get(key).run();
-        }
-    }
+    void generateBlockRandomizer(int mode) {
+        int jBlock = Block.JBLOCK_IDENTIFY_NUMBER;
+        int lBlock = Block.LBLOCK_IDENTIFY_NUMBER;
+        int zBlock = Block.ZBLOCK_IDENTIFY_NUMBER;
+        int sBlock = Block.SBLOCK_IDENTIFY_NUMBER;
+        int tBlock = Block.TBLOCK_IDENTIFY_NUMBER;
+        int oBlock = Block.OBLOCK_IDENTIFY_NUMBER;
+        int iBlock = Block.IBLOCK_IDENTIFY_NUMBER;
 
-    private class InitGameKeyMap {
-
-        int leftKey;
-        int rightKey;
-        int stackKey;
-
-        private InitGameKeyMap(Setting setting) {
-            loadSetting(setting);
-            resetMap();
-            initAllKey();
+        randomBlockList = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
         }
 
-        private void loadSetting(Setting setting) {
-            this.leftKey = setting.getMoveLeftKey();
-            this.rightKey = setting.getMoveRightKey();
-            this.stackKey = setting.getStackKey();
+        // easy mode
+        if (mode == 1) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
+            randomBlockList.add(iBlock);
         }
 
-        private void initAllKey() {
-            initLeftKey();
-            initRightKey();
-            initStackKey();
-            initOtherKeys();
+        // hard mode
+        else if (mode == 2) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
         }
-
-        private void resetMap() {
-            gameKeyMap = new HashMap<>();
-        }
-
-        private void initLeftKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
-                gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getEasyBtn()),
-                    () -> gameView.getHardBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
-                gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getGeneralModeBtn()),
-                    () -> gameView.getTimeAttackBtn().requestFocus(true));
-        }
-
-        private void initRightKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
-                gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            gameKeyMap.put(new KeyPair(rightKey, gameView.getHardBtn()),
-                    () -> gameView.getEasyBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
-                gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            gameKeyMap.put(new KeyPair(rightKey, gameView.getTimeAttackBtn()),
-                    () -> gameView.getGeneralModeBtn().requestFocus(true));
-        }
-
-        private void initStackKey() {
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
-                diffMode = GameController.EASY_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
-                diffMode = GameController.NORMAL_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
-                diffMode = GameController.HARD_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameMode = GameController.GENERAL_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameMode = GameController.ITEM_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameMode = GameController.TIME_ATTACK_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-        }
-
-        private void initOtherKeys() {
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ENTER, gameView.getInputName()), () -> {
-                saveUserName();
-            });
-        }
-    }
-
-    // 전환함수
-    private void transitView(Container pane, Container to, Container from) {
-        pane.add(to);
-        pane.remove(from);
-        focus(to);
-    }
-
-    private void focus(Container to) {
-        if (to.equals(gameView.getSelectDiffPane()))
-            gameView.getEasyBtn().requestFocus();
-        else if (to.equals(gameView.getSelectModePane()))
-            gameView.getGeneralModeBtn().requestFocus();
-        else if (to.equals(gameView.getSingleGameDisplayPane()))
-            gamePane.requestFocus();
-        else if (to.equals(scoreView))
-            scoreView.getReturnScoreToMainBtn().requestFocus();
-    }
-
-    // 유저 저장 메소드
-    void saveUserName() {
-        String difficulty = "normal";
-        if (diffMode == GameController.EASY_MODE)
-            difficulty = "easy";
-        else if (diffMode == GameController.HARD_MODE)
-            difficulty = "hard";
-        userName = gameView.getInputName().getText();
-        playerController.addPlayer(userName, player1.score, difficulty);
-        System.out.println("선수의 점수: " + player1.score);
-        playerController.savePlayerList();
-        playerController.loadPlayerList();
-        scoreView.resetRankingPane();
-        scoreView.resetRankingList();
-        playerController.getPlayerList()
-                .forEach(player -> System.out.println(player.getName() + player.getScore() + player.getDifficulty()));
-
-        playerController.getPlayerList()
-                .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
-                        Integer.toString(player.getScore()), player.getDifficulty()))));
-        scoreView.fillScoreBoard(userName);
-        gameView.resetGameView();
-        transitView(contentPane, scoreView, gameView);
     }
 }

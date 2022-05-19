@@ -1,9 +1,9 @@
 package tetris.controller;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import java.util.List;
 
 import tetris.model.*;
 import tetris.view.*;
@@ -12,158 +12,59 @@ public class SingleGameController {
 
     private GameView gameView;
     private ScoreView scoreView;
-    private JTextPane gamePane;
-    private Container contentPane;
 
-    private Map<KeyPair, Runnable> gameKeyMap;
-    GameController player1;
+    JTextPane gamepane;
+
+    GameController gamePlayer;
     private PlayerController playerController;
 
     private int diffMode;
     private int gameMode;
-    private String userName;
+    private List<Integer> randomBlockList;
 
-    public SingleGameController(Setting setting, PlayerController playerController, Container contentPane) {
+    public SingleGameController(PlayerController playerController) {
         this.playerController = playerController;
-        this.contentPane = contentPane;
-        scoreView = ScoreView.getInstance();
         gameView = GameView.getInstance();
-        gamePane = gameView.getPlayerOneGameBoardPane();
-        player1 = new GameController(setting, contentPane, gamePane,
-                gameView.getPlayerOneNextBlockPane(), gameView.getPlayerOneAttackLinePane()) {
+        scoreView = ScoreView.getInstance();
+        gamepane = gameView.getPlayerOneGameBoardPane();
+        JTextPane nextBlockPane = gameView.getPlayerOneNextBlockPane();
+        JTextPane attackLinePane = gameView.getPlayerOneAttackLinePane();
+        JLabel scoreLabel = gameView.getPlayerOneScoreLabel();
+        gamePlayer = new GameController(gamepane, nextBlockPane, attackLinePane, scoreLabel,
+                gamepane) {
             @Override
             void doAfterGameOver() {
-                player1.endGame();
-                transitView(gameView, gameView.getGameOverPanel(), gameView.getSingleGameDisplayPane());
+                gameView.add(gameView.getGameOverPanel());
+                gameView.remove(gameView.getSingleGameDisplayPane());
+                gameView.getInputName().requestFocus();
+                gamePlayer.endGame();
+            }
+
+            @Override
+            void doAfterArriveBottom() {
+                if (blockDeque.size() < 3) {
+                    generateBlockRandomizer(diffMode);
+                    blockDeque.addAll(randomBlockList);
+                }
             }
         };
-        new InitGameKeyMap(setting);
-        addSingleGameKeyListener();
+
     }
 
-    private void addSingleGameKeyListener() {
-        SingleGameKeyListener gameKeyListener = new SingleGameKeyListener();
-        for (Component comp : gameView.getSelectDiffPane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectModePane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getGameOverPanel().getComponents())
-            comp.addKeyListener(gameKeyListener);
+    void startSingleGame(Setting setting) {
+        gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
+                setting.getMoveRightKey(), setting.getStackKey());
+        generateBlockRandomizer(diffMode);
+        gamePlayer.startGame(diffMode, gameMode, randomBlockList);
+        gamepane.requestFocus(true);
     }
 
-    public class SingleGameKeyListener extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            KeyPair key = new KeyPair(e.getKeyCode(), e.getComponent());
-            if (gameKeyMap.containsKey(key))
-                gameKeyMap.get(key).run();
-        }
+    void setDiffMode(int diffMode) {
+        this.diffMode = diffMode;
     }
 
-    private class InitGameKeyMap {
-
-        int leftKey;
-        int rightKey;
-        int stackKey;
-
-        private InitGameKeyMap(Setting setting) {
-            loadSetting(setting);
-            resetMap();
-            initAllKey();
-        }
-
-        private void loadSetting(Setting setting) {
-            this.leftKey = setting.getMoveLeftKey();
-            this.rightKey = setting.getMoveRightKey();
-            this.stackKey = setting.getStackKey();
-        }
-
-        private void initAllKey() {
-            initLeftKey();
-            initRightKey();
-            initStackKey();
-            initOtherKeys();
-        }
-
-        private void resetMap() {
-            gameKeyMap = new HashMap<>();
-        }
-
-        private void initLeftKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
-                gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getEasyBtn()),
-                    () -> gameView.getHardBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
-                gameKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
-            gameKeyMap.put(new KeyPair(leftKey, gameView.getGeneralModeBtn()),
-                    () -> gameView.getTimeAttackBtn().requestFocus(true));
-        }
-
-        private void initRightKey() {
-            for (Component comp : gameView.getSelectDiffPane().getComponents())
-                gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            gameKeyMap.put(new KeyPair(rightKey, gameView.getHardBtn()),
-                    () -> gameView.getEasyBtn().requestFocus(true));
-            for (Component comp : gameView.getSelectModePane().getComponents())
-                gameKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
-            gameKeyMap.put(new KeyPair(rightKey, gameView.getTimeAttackBtn()),
-                    () -> gameView.getGeneralModeBtn().requestFocus(true));
-        }
-
-        private void initStackKey() {
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
-                diffMode = GameController.EASY_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
-                diffMode = GameController.NORMAL_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
-                diffMode = GameController.HARD_MODE;
-                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectDiffPane());
-                player1.startGame(diffMode, gameMode);
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameMode = GameController.GENERAL_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameMode = GameController.ITEM_GAME_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-            gameKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameMode = GameController.TIME_ATTACK_MODE;
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
-            });
-        }
-
-        private void initOtherKeys() {
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ENTER, gameView.getInputName()), () -> {
-                saveUserName();
-            });
-        }
-    }
-
-    // 전환함수
-    private void transitView(Container pane, Container to, Container from) {
-        pane.add(to);
-        pane.remove(from);
-        focus(to);
-    }
-
-    private void focus(Container to) {
-        if (to.equals(gameView.getSelectDiffPane()))
-            gameView.getEasyBtn().requestFocus();
-        else if (to.equals(gameView.getSelectModePane()))
-            gameView.getGeneralModeBtn().requestFocus();
-        else if (to.equals(gameView.getSingleGameDisplayPane()))
-            gamePane.requestFocus();
-        else if (to.equals(scoreView))
-            scoreView.getReturnScoreToMainBtn().requestFocus();
+    void setGameMode(int gameMode) {
+        this.gameMode = gameMode;
     }
 
     // 유저 저장 메소드
@@ -173,9 +74,9 @@ public class SingleGameController {
             difficulty = "easy";
         else if (diffMode == GameController.HARD_MODE)
             difficulty = "hard";
-        userName = gameView.getInputName().getText();
-        playerController.addPlayer(userName, player1.score, difficulty);
-        System.out.println("선수의 점수: " + player1.score);
+        String userName = gameView.getInputName().getText();
+        playerController.addPlayer(userName, gamePlayer.score, difficulty);
+        System.out.println("선수의 점수: " + gamePlayer.score);
         playerController.savePlayerList();
         playerController.loadPlayerList();
         scoreView.resetRankingPane();
@@ -188,6 +89,38 @@ public class SingleGameController {
                         Integer.toString(player.getScore()), player.getDifficulty()))));
         scoreView.fillScoreBoard(userName);
         gameView.resetGameView();
-        transitView(contentPane, scoreView, gameView);
     }
+
+    void generateBlockRandomizer(int mode) {
+        int jBlock = Block.JBLOCK_IDENTIFY_NUMBER;
+        int lBlock = Block.LBLOCK_IDENTIFY_NUMBER;
+        int zBlock = Block.ZBLOCK_IDENTIFY_NUMBER;
+        int sBlock = Block.SBLOCK_IDENTIFY_NUMBER;
+        int tBlock = Block.TBLOCK_IDENTIFY_NUMBER;
+        int oBlock = Block.OBLOCK_IDENTIFY_NUMBER;
+        int iBlock = Block.IBLOCK_IDENTIFY_NUMBER;
+
+        randomBlockList = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
+        }
+
+        // easy mode
+        if (mode == 1) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
+            randomBlockList.add(iBlock);
+        }
+
+        // hard mode
+        else if (mode == 2) {
+            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock);
+            Collections.shuffle(blockList);
+            randomBlockList.addAll(blockList);
+        }
+    }
+
 }

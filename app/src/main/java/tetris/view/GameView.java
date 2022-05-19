@@ -14,6 +14,7 @@ public class GameView extends MasterView {
     public static final char BOMB_CHAR = 'T';
     public static final char ONELINE_CHAR = 'L';
     public static final char GHOST_CHAR = 'G';
+    public static final String RETURN_STRING = "Return";
 
     private JTextPane playerOneGameBoardPane;
     private JTextPane playerOneNextBlockPane;
@@ -26,12 +27,21 @@ public class GameView extends MasterView {
     private JLabel playerTwoScoreLabel;
 
     private JPanel singleGameDisplayPanel;
-    private JPanel mulitiGameDisplayPanel;
+    private JPanel playerTwoGameDisplayPanel;
+    private JPanel multiGameDisplayPanel;
     private JPanel selectGamePanel;
+    private JPanel selectMultiGamePanel;
     private JPanel selectModePanel;
     private JPanel selectDiffPanel;
     private JPanel gameOverPanel;
     private JTextField inputName;
+    private JButton modeReturnBtn;
+    private JButton gameReturnBtn;
+    private JButton diffReturnBtn;
+    private JButton multiGameReturnBtn;
+    private JButton robotGameBtn;
+    private JButton localGameBtn;
+    private JButton onlineGameBtn;
     private JButton easyBtn;
     private JButton normalBtn;
     private JButton hardBtn;
@@ -46,6 +56,7 @@ public class GameView extends MasterView {
         initSingleGameDisplayPane();
         initMultiGameDisplayPane();
         initSelectGamePane();
+        initSelectMultiGamePane();
         initSelectModePane();
         initSelectDiffPane();
         initGameOverPanel();
@@ -54,12 +65,11 @@ public class GameView extends MasterView {
 
     public void resetGameView() {
         super.removeAll();
-        initGameDisplayComponents();
-        initMultiGameDisplayPane();
-        initSelectModePane();
-        initSelectDiffPane();
-        initGameOverPanel();
-        initView();
+        multiGameDisplayPanel.removeAll();
+        playerOneGameBoardPane.setText(null);
+        multiGameDisplayPanel.add(singleGameDisplayPanel);
+        multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
+        super.add(selectGamePanel);
     }
 
     private static class LazyHolder {
@@ -73,24 +83,24 @@ public class GameView extends MasterView {
     private void initView() {
         setFocusable(true);
         super.setLayout(new GridLayout(1, 1, 0, 0));
-        super.add(selectModePanel);
+        super.add(selectGamePanel);
     }
 
     private void initGameDisplayComponents() {
-        playerOneGameBoardPane = new JTextPane();
+        playerOneGameBoardPane = initAndSetName("playerOneGameBoardPane", new JTextPane());
         playerOneGameBoardPane.setBackground(Color.BLACK);
         playerOneGameBoardPane.setEditable(false);
         CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
                 BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
         playerOneGameBoardPane.setBorder(border);
 
-        playerOneNextBlockPane = new JTextPane();
+        playerOneNextBlockPane = initAndSetName("playerOneNextBlockPane", new JTextPane());
         playerOneNextBlockPane.setEditable(false);
         playerOneNextBlockPane.setBackground(Color.BLACK);
         playerOneNextBlockPane.setBorder(border);
         playerOneNextBlockPane.setFocusable(false);
 
-        playerOneAttackLinePane = new JTextPane();
+        playerOneAttackLinePane = initAndSetName("playerOneAttackLinePane", new JTextPane());
         playerOneAttackLinePane.setEditable(false);
         playerOneAttackLinePane.setBackground(Color.BLACK);
         playerOneAttackLinePane.setBorder(border);
@@ -128,7 +138,7 @@ public class GameView extends MasterView {
     }
 
     private void initSingleGameDisplayPane() {
-        singleGameDisplayPanel = new JPanel();
+        singleGameDisplayPanel = initAndSetName("singleGameDisplayPanel", new JPanel());
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
@@ -138,7 +148,7 @@ public class GameView extends MasterView {
 
         JPanel scorePane = new JPanel();
         scorePane.setLayout(new GridLayout(2, 1, 0, 0));
-        scorePane.setFocusable(false);
+        scorePane.setFocusable(true);
         scorePane.add(new JLabel("Score"));
         scorePane.add(playerOneScoreLabel);
 
@@ -153,13 +163,14 @@ public class GameView extends MasterView {
         singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
         singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
         singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2, 1, 1, 2));
+        singleGameDisplayPanel.setFocusable(false);
     }
 
     private void initMultiGameDisplayPane() {
-        mulitiGameDisplayPanel = new JPanel();
-        mulitiGameDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
+        multiGameDisplayPanel = new JPanel();
+        multiGameDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
 
-        JPanel playerTwoGameDisplayPanel = new JPanel();
+        playerTwoGameDisplayPanel = new JPanel();
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
@@ -185,8 +196,8 @@ public class GameView extends MasterView {
         playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
         playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(2, 1, 1, 2));
 
-        mulitiGameDisplayPanel.add(singleGameDisplayPanel);
-        mulitiGameDisplayPanel.add(playerTwoGameDisplayPanel);
+        multiGameDisplayPanel.add(singleGameDisplayPanel);
+        multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
     }
 
     private void initGameOverPanel() {
@@ -201,39 +212,80 @@ public class GameView extends MasterView {
 
     private void initSelectGamePane() {
         selectGamePanel = new JPanel();
-        selectGamePanel.setLayout(new GridLayout(0, 2, 0, 0));
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 1.0, 0.2, Double.MIN_VALUE };
+        selectGamePanel.setLayout(gridBagLayout);
 
         singleGameBtn = initAndSetName("singleGameBtn", new JButton("싱글게임"));
         mulitiGameBtn = initAndSetName("mulitiGameBtn", new JButton("멀티게임"));
+        gameReturnBtn = initAndSetName("gameReturnBtn", new JButton(RETURN_STRING));
 
-        selectGamePanel.add(singleGameBtn);
-        selectGamePanel.add(mulitiGameBtn);
+        selectGamePanel.add(singleGameBtn, addGridBagComponents(0, 0));
+        selectGamePanel.add(mulitiGameBtn, addGridBagComponents(1, 0));
+        selectGamePanel.add(gameReturnBtn, addGridBagComponents(0, 1, 2, 1));
+    }
+
+    private void initSelectMultiGamePane() {
+        selectMultiGamePanel = new JPanel();
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 1.0, 0.2, Double.MIN_VALUE };
+        selectMultiGamePanel.setLayout(gridBagLayout);
+
+        robotGameBtn = initAndSetName("robotGameBtn", new JButton("인공지능"));
+        localGameBtn = initAndSetName("localGameBtn", new JButton("로컬게임"));
+        onlineGameBtn = initAndSetName("onlineGameBtn", new JButton("온라인게임"));
+        multiGameReturnBtn = initAndSetName("multiGameReturnBtn", new JButton(RETURN_STRING));
+
+        selectMultiGamePanel.add(robotGameBtn, addGridBagComponents(0, 0));
+        selectMultiGamePanel.add(localGameBtn, addGridBagComponents(1, 0));
+        selectMultiGamePanel.add(onlineGameBtn, addGridBagComponents(2, 0));
+        selectMultiGamePanel.add(multiGameReturnBtn, addGridBagComponents(0, 1, 3, 1));
     }
 
     private void initSelectModePane() {
         selectModePanel = new JPanel();
-        selectModePanel.setLayout(new GridLayout(0, 3, 0, 0));
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 1.0, 0.2, Double.MIN_VALUE };
+        selectModePanel.setLayout(gridBagLayout);
 
         generalModeBtn = initAndSetName("generalModeBtn", new JButton("일반모드"));
         itemModeBtn = initAndSetName("itemModeBtn", new JButton("아이템모드"));
         timeAttackBtn = initAndSetName("timeAttackBtn", new JButton("시간제한모드"));
+        modeReturnBtn = initAndSetName("modeReturnBtn", new JButton(RETURN_STRING));
 
-        selectModePanel.add(generalModeBtn);
-        selectModePanel.add(itemModeBtn);
-        selectModePanel.add(timeAttackBtn);
+        selectModePanel.add(generalModeBtn, addGridBagComponents(0, 0));
+        selectModePanel.add(itemModeBtn, addGridBagComponents(1, 0));
+        selectModePanel.add(timeAttackBtn, addGridBagComponents(2, 0));
+        selectModePanel.add(modeReturnBtn, addGridBagComponents(0, 1, 3, 1));
     }
 
     private void initSelectDiffPane() {
         selectDiffPanel = new JPanel();
-        selectDiffPanel.setLayout(new GridLayout(0, 3, 0, 0));
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 1.0, 0.2, Double.MIN_VALUE };
+        selectDiffPanel.setLayout(gridBagLayout);
 
         easyBtn = initAndSetName("generalModeBtn", new JButton("Easy"));
         normalBtn = initAndSetName("itemModeBtn", new JButton("Normal"));
         hardBtn = initAndSetName("timeAttackBtn", new JButton("Hard"));
+        diffReturnBtn = initAndSetName("diffReturnBtn", new JButton(RETURN_STRING));
 
-        selectDiffPanel.add(easyBtn);
-        selectDiffPanel.add(normalBtn);
-        selectDiffPanel.add(hardBtn);
+        selectDiffPanel.add(easyBtn, addGridBagComponents(0, 0));
+        selectDiffPanel.add(normalBtn, addGridBagComponents(1, 0));
+        selectDiffPanel.add(hardBtn, addGridBagComponents(2, 0));
+        selectDiffPanel.add(diffReturnBtn, addGridBagComponents(0, 1, 3, 1));
     }
 
     public JPanel getSingleGameDisplayPane() {
@@ -241,7 +293,7 @@ public class GameView extends MasterView {
     }
 
     public JPanel getMulitiGameDisplayPane() {
-        return this.mulitiGameDisplayPanel;
+        return this.multiGameDisplayPanel;
     }
 
     public JPanel getSelectDiffPane() {
@@ -250,6 +302,10 @@ public class GameView extends MasterView {
 
     public JPanel getSelectModePane() {
         return this.selectModePanel;
+    }
+
+    public JPanel getSelectMultiGamePanel() {
+        return this.selectMultiGamePanel;
     }
 
     public JTextPane getPlayerOneGameBoardPane() {
@@ -294,6 +350,34 @@ public class GameView extends MasterView {
 
     public JButton getMulitiGameBtn() {
         return this.mulitiGameBtn;
+    }
+
+    public JButton getModeReturnBtn() {
+        return this.modeReturnBtn;
+    }
+
+    public JButton getGameReturnBtn() {
+        return this.gameReturnBtn;
+    }
+
+    public JButton getDiffReturnBtn() {
+        return this.diffReturnBtn;
+    }
+
+    public JButton getMultiGameReturnBtn() {
+        return this.multiGameReturnBtn;
+    }
+
+    public JButton getRobotGameBtn() {
+        return this.robotGameBtn;
+    }
+
+    public JButton getLocalGameBtn() {
+        return this.localGameBtn;
+    }
+
+    public JButton getOnlineGameBtn() {
+        return this.onlineGameBtn;
     }
 
     public JButton getEasyBtn() {
