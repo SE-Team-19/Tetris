@@ -22,7 +22,11 @@ public class MultiGameController {
         JTextPane nextBlockPane1 = gameView.getPlayerOneNextBlockPane();
         JTextPane attackLinePane1 = gameView.getPlayerOneAttackLinePane();
         JLabel scoreLabel1 = gameView.getPlayerOneScoreLabel();
-        gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, gamepane1) {
+        JTextPane gamepane2 = gameView.getPlayerTwoGameBoardPane();
+        JTextPane nextBlockPane2 = gameView.getPlayerTwoNextBlockPane();
+        JTextPane attackLinePane2 = gameView.getPlayerTwoAttackLinePane();
+        JLabel scoreLabel2 = gameView.getPlayerTwoScoreLabel();
+        gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, gamepane2) {
             @Override
             void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
@@ -39,9 +43,10 @@ public class MultiGameController {
                 }
             }
         };
-        gamePlayer2 = new GameController(gameView.getPlayerTwoGameBoardPane(), gameView.getPlayerTwoNextBlockPane(),
-                gameView.getPlayerTwoAttackLinePane(), gameView.getPlayerTwoScoreLabel(),
-                gameView.getPlayerOneGameBoardPane()) {
+
+        gamePlayer2 = new GameController(gamepane2, nextBlockPane2,
+                attackLinePane2, scoreLabel2,
+                gamepane2) {
             @Override
             void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
@@ -67,6 +72,7 @@ public class MultiGameController {
                 setting.getMoveRightKey(), setting.getStackKey());
         gamePlayer2.setPlayerKeys(setting.getRotate2Key(), setting.getMoveDown2Key(), setting.getMoveLeft2Key(),
                 setting.getMoveRight2Key(), setting.getStack2Key());
+
         gamePlayer1.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
         gamePlayer2.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
     }

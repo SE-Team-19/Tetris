@@ -113,6 +113,7 @@ public abstract class GameController {
         initRotateMap();
         initWallKickList();
 
+        gameKeyMap = new HashMap<>();
         initGameKeyMap = new InitGameKeyMap();
         addGameKeyListener();
 
@@ -918,9 +919,6 @@ public abstract class GameController {
         int rightKey;
         int stackKey;
 
-        private InitGameKeyMap() {
-        }
-
         private void initAllKey() {
             initUpKey();
             initDownKey();
@@ -941,7 +939,7 @@ public abstract class GameController {
         }
 
         private void resetMap() {
-            gameKeyMap = new HashMap<>();
+            gameKeyMap.clear();
         }
 
         private void initUpKey() {
@@ -1005,7 +1003,7 @@ public abstract class GameController {
 
     private void addGameKeyListener() {
         gameKeyListener = new GameKeyListener();
-        gamePane.addKeyListener(gameKeyListener);
+        focusing.addKeyListener(gameKeyListener);
     }
 
     private void initZeroBoard(int[][] board) {

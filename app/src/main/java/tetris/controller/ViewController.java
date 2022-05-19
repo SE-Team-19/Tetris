@@ -93,7 +93,7 @@ public class ViewController extends JFrame {
         focusingMap.put(gameView.getSingleGameDisplayPane(),
                 () -> gameView.getPlayerOneGameBoardPane().grabFocus());
         focusingMap.put(gameView.getMulitiGameDisplayPane(),
-                () -> gameView.getPlayerOneGameBoardPane().grabFocus());
+                () -> gameView.getPlayerTwoGameBoardPane().grabFocus());
         focusingMap.put(gameView.getGameOverPanel(), () -> gameView.getInputName().grabFocus());
         focusingMap.put(settingView, () -> settingView.getReturnSettingToMainBtn().grabFocus());
         focusingMap.put(scoreView, () -> scoreView.getReturnScoreToMainBtn().grabFocus());

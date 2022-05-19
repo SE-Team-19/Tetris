@@ -24,7 +24,7 @@ public class SingleGameController {
 
     public SingleGameController(PlayerController playerController) {
         this.playerController = playerController;
-        gameView = GameView.getInstance();
+        this.gameView = GameView.getInstance();
         scoreView = ScoreView.getInstance();
         gamepane = gameView.getPlayerOneGameBoardPane();
         JTextPane nextBlockPane = gameView.getPlayerOneNextBlockPane();
