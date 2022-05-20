@@ -36,7 +36,7 @@ public class SettingController {
         } else if (!displayList.get(0).isEmpty()) {
             return displayList.get(0);
         } else {
-            return new Rectangle(0, 0, 360, 240);
+            return new Rectangle(0, 0, 1366, 768);
         }
     }
 
