@@ -1,5 +1,5 @@
 {
-  "displayMode": 0,
+  "displayMode": 2,
   "displayList": [
     {
       "x": 0,
@@ -10,8 +10,8 @@
     {
       "x": 0,
       "y": 0,
-      "width": 1024,
-      "height": 768
+      "width": 1400,
+      "height": 1050
     },
     {
       "x": 0,

@@ -23,7 +23,7 @@ public class Setting {
     public Setting() {
         displayMode = 0;
         displayList = Arrays.asList(new Rectangle(0, 0, 1366, 768),
-                new Rectangle(0, 0, 1024, 768),
+                new Rectangle(0, 0, 1400, 1050),
                 new Rectangle(0, 0, 1600, 900));
         colorBlindMode = false;
         moveLeftKey = KeyEvent.VK_LEFT;
