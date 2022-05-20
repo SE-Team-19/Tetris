@@ -160,9 +160,12 @@ public class GameView extends MasterView {
 
         singleGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 0, 1, 3));
         singleGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 0, 2, 1));
+//        singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
+//        singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
+//        singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2, 1, 1, 2));
         singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-        singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2, 1, 1, 2));
+        singleGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
+        singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 2, 2, 2));
         singleGameDisplayPanel.setFocusable(false);
     }
 
@@ -192,9 +195,12 @@ public class GameView extends MasterView {
 
         playerTwoGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(0, 0, 1, 3));
         playerTwoGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(1, 0, 2, 1));
+//        playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
+//        playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
+//        playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(2, 1, 1, 2));
         playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-        playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(2, 1, 1, 2));
+        playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
+        playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(1, 2, 2, 1));
 
         multiGameDisplayPanel.add(singleGameDisplayPanel);
         multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
