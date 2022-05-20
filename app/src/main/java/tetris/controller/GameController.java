@@ -83,6 +83,7 @@ public abstract class GameController {
 
     private Setting setting;
     private boolean isColorBlindMode;
+    private int displayWidthSize;
 
     public GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
             Component focusing) {
@@ -92,6 +93,7 @@ public abstract class GameController {
         this.scoreLabel = scoreLabel;
         this.focusing = focusing;
         initGameController();
+        //setDisplayWidth();
     }
 
     private void initGameController() {
@@ -124,6 +126,10 @@ public abstract class GameController {
         setAttributeSet(boardAttributeSet);
         setAttributeSet(nextBoardAttributeSet);
         setAttributeSet(attackBoardAttributeSet);
+
+//        setAttributeSet(boardAttributeSet, displayWidthSize);
+//        setAttributeSet(nextBoardAttributeSet, displayWidthSize);
+//        setAttributeSet(attackBoardAttributeSet, displayWidthSize);
     }
 
     public void startGame(int diffMode, int gameMode, List<Integer> randomBlockList) {
@@ -167,6 +173,23 @@ public abstract class GameController {
         this.setting = setting;
         isColorBlindMode = setting.isColorBlindMode();
     }
+
+    /*
+    private void setDisplayWidth() {
+        int displayMode = setting.getDisplayMode();
+        List<Rectangle> displayList = setting.getDisplayList();
+//        if (displayList.get(0).getWidth() == 1366) {
+//            displayWidthSize = 1366;
+//        }
+        if (!displayList.get(displayMode).isEmpty()) {
+            displayWidthSize = 1400;
+        } else if (!displayList.get(0).isEmpty()) {
+            displayWidthSize = 1600;
+        } else {
+            displayWidthSize = 1366;
+        }
+    } */
+
 
     private void initBlockCharMap() {
         blockCharMap = new HashMap<>();
@@ -301,6 +324,89 @@ public abstract class GameController {
         gameTimer.start();
     }
 
+    private void setAttributeSet(SimpleAttributeSet attributeSet, int displayWidthSize){
+        // 1366 * 768
+        if (displayWidthSize == 1366) {
+            StyleConstants.setFontSize(attributeSet, 53);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -85);
+            StyleConstants.setRightIndent(attributeSet, -85);
+            StyleConstants.setLineSpacing(attributeSet, -0.45f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            // StyleConstants.setSpaceBelow(attributeSet, -0.5f);
+        }
+        else if (displayWidthSize == 1400) {
+            StyleConstants.setFontSize(attributeSet, 53);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -85);
+            StyleConstants.setRightIndent(attributeSet, -85);
+            StyleConstants.setLineSpacing(attributeSet, -0.23f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+        }
+        else {
+            StyleConstants.setFontSize(attributeSet, 60);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -105);
+            StyleConstants.setRightIndent(attributeSet, -105);
+            StyleConstants.setLineSpacing(attributeSet, -0.42f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+        }
+    }
+
+    // 1366 * 768
+    /*
+    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+        StyleConstants.setFontSize(attributeSet, 53);
+        StyleConstants.setFontFamily(attributeSet, "Courier New");
+        StyleConstants.setBold(attributeSet, true);
+        StyleConstants.setForeground(attributeSet, Color.WHITE);
+        StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setLeftIndent(attributeSet, -85);
+        StyleConstants.setRightIndent(attributeSet, -85);
+        StyleConstants.setLineSpacing(attributeSet, -0.45f);
+        StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+        // StyleConstants.setSpaceBelow(attributeSet, -0.5f);
+    } */
+
+    /*
+    // 1400 * 1050
+    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+        StyleConstants.setFontSize(attributeSet, 53);
+        StyleConstants.setFontFamily(attributeSet, "Courier New");
+        StyleConstants.setBold(attributeSet, true);
+        StyleConstants.setForeground(attributeSet, Color.WHITE);
+        StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setLeftIndent(attributeSet, -85);
+        StyleConstants.setRightIndent(attributeSet, -85);
+        StyleConstants.setLineSpacing(attributeSet, -0.23f);
+        StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+    } */
+
+    // 1600 * 900
+
+    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+        StyleConstants.setFontSize(attributeSet, 60);
+        StyleConstants.setFontFamily(attributeSet, "Courier New");
+        StyleConstants.setBold(attributeSet, true);
+        StyleConstants.setForeground(attributeSet, Color.WHITE);
+        StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setLeftIndent(attributeSet, -105);
+        StyleConstants.setRightIndent(attributeSet, -105);
+        StyleConstants.setLineSpacing(attributeSet, -0.42f);
+        StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+    }
+
+
+    /*
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 20);
         StyleConstants.setFontFamily(attributeSet, "Courier New");
@@ -308,7 +414,7 @@ public abstract class GameController {
         StyleConstants.setForeground(attributeSet, Color.WHITE);
         StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
         StyleConstants.setLineSpacing(attributeSet, -0.5f);
-    }
+    } */
 
     public void drawGameBoard() {
         StringBuilder sb = new StringBuilder();
