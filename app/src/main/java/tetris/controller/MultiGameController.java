@@ -3,6 +3,7 @@ package tetris.controller;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.util.*;
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class MultiGameController {
 
     private List<Integer> randomBlockList;
 
+    protected int gameTime;
+    protected Timer gameTimer;
+
     public MultiGameController() {
         JTextPane gamepane1 = gameView.getPlayerOneGameBoardPane();
         JTextPane nextBlockPane1 = gameView.getPlayerOneNextBlockPane();
@@ -30,23 +34,25 @@ public class MultiGameController {
             @Override
             void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
-                gameView.remove(gameView.getSingleGameDisplayPane());
+                gameView.remove(gameView.getMulitiGameDisplayPane());
                 gameView.getInputName().requestFocus();
                 gamePlayer1.endGame();
             }
 
             @Override
-            void doAfterArriveBottom() {
-                if (blockDeque.size() < 3) {
+            void doBeforeTakeOutNextBlock() {
+                if (attackLines > 0) {
+                    underAttack();
+                }
+                if (blockDeque.isEmpty()) {
                     generateBlockRandomizer(GameController.NORMAL_MODE);
                     blockDeque.addAll(randomBlockList);
+                    opponentBlockDeque.addAll(randomBlockList);
                 }
             }
         };
 
-        gamePlayer2 = new GameController(gamepane2, nextBlockPane2,
-                attackLinePane2, scoreLabel2,
-                gamepane2) {
+        gamePlayer2 = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, gamepane2) {
             @Override
             void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
@@ -56,13 +62,20 @@ public class MultiGameController {
             }
 
             @Override
-            void doAfterArriveBottom() {
-                if (blockDeque.size() < 3) {
+            void doBeforeTakeOutNextBlock() {
+                if (attackLines > 0) {
+                    underAttack();
+                }
+                if (blockDeque.isEmpty()) {
                     generateBlockRandomizer(GameController.NORMAL_MODE);
                     blockDeque.addAll(randomBlockList);
+                    opponentBlockDeque.addAll(randomBlockList);
                 }
             }
         };
+
+        gamePlayer1.setOpponentPlayer(gamePlayer2);
+        gamePlayer2.setOpponentPlayer(gamePlayer1);
     }
 
     public void startLocalGame(Setting setting) {
@@ -75,6 +88,9 @@ public class MultiGameController {
 
         gamePlayer1.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
         gamePlayer2.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
+        gameTime = 0;
+        showTime();
+        startStopWatch();
     }
 
     void generateBlockRandomizer(int mode) {
@@ -107,5 +123,29 @@ public class MultiGameController {
             Collections.shuffle(blockList);
             randomBlockList.addAll(blockList);
         }
+    }
+
+    protected void startStopWatch() {
+        gameTimer = new Timer(1000, e -> {
+            gameTime++;
+            showTime();
+        });
+        gameTimer.start();
+    }
+
+    protected void startTimeAttack() {
+        gameTimer = new Timer(1000, e -> {
+            gameTime--;
+            showTime();
+            if (gameTime == 0) {
+                // TimeAttack 이후 할 일
+                gamePlayer1.doAfterGameOver();
+            }
+        });
+        gameTimer.start();
+    }
+
+    protected void showTime() {
+        gameView.getTimeLabel().setText(String.format("%d", gameTime));
     }
 }

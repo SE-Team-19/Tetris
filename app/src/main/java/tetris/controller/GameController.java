@@ -2,7 +2,7 @@ package tetris.controller;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.security.DrbgParameters.NextBytes;
+import java.util.logging.Logger;
 import java.util.List;
 
 import javax.swing.*;
@@ -15,6 +15,8 @@ import tetris.view.*;
 
 public abstract class GameController {
 
+    private final Logger log = Logger.getGlobal();
+
     private static final int ANIMATION_INTERVAL = 50;
     private static final int LOCK_DELAY_TIME = 500;
     private static final int BOARD_START_HEIGHT = 5;
@@ -25,6 +27,10 @@ public abstract class GameController {
     private static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
     private static final int MAX_BLOCK_HEIGHT = 4;
+    private static final int UNFIXED_BLOCK_NUMBER = 1;
+    private static final int FIXED_BLOCK_NUMBER = 2;
+    private static final int OVERLAP_BLOCK_NUMBER = UNFIXED_BLOCK_NUMBER + FIXED_BLOCK_NUMBER;
+    private static final int FULL_LINE = FIXED_BLOCK_NUMBER * BOARD_WIDTH;
     public static final int EASY_MODE = 1;
     public static final int NORMAL_MODE = 1;
     public static final int HARD_MODE = 1;
@@ -44,24 +50,23 @@ public abstract class GameController {
     private Block nextBlock;
     private Block blockBuffer;
 
-    private int[][] visualBoard;
-    private int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
+    protected int[][] visualBoard;
+    protected int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
     private int[][] boardBuffer;
-    private int[][] attackLineBoard;
-    Deque<Integer> blockDeque;
+    protected int[][] attackLineBoard;
+    protected Deque<Integer> blockDeque;
+    protected Deque<Integer> opponentBlockDeque;
     private Deque<int[]> attackLinesDeque;
 
     private int x;
     private int y;
     private int ghostY;
-    int score; // game 점수와 관련된 변수
-    private int attackLines;
+    protected int score; // game 점수와 관련된 변수
+    protected int attackLines;
     private int deleteLines;
 
-    private String userName;
-
     private GameView gameView = GameView.getInstance();
-    private ScoreView scoreView = ScoreView.getInstance();
+    private GameController opponent;
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
     private JTextPane attackLinePane;
@@ -84,7 +89,7 @@ public abstract class GameController {
     private Setting setting;
     private boolean isColorBlindMode;
 
-    public GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
+    protected GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
             Component focusing) {
         this.gamePane = gamePane;
         this.nextBlockPane = nextBlockPane;
@@ -126,6 +131,13 @@ public abstract class GameController {
         setAttributeSet(attackBoardAttributeSet);
     }
 
+    public void setOpponentPlayer(GameController opponent) {
+        this.opponent = opponent;
+        this.attackLines = opponent.attackLines;
+        this.opponentBlockDeque = opponent.blockDeque;
+        this.attackLineBoard = opponent.attackLineBoard;
+    }
+
     public void startGame(int diffMode, int gameMode, List<Integer> randomBlockList) {
         this.diffMode = diffMode;
         this.gameMode = gameMode;
@@ -148,15 +160,7 @@ public abstract class GameController {
         isItemFlag = false;
 
         showScore();
-        showTime();
         startGameDelayTimer(delay);
-        if (gameMode == TIME_ATTACK_MODE) {
-            gameTime = 60;
-            startTimeAttack();
-        } else {
-            gameTime = 0;
-            startStopWatch();
-        }
     }
 
     public void setPlayerKeys(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
@@ -182,6 +186,7 @@ public abstract class GameController {
         blockCharMap.put(Block.WEIGHTBLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
         blockCharMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, GameView.ONELINE_CHAR);
         blockCharMap.put(Block.NULL_IDENTIFY_NUMBER, GameView.NULL_CHAR);
+        blockCharMap.put(Block.ATTACK_BLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
     }
 
     private void initColorMap() {
@@ -190,6 +195,7 @@ public abstract class GameController {
         colorMap.put(Block.NULL_IDENTIFY_NUMBER, Color.WHITE);
         colorMap.put(Block.GHOST_IDENTIFIY_NUMBER, new Color(200, 200, 200));
         colorMap.put(Block.BOMBBLOCK_IDENTIFY_NUMBER, Color.RED);
+        colorMap.put(Block.ATTACK_BLOCK_IDENTIFY_NUMBER, Color.GRAY);
         if (isColorBlindMode) {
             colorMap.put(Block.IBLOCK_IDENTIFY_NUMBER, new IBlock().getBlindColor());
             colorMap.put(Block.JBLOCK_IDENTIFY_NUMBER, new JBlock().getBlindColor());
@@ -275,30 +281,10 @@ public abstract class GameController {
             drawGameBoard();
             delay -= delay > 250 ? 1 : 0;
             gameDelayTimer.setDelay(delay);
-            // System.out.println(delay);
+            // String msg = "현재 딜레이: " + delay;
+            // log.info(msg);
         });
         gameDelayTimer.start();
-    }
-
-    private void startStopWatch() {
-        gameTimer = new Timer(1000, e -> {
-            gameTime++;
-            showTime();
-        });
-        gameTimer.start();
-    }
-
-    private void startTimeAttack() {
-        gameTimer = new Timer(1000, e -> {
-            System.out.println("타임어택중: " + gameTime);
-            gameTime--;
-            showTime();
-            if (gameTime == 0) {
-                showESCMessage();
-                stopGameDelayTimer();
-            }
-        });
-        gameTimer.start();
     }
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
@@ -315,6 +301,7 @@ public abstract class GameController {
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
             sb.append(GameView.BORDER_CHAR);
         }
+
         sb.append("\n");
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
             sb.append(GameView.BORDER_CHAR);
@@ -331,7 +318,7 @@ public abstract class GameController {
         gamePane.setText(sb.toString());
 
         StyledDocument doc = gamePane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, false);
+        doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, true);
         paintBlock();
     }
 
@@ -496,7 +483,6 @@ public abstract class GameController {
             startGameDelayTimer(delay);
             isBottomFlag = flag;
         }
-        showCurrent(board, currentBlock);
     }
 
     /* SRS기반 회전 점검 */
@@ -579,8 +565,8 @@ public abstract class GameController {
         placeBlock(boardBuffer, blockBuffer, x, y);
         for (int j = 0; j < blockBuffer.getHeight(); j++) {
             for (int i = 0; i < blockBuffer.getWidth(); i++) {
-                if (boardBuffer[y + j][x + i] > 2) {
-                    System.out.println("충돌발생");
+                if (boardBuffer[y + j][x + i] > FIXED_BLOCK_NUMBER) {
+                    // log.info("충돌발생");
                     return true;
                 }
             }
@@ -613,39 +599,35 @@ public abstract class GameController {
     abstract void doAfterGameOver();
 
     // 바닥 도달시 발동 메소드
-    abstract void doAfterArriveBottom();
+    abstract void doBeforeTakeOutNextBlock();
 
     // 삭제줄 복사 메소드
     private void drawAttackLine(int lines) {
 
-        if (attackLines > (BOARD_HEIGHT) / 2)
+        if (opponent == null || opponent.attackLines > (BOARD_HEIGHT) / 2)
             return;
 
         // 만일 이번에 들어오는 줄로 공격할 줄이 10개를 넘어선다면
-        if (attackLines + lines > 10)
-            lines = 10 - attackLines;
-
-        System.out.println("현재스택 사이즈: " + attackLinesDeque.size());
+        if (opponent.attackLines + lines > (BOARD_HEIGHT) / 2)
+            lines = (BOARD_HEIGHT) / 2 - attackLines;
 
         // 먼저 이미 공격 줄이 있다면 미리 스택에 넣어두고
-        if (attackLines > 0) {
-            for (int i = BOARD_HEIGHT - attackLines; i < BOARD_HEIGHT; i++)
-                attackLinesDeque.push(attackLineBoard[i]);
-        }
+        for (int i = BOARD_HEIGHT - opponent.attackLines; i < BOARD_HEIGHT; i++)
+            attackLinesDeque.push(attackLineBoard[i].clone());
 
         // 공격할 줄을 만들고 (구멍을 만드는 과정)
         int[][] temp = new int[MAX_BLOCK_HEIGHT][BOARD_WIDTH];
         for (int j = 3; j > 3 - lines; j--) {
             for (int i = 0; i < BOARD_WIDTH; i++) {
-                temp[j][i] = 2;
+                temp[j][i] = FIXED_BLOCK_NUMBER;
             }
         }
         placeBlock(temp, currentBlock, x, MAX_BLOCK_HEIGHT - currentBlock.getHeight());
 
         // 구멍난 공격줄을 stack에 넣어주고 4-> 테트리미노 블록개수
         for (int j = 0; j < MAX_BLOCK_HEIGHT; j++) {
-            if (Arrays.stream(temp[j]).sum() > 20) {
-                attackLinesDeque.push(Arrays.stream(temp[j]).map(e -> e % 3).toArray());
+            if (Arrays.stream(temp[j]).sum() > FULL_LINE) {
+                attackLinesDeque.push(Arrays.stream(temp[j]).map(e -> e % OVERLAP_BLOCK_NUMBER).toArray());
             }
         }
 
@@ -664,12 +646,51 @@ public abstract class GameController {
             }
             sb.append("\n");
         }
+        opponent.attackLinePane.setText(sb.toString());
+        StyleConstants.setFontSize(attackBoardAttributeSet, 20);
+
+        StyledDocument doc = opponent.attackLinePane.getStyledDocument();
+        doc.setParagraphAttributes(0, doc.getLength(), attackBoardAttributeSet, false);
+
+        // 상대방 공격줄에 라인 추가
+        opponent.attackLines += lines;
+
+        log.info("공격줄 추가 후");
+        showCurrent(attackLineBoard, currentBlock);
+    }
+
+    // 공격받는중
+    void underAttack() {
+        copyBoard(board, boardBuffer);
+        copyBoard(attackLineBoard, board, BOARD_END_HEIGHT - 1);
+        copyBoard(boardBuffer, board, BOARD_END_HEIGHT - attackLines - 1);
+        for (int i = BOARD_HEIGHT - 1 - attackLines; i < BOARD_HEIGHT; i++) {
+            attackLineBoard[i] = Arrays.stream(attackLineBoard[i])
+                    .map(e -> e * 6)
+                    .toArray();
+        }
+        copyBoard(visualBoard, boardBuffer);
+        copyBoard(attackLineBoard, visualBoard, BOARD_END_HEIGHT - 1);
+        copyBoard(boardBuffer, visualBoard, BOARD_END_HEIGHT - attackLines - 1);
+        showCurrent(visualBoard, currentBlock);
+        attackLines = 0;
+        attackLinesDeque.clear();
+        initZeroBoard(attackLineBoard);
+
+        // 그리고 그걸 attackLinePane에 표현한다.
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < BOARD_HEIGHT; j++) {
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                sb.append(" ");
+            }
+            sb.append("\n");
+        }
         attackLinePane.setText(sb.toString());
         StyleConstants.setFontSize(attackBoardAttributeSet, 20);
 
         StyledDocument doc = attackLinePane.getStyledDocument();
         doc.setParagraphAttributes(0, doc.getLength(), attackBoardAttributeSet, false);
-        attackLines += lines;
+
     }
 
     // 블럭 줄삭제
@@ -835,7 +856,6 @@ public abstract class GameController {
             stopGameDelayTimer();
             startGameDelayTimer(delay);
         }
-        doAfterArriveBottom();
 
     }
 
@@ -845,6 +865,7 @@ public abstract class GameController {
             doAfterGameOver();
             return;
         }
+        doBeforeTakeOutNextBlock();
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
         nextBlock = getBlock(blockDeque.removeFirst());
@@ -1034,19 +1055,32 @@ public abstract class GameController {
         pasteLines(copy, visualBoard);
     }
 
-    private void copyBoard(int[][] copy, int[][] paste) {
+    void copyBoard(int[][] copy, int[][] paste) {
         for (int i = 0; i < paste.length; i++) {
             paste[i] = Arrays.copyOf(copy[i], paste[i].length);
         }
+    }
+
+    void copyBoard(int[][] copy, int[][] paste, int start) {
+        int copyIndex = copy.length;
+        copyIndex--;
+        if (start > paste.length) {
+            log.info("입력받은 시작인덱스가 실제 복사받을 인덱스를 넘어섭니다.");
+            return;
+        }
+        for (int i = start; i > -1 && copyIndex > -1; i--, copyIndex--) {
+            paste[i] = Arrays.copyOf(copy[copyIndex], paste[i].length);
+        }
+
     }
 
     private void fixBoard() {
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 if (board[i][j] == 1) {
-                    board[i][j] = 2;
+                    board[i][j] = FIXED_BLOCK_NUMBER;
                     if (visualBoard[i][j] == Block.ONELINEBLOCK_IDENTIFY_NUMBER)
-                        board[i][j] = 20;
+                        board[i][j] = FULL_LINE;
                     visualBoard[i][j] = currentBlock.getIdentifynumber();
                 }
                 // else if (board[i][j] == 3) {
@@ -1085,21 +1119,21 @@ public abstract class GameController {
     }
 
     private void showCurrent(int[][] board, Block block) {
-        System.out.println("블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
-                + block.getHeight() + " rotateCount: " + block.getRotateCount());
+        String msg = "블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
+                + block.getHeight() + " rotateCount: " + block.getRotateCount();
+        log.info(msg);
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                System.out.print(board[i][j]);
+                sb.append(board[i][j] + " ");
             }
-            System.out.println();
+            sb.append('\n');
         }
+        msg = sb.toString();
+        log.info(msg);
     }
 
     private void showScore() {
         scoreLabel.setText(String.format("%d", score));
-    }
-
-    private void showTime() {
-        gameView.getTimeLabel().setText(String.format("%d", gameTime));
     }
 }

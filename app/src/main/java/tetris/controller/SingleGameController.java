@@ -2,6 +2,7 @@ package tetris.controller;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.util.*;
 import java.util.List;
 
@@ -10,17 +11,19 @@ import tetris.view.*;
 
 public class SingleGameController {
 
-    private GameView gameView;
-    private ScoreView scoreView;
+    protected GameView gameView;
+    protected ScoreView scoreView;
 
     JTextPane gamepane;
+    protected Timer gameTimer;
 
     GameController gamePlayer;
-    private PlayerController playerController;
+    protected PlayerController playerController;
 
-    private int diffMode;
-    private int gameMode;
-    private List<Integer> randomBlockList;
+    protected int diffMode;
+    protected int gameMode;
+    protected int gameTime;
+    protected List<Integer> randomBlockList;
 
     public SingleGameController(PlayerController playerController) {
         this.playerController = playerController;
@@ -30,6 +33,7 @@ public class SingleGameController {
         JTextPane nextBlockPane = gameView.getPlayerOneNextBlockPane();
         JTextPane attackLinePane = gameView.getPlayerOneAttackLinePane();
         JLabel scoreLabel = gameView.getPlayerOneScoreLabel();
+        gameTime = 0;
         gamePlayer = new GameController(gamepane, nextBlockPane, attackLinePane, scoreLabel,
                 gamepane) {
             @Override
@@ -41,7 +45,7 @@ public class SingleGameController {
             }
 
             @Override
-            void doAfterArriveBottom() {
+            void doBeforeTakeOutNextBlock() {
                 if (blockDeque.size() < 3) {
                     generateBlockRandomizer(diffMode);
                     blockDeque.addAll(randomBlockList);
@@ -51,24 +55,33 @@ public class SingleGameController {
 
     }
 
-    void startSingleGame(Setting setting) {
+    protected void startSingleGame(Setting setting) {
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
         generateBlockRandomizer(diffMode);
         gamePlayer.startGame(diffMode, gameMode, randomBlockList);
         gamepane.requestFocus(true);
+        showTime();
+        if (gameMode == GameController.TIME_ATTACK_MODE) {
+            gameTime = 100;
+            showTime();
+            startTimeAttack();
+        } else {
+            showTime();
+            startStopWatch();
+        }
     }
 
-    void setDiffMode(int diffMode) {
+    protected void setDiffMode(int diffMode) {
         this.diffMode = diffMode;
     }
 
-    void setGameMode(int gameMode) {
+    protected void setGameMode(int gameMode) {
         this.gameMode = gameMode;
     }
 
     // 유저 저장 메소드
-    void saveUserName() {
+    protected void saveUserName() {
         String difficulty = "normal";
         if (diffMode == GameController.EASY_MODE)
             difficulty = "easy";
@@ -91,7 +104,7 @@ public class SingleGameController {
         gameView.resetGameView();
     }
 
-    void generateBlockRandomizer(int mode) {
+    protected void generateBlockRandomizer(int mode) {
         int jBlock = Block.JBLOCK_IDENTIFY_NUMBER;
         int lBlock = Block.LBLOCK_IDENTIFY_NUMBER;
         int zBlock = Block.ZBLOCK_IDENTIFY_NUMBER;
@@ -121,6 +134,29 @@ public class SingleGameController {
             Collections.shuffle(blockList);
             randomBlockList.addAll(blockList);
         }
+    }
+
+    protected void startStopWatch() {
+        gameTimer = new Timer(1000, e -> {
+            gameTime++;
+            showTime();
+        });
+        gameTimer.start();
+    }
+
+    protected void startTimeAttack() {
+        gameTimer = new Timer(1000, e -> {
+            gameTime--;
+            showTime();
+            if (gameTime == 0) {
+                gamePlayer.doAfterGameOver();
+            }
+        });
+        gameTimer.start();
+    }
+
+    protected void showTime() {
+        gameView.getTimeLabel().setText(String.format("%d", gameTime));
     }
 
 }

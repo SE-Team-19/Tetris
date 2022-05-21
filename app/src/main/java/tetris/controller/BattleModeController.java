@@ -76,5 +76,4 @@ public class BattleModeController {
         });
         timeLimitTimer.start();
     }
-
 }
