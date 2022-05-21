@@ -41,11 +41,14 @@ public class ViewController extends JFrame {
     private transient SingleGameController singleGameController;
     private transient MultiGameController multiGameController;
 
+    public static int screenWidthNum = 0;
+
     public ViewController() {
         initJFrame();
         initViewAndController();
         initView();
         addEventListener();
+
     }
 
     private void initViewAndController() {
@@ -54,8 +57,8 @@ public class ViewController extends JFrame {
         battleModeView = BattleModeView.getInstance();
         scoreView = ScoreView.getInstance();
         settingView = SettingView.getInstance();
-        settingController = new SettingController();
-        playerController = new PlayerController();
+        //settingController = new SettingController();
+        //playerController = new PlayerController();
         singleGameController = new SingleGameController(playerController);
         multiGameController = new MultiGameController();
     }
@@ -65,6 +68,7 @@ public class ViewController extends JFrame {
         super.setResizable(false); // 창의 크기 조정 가능 여부
         setDefaultCloseOperation(EXIT_ON_CLOSE); // 창을 닫으면 더 이상 실행(run)되지 않는다
         resizeJFrame();
+        checkJFrame();
         super.setVisible(true);
         contentPane = super.getContentPane(); // contentPane 부르기
         super.rootPane.setFocusable(false);
@@ -73,6 +77,26 @@ public class ViewController extends JFrame {
     private void resizeJFrame() {
         super.setBounds(settingController.getScreenSize());
         super.setLocationRelativeTo(null);
+    }
+
+    // ScreenSize를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameView, GameController로 전달한다.
+    private void checkJFrame() {
+        List<Rectangle> checkRectSize = Arrays.asList(new Rectangle(0, 0, 1366, 768),
+            new Rectangle(0, 0, 1400, 1050),
+            new Rectangle(0, 0, 1600, 900));
+        if (settingController.getScreenSize().equals(checkRectSize.get(0))) {
+            screenWidthNum = 0;
+        }
+        else if (settingController.getScreenSize().equals(checkRectSize.get(1))) {
+            screenWidthNum = 1;
+        }
+        else if (settingController.getScreenSize().equals(checkRectSize.get(2))) {
+            screenWidthNum = 2;
+        }
+
+        // test용. 추후 지울 것
+        System.out.println("ScreenNum : " + screenWidthNum);
+        System.out.println("ScreenNum : " + screenWidthNum);
     }
 
     private void initView() {
