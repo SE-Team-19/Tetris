@@ -333,6 +333,7 @@ public abstract class GameController {
             StyleConstants.setSpaceAbove(attributeSet, -3.5f);
             System.out.println("here is 0");    // test용. 추후 지울 것
         }
+        // 1400 * 1050
         else if (ViewController.screenWidthNum == 1) {
             StyleConstants.setFontSize(attributeSet, 53);
             StyleConstants.setFontFamily(attributeSet, "Courier New");
@@ -345,6 +346,7 @@ public abstract class GameController {
             StyleConstants.setSpaceAbove(attributeSet, -3.5f);
             System.out.println("here is 1");      // test용. 추후 지울 것
         }
+        // 1600 * 900
         else {
             StyleConstants.setFontSize(attributeSet, 60);
             StyleConstants.setFontFamily(attributeSet, "Courier New");

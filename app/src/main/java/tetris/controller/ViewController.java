@@ -623,6 +623,9 @@ public class ViewController extends JFrame {
                 settingController.setDisplayMode(displayComboBox.getSelectedIndex());
                 settingController.saveSetting();
                 resizeJFrame();
+                checkJFrame();
+                initViewAndController();
+
                 settingView.getSetDisplayBtn().requestFocus();
             });
             settingViewKeyMap.put(new KeyPair(stackKey, settingView.getInitKeyBtn()), () -> {
