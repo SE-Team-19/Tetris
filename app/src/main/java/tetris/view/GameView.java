@@ -3,6 +3,7 @@ package tetris.view;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
+import tetris.controller.ViewController;
 
 public class GameView extends MasterView {
 
@@ -53,6 +54,7 @@ public class GameView extends MasterView {
 
     private GameView() {
         initGameDisplayComponents();
+        initSettingLayout();
         initSingleGameDisplayPane();
         initMultiGameDisplayPane();
         initSelectGamePane();
@@ -137,28 +139,29 @@ public class GameView extends MasterView {
         // setMargin test
         // playerOneNextBlockPane.setMargin(new Insets(100, 100, 10, 10));
 
-
-        // 아래 추가(setPreferredSize): 1366 * 768
-        playerOneNextBlockPane.setPreferredSize(new Dimension(85, 128));
-        playerOneAttackLinePane.setPreferredSize(new Dimension(57, 84));
-        playerTwoNextBlockPane.setPreferredSize(new Dimension(85, 128));
-        playerTwoAttackLinePane.setPreferredSize(new Dimension(85, 84));
-
-
-        // 아래 추가(setPreferredSize): 1400 * 1050,
-//        playerOneNextBlockPane.setPreferredSize(new Dimension(87, 175));
-//        playerOneAttackLinePane.setPreferredSize(new Dimension(87, 116));
-//        playerTwoNextBlockPane.setPreferredSize(new Dimension(87, 175));
-//        playerTwoAttackLinePane.setPreferredSize(new Dimension(87, 116));
-
-        // 아래 추가(setPreferredSize): 1600 * 900
-//        playerOneNextBlockPane.setPreferredSize(new Dimension(100, 150));
-//        playerOneAttackLinePane.setPreferredSize(new Dimension(100, 100));
-//        playerTwoNextBlockPane.setPreferredSize(new Dimension(100, 150));
-//        playerTwoAttackLinePane.setPreferredSize(new Dimension(100, 100));
-
         timeLabel = new JLabel("");
         timeLabel.setFocusable(false);
+    }
+
+    private void initSettingLayout() {
+        if (ViewController.screenWidthNum == 0) {
+            playerOneNextBlockPane.setPreferredSize(new Dimension(85, 128));
+            playerOneAttackLinePane.setPreferredSize(new Dimension(57, 84));
+            playerTwoNextBlockPane.setPreferredSize(new Dimension(85, 128));
+            playerTwoAttackLinePane.setPreferredSize(new Dimension(85, 84));
+        }
+        else if (ViewController.screenWidthNum == 1) {
+            playerOneNextBlockPane.setPreferredSize(new Dimension(87, 175));
+            playerOneAttackLinePane.setPreferredSize(new Dimension(87, 116));
+            playerTwoNextBlockPane.setPreferredSize(new Dimension(87, 175));
+            playerTwoAttackLinePane.setPreferredSize(new Dimension(87, 116));
+        }
+        else {
+            playerOneNextBlockPane.setPreferredSize(new Dimension(100, 150));
+            playerOneAttackLinePane.setPreferredSize(new Dimension(100, 100));
+            playerTwoNextBlockPane.setPreferredSize(new Dimension(100, 150));
+            playerTwoAttackLinePane.setPreferredSize(new Dimension(100, 100));
+        }
     }
 
     private void initSingleGameDisplayPane() {

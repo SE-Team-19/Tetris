@@ -83,7 +83,6 @@ public abstract class GameController {
 
     private Setting setting;
     private boolean isColorBlindMode;
-    private int displayWidthSize;
 
     public GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
             Component focusing) {
@@ -126,10 +125,6 @@ public abstract class GameController {
         setAttributeSet(boardAttributeSet);
         setAttributeSet(nextBoardAttributeSet);
         setAttributeSet(attackBoardAttributeSet);
-
-//        setAttributeSet(boardAttributeSet, displayWidthSize);
-//        setAttributeSet(nextBoardAttributeSet, displayWidthSize);
-//        setAttributeSet(attackBoardAttributeSet, displayWidthSize);
     }
 
     public void startGame(int diffMode, int gameMode, List<Integer> randomBlockList) {
@@ -174,21 +169,21 @@ public abstract class GameController {
         isColorBlindMode = setting.isColorBlindMode();
     }
 
-    /*
-    private void setDisplayWidth() {
-        int displayMode = setting.getDisplayMode();
-        List<Rectangle> displayList = setting.getDisplayList();
-//        if (displayList.get(0).getWidth() == 1366) {
-//            displayWidthSize = 1366;
+
+    public void setDisplayWidth() {
+        //int displayMode = setting.getDisplayMode();
+
+
+//        if (ViewController.resolution.equals(setting.getDisplayList().get(0))){
+//            displayWidthSize = 1;
 //        }
-        if (!displayList.get(displayMode).isEmpty()) {
-            displayWidthSize = 1400;
-        } else if (!displayList.get(0).isEmpty()) {
-            displayWidthSize = 1600;
-        } else {
-            displayWidthSize = 1366;
-        }
-    } */
+//        else if  (ViewController.resolution.equals(setting.getDisplayList().get(1))){
+//            displayWidthSize = 2;
+//        }
+//        else {
+//            displayWidthSize = 3;
+//        }
+    }
 
 
     private void initBlockCharMap() {
@@ -324,9 +319,9 @@ public abstract class GameController {
         gameTimer.start();
     }
 
-    private void setAttributeSet(SimpleAttributeSet attributeSet, int displayWidthSize){
+    private void setAttributeSet(SimpleAttributeSet attributeSet){
         // 1366 * 768
-        if (displayWidthSize == 1366) {
+        if (ViewController.screenWidthNum == 0) {
             StyleConstants.setFontSize(attributeSet, 53);
             StyleConstants.setFontFamily(attributeSet, "Courier New");
             StyleConstants.setBold(attributeSet, true);
@@ -336,9 +331,9 @@ public abstract class GameController {
             StyleConstants.setRightIndent(attributeSet, -85);
             StyleConstants.setLineSpacing(attributeSet, -0.45f);
             StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-            // StyleConstants.setSpaceBelow(attributeSet, -0.5f);
+            System.out.println("here is 0");    // test용. 추후 지울 것
         }
-        else if (displayWidthSize == 1400) {
+        else if (ViewController.screenWidthNum == 1) {
             StyleConstants.setFontSize(attributeSet, 53);
             StyleConstants.setFontFamily(attributeSet, "Courier New");
             StyleConstants.setBold(attributeSet, true);
@@ -348,6 +343,7 @@ public abstract class GameController {
             StyleConstants.setRightIndent(attributeSet, -85);
             StyleConstants.setLineSpacing(attributeSet, -0.23f);
             StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            System.out.println("here is 1");      // test용. 추후 지울 것
         }
         else {
             StyleConstants.setFontSize(attributeSet, 60);
@@ -359,12 +355,12 @@ public abstract class GameController {
             StyleConstants.setRightIndent(attributeSet, -105);
             StyleConstants.setLineSpacing(attributeSet, -0.42f);
             StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            System.out.println("here is 2");      // test용. 추후 지울 것
         }
     }
 
     // 1366 * 768
-    /*
-    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+/*    private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 53);
         StyleConstants.setFontFamily(attributeSet, "Courier New");
         StyleConstants.setBold(attributeSet, true);
@@ -375,11 +371,10 @@ public abstract class GameController {
         StyleConstants.setLineSpacing(attributeSet, -0.45f);
         StyleConstants.setSpaceAbove(attributeSet, -3.5f);
         // StyleConstants.setSpaceBelow(attributeSet, -0.5f);
-    } */
+    }*/
 
-    /*
     // 1400 * 1050
-    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+    /*private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 53);
         StyleConstants.setFontFamily(attributeSet, "Courier New");
         StyleConstants.setBold(attributeSet, true);
@@ -389,11 +384,10 @@ public abstract class GameController {
         StyleConstants.setRightIndent(attributeSet, -85);
         StyleConstants.setLineSpacing(attributeSet, -0.23f);
         StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-    } */
+    }*/
 
     // 1600 * 900
-
-    private void setAttributeSet(SimpleAttributeSet attributeSet) {
+    /*private void setAttributeSet(SimpleAttributeSet attributeSet) {
         StyleConstants.setFontSize(attributeSet, 60);
         StyleConstants.setFontFamily(attributeSet, "Courier New");
         StyleConstants.setBold(attributeSet, true);
@@ -403,8 +397,7 @@ public abstract class GameController {
         StyleConstants.setRightIndent(attributeSet, -105);
         StyleConstants.setLineSpacing(attributeSet, -0.42f);
         StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-    }
-
+    }*/
 
     /*
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
