@@ -133,6 +133,30 @@ public class GameView extends MasterView {
         playerTwoAttackLinePane.setBorder(border);
         playerTwoAttackLinePane.setFocusable(false);
 
+
+        // setMargin test
+        // playerOneNextBlockPane.setMargin(new Insets(100, 100, 10, 10));
+
+
+        // 아래 추가(setPreferredSize): 1366 * 768
+        playerOneNextBlockPane.setPreferredSize(new Dimension(85, 128));
+        playerOneAttackLinePane.setPreferredSize(new Dimension(57, 84));
+        playerTwoNextBlockPane.setPreferredSize(new Dimension(85, 128));
+        playerTwoAttackLinePane.setPreferredSize(new Dimension(85, 84));
+
+
+        // 아래 추가(setPreferredSize): 1400 * 1050,
+//        playerOneNextBlockPane.setPreferredSize(new Dimension(87, 175));
+//        playerOneAttackLinePane.setPreferredSize(new Dimension(87, 116));
+//        playerTwoNextBlockPane.setPreferredSize(new Dimension(87, 175));
+//        playerTwoAttackLinePane.setPreferredSize(new Dimension(87, 116));
+
+        // 아래 추가(setPreferredSize): 1600 * 900
+//        playerOneNextBlockPane.setPreferredSize(new Dimension(100, 150));
+//        playerOneAttackLinePane.setPreferredSize(new Dimension(100, 100));
+//        playerTwoNextBlockPane.setPreferredSize(new Dimension(100, 150));
+//        playerTwoAttackLinePane.setPreferredSize(new Dimension(100, 100));
+
         timeLabel = new JLabel("");
         timeLabel.setFocusable(false);
     }
