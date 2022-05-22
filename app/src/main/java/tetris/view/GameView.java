@@ -54,7 +54,6 @@ public class GameView extends MasterView {
 
     private GameView() {
         initGameDisplayComponents();
-        initSettingLayout();
         initSingleGameDisplayPane();
         initMultiGameDisplayPane();
         initSelectGamePane();
@@ -135,33 +134,8 @@ public class GameView extends MasterView {
         playerTwoAttackLinePane.setBorder(border);
         playerTwoAttackLinePane.setFocusable(false);
 
-
-        // setMargin test
-        // playerOneNextBlockPane.setMargin(new Insets(100, 100, 10, 10));
-
         timeLabel = new JLabel("");
         timeLabel.setFocusable(false);
-    }
-
-    private void initSettingLayout() {
-        if (ViewController.screenWidthNum == 0) {
-            playerOneNextBlockPane.setPreferredSize(new Dimension(85, 128));
-            playerOneAttackLinePane.setPreferredSize(new Dimension(57, 84));
-            playerTwoNextBlockPane.setPreferredSize(new Dimension(85, 128));
-            playerTwoAttackLinePane.setPreferredSize(new Dimension(85, 84));
-        }
-        else if (ViewController.screenWidthNum == 1) {
-            playerOneNextBlockPane.setPreferredSize(new Dimension(87, 175));
-            playerOneAttackLinePane.setPreferredSize(new Dimension(87, 116));
-            playerTwoNextBlockPane.setPreferredSize(new Dimension(87, 175));
-            playerTwoAttackLinePane.setPreferredSize(new Dimension(87, 116));
-        }
-        else {
-            playerOneNextBlockPane.setPreferredSize(new Dimension(100, 150));
-            playerOneAttackLinePane.setPreferredSize(new Dimension(100, 100));
-            playerTwoNextBlockPane.setPreferredSize(new Dimension(100, 150));
-            playerTwoAttackLinePane.setPreferredSize(new Dimension(100, 100));
-        }
     }
 
     private void initSingleGameDisplayPane() {
@@ -448,30 +422,4 @@ public class GameView extends MasterView {
     public JTextField getInputName() {
         return this.inputName;
     }
-
-    // public SimpleAttributeSet getBoardAttributeSet() {
-    // return this.boardAttributeSet;
-    // }
-
-    // public void setBoardAttributeSet() {
-    // boardAttributeSet = new SimpleAttributeSet();
-    // StyleConstants.setFontSize(boardAttributeSet, 20);
-    // StyleConstants.setFontFamily(boardAttributeSet, "Courier New");
-    // StyleConstants.setBold(boardAttributeSet, true);
-    // StyleConstants.setAlignment(boardAttributeSet, StyleConstants.ALIGN_CENTER);
-    // }
-
-    // public SimpleAttributeSet getNextBoardAttributeSet() {
-    // return this.nextBoardAttributeSet;
-    // }
-
-    // public void setNextBoardAttributeSet() {
-    // nextBoardAttributeSet = new SimpleAttributeSet();
-    // StyleConstants.setFontSize(nextBoardAttributeSet, 15);
-    // StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
-    // StyleConstants.setBold(nextBoardAttributeSet, true);
-    // StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
-    // StyleConstants.setAlignment(nextBoardAttributeSet,
-    // StyleConstants.ALIGN_CENTER);
-    // }
 }

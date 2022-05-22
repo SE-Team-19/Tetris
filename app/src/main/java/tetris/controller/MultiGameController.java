@@ -63,6 +63,29 @@ public class MultiGameController {
                 }
             }
         };
+
+        // 게임 오른쪽 부분 배치 고정; 블럭이 쌓일 때 흔들림 방지
+        if (ViewController.screenWidthNum == 0) {
+            nextBlockPane1.setPreferredSize(new Dimension(85, 128));
+            attackLinePane1.setPreferredSize(new Dimension(57, 84));
+            nextBlockPane2.setPreferredSize(new Dimension(85, 128));
+            attackLinePane2.setPreferredSize(new Dimension(85, 84));
+            System.out.println("GameView is " + ViewController.screenWidthNum);
+        }
+        else if (ViewController.screenWidthNum == 1) {
+            nextBlockPane1.setPreferredSize(new Dimension(87, 175));
+            attackLinePane1.setPreferredSize(new Dimension(87, 116));
+            nextBlockPane2.setPreferredSize(new Dimension(87, 175));
+            attackLinePane2.setPreferredSize(new Dimension(87, 116));
+            System.out.println("GameView is " + ViewController.screenWidthNum);
+        }
+        else {
+            nextBlockPane1.setPreferredSize(new Dimension(100, 150));
+            attackLinePane1.setPreferredSize(new Dimension(100, 100));
+            nextBlockPane2.setPreferredSize(new Dimension(100, 150));
+            attackLinePane2.setPreferredSize(new Dimension(100, 100));
+            System.out.println("GameView is " + ViewController.screenWidthNum);
+        }
     }
 
     public void startLocalGame(Setting setting) {

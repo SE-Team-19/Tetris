@@ -77,9 +77,11 @@ public class ViewController extends JFrame {
     private void resizeJFrame() {
         super.setBounds(settingController.getScreenSize());
         super.setLocationRelativeTo(null);
+        Dimension frameSize = this.getSize();
+
     }
 
-    // ScreenSize를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameView, GameController로 전달한다.
+    // ScreenSize 를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameController 로 전달한다.
     private void checkJFrame() {
         List<Rectangle> checkRectSize = Arrays.asList(new Rectangle(0, 0, 1366, 768),
             new Rectangle(0, 0, 1400, 1050),
