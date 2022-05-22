@@ -33,7 +33,6 @@ public class ViewController extends JFrame {
 
     private MainView mainView;
     private GameView gameView;
-    private BattleModeView battleModeView;
     private ScoreView scoreView;
     private SettingView settingView;
 
@@ -54,7 +53,6 @@ public class ViewController extends JFrame {
     private void initViewAndController() {
         mainView = MainView.getInstance();
         gameView = GameView.getInstance();
-        battleModeView = BattleModeView.getInstance();
         scoreView = ScoreView.getInstance();
         settingView = SettingView.getInstance();
         settingController = new SettingController();
@@ -103,7 +101,6 @@ public class ViewController extends JFrame {
     private void initView() {
         viewMap = new HashMap<>();
         viewMap.put(mainView.getStartBtn(), gameView);
-        viewMap.put(mainView.getBattleModeBtn(), battleModeView);
         viewMap.put(mainView.getScoreBoardBtn(), scoreView);
         viewMap.put(mainView.getSettingBtn(), settingView);
 

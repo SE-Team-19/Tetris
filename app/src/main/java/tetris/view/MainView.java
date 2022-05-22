@@ -9,7 +9,6 @@ public class MainView extends MasterView {
 
     private JPanel buttonPanel;
     private JButton startBtn;
-    private JButton battleModeBtn;
     private JButton settingBtn;
     private JButton scoreBoardBtn;
     private JButton exitBtn;
@@ -31,15 +30,13 @@ public class MainView extends MasterView {
         buttonPanel = new JPanel();
 
         startBtn = initAndSetName("startBtn", new JButton("Game Start"));
-        battleModeBtn = initAndSetName("BattleModeBtn", new JButton("BattleMode Start"));
         settingBtn = initAndSetName("settingBtn", new JButton("Settings"));
         scoreBoardBtn = initAndSetName("scoreBoardBtn", new JButton("Scoreboard"));
         exitBtn = initAndSetName("exitBtn", new JButton("Exit"));
-        deleteKeyBinding(startBtn, battleModeBtn, settingBtn, scoreBoardBtn, exitBtn);
+        deleteKeyBinding(startBtn, settingBtn, scoreBoardBtn, exitBtn);
 
         buttonList = new ArrayList<>();
         buttonList.add(startBtn);
-        buttonList.add(battleModeBtn);
         buttonList.add(settingBtn);
         buttonList.add(scoreBoardBtn);
         buttonList.add(exitBtn);
@@ -64,10 +61,6 @@ public class MainView extends MasterView {
 
     public JButton getStartBtn() {
         return this.startBtn;
-    }
-
-    public JButton getBattleModeBtn() {
-        return this.battleModeBtn;
     }
 
     public JButton getSettingBtn() {
