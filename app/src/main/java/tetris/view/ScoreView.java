@@ -72,8 +72,6 @@ public class ScoreView extends MasterView {
         addGridBagComponents(rankingPane, new JLabel("이름"), 1, 0);
         addGridBagComponents(rankingPane, new JLabel("점수"), 2, 0);
         addGridBagComponents(rankingPane, new JLabel("난이도"), 3, 0);
-
-        // rankingList.add(new ArrayList<>(Arrays.asList("NULL", "NULL", "789")));
     }
 
     private void addRankInfo(Container pane, List<String> array, int y) {

@@ -415,30 +415,4 @@ public class GameView extends MasterView {
     public JTextField getInputName() {
         return this.inputName;
     }
-
-    // public SimpleAttributeSet getBoardAttributeSet() {
-    // return this.boardAttributeSet;
-    // }
-
-    // public void setBoardAttributeSet() {
-    // boardAttributeSet = new SimpleAttributeSet();
-    // StyleConstants.setFontSize(boardAttributeSet, 20);
-    // StyleConstants.setFontFamily(boardAttributeSet, "Courier New");
-    // StyleConstants.setBold(boardAttributeSet, true);
-    // StyleConstants.setAlignment(boardAttributeSet, StyleConstants.ALIGN_CENTER);
-    // }
-
-    // public SimpleAttributeSet getNextBoardAttributeSet() {
-    // return this.nextBoardAttributeSet;
-    // }
-
-    // public void setNextBoardAttributeSet() {
-    // nextBoardAttributeSet = new SimpleAttributeSet();
-    // StyleConstants.setFontSize(nextBoardAttributeSet, 15);
-    // StyleConstants.setFontFamily(nextBoardAttributeSet, "Courier New");
-    // StyleConstants.setBold(nextBoardAttributeSet, true);
-    // StyleConstants.setForeground(nextBoardAttributeSet, Color.WHITE);
-    // StyleConstants.setAlignment(nextBoardAttributeSet,
-    // StyleConstants.ALIGN_CENTER);
-    // }
 }

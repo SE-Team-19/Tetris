@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
 
+import tetris.model.Setting;
 import tetris.view.*;
 import tetris.view.MasterView.JToggleButton;
 import tetris.view.MasterView.JLabel;
@@ -32,14 +33,12 @@ public class ViewController extends JFrame {
 
     private MainView mainView;
     private GameView gameView;
-    private BattleModeView battleModeView;
     private ScoreView scoreView;
     private SettingView settingView;
 
     private transient PlayerController playerController = new PlayerController();
     private transient SettingController settingController = new SettingController();
-    private transient SingleGameController singleGameController;
-    private transient MultiGameController multiGameController;
+    private transient MultiGameController gameController;
 
     public ViewController() {
         initJFrame();
@@ -51,13 +50,11 @@ public class ViewController extends JFrame {
     private void initViewAndController() {
         mainView = MainView.getInstance();
         gameView = GameView.getInstance();
-        battleModeView = BattleModeView.getInstance();
         scoreView = ScoreView.getInstance();
         settingView = SettingView.getInstance();
         settingController = new SettingController();
         playerController = new PlayerController();
-        singleGameController = new SingleGameController(playerController);
-        multiGameController = new MultiGameController();
+        gameController = new MultiGameController(playerController);
     }
 
     private void initJFrame() {
@@ -81,7 +78,6 @@ public class ViewController extends JFrame {
         viewMap.put(mainView.getStartBtn(), gameView);
         viewMap.put(mainView.getScoreBoardBtn(), scoreView);
         viewMap.put(mainView.getSettingBtn(), settingView);
-        viewMap.put(mainView.getBattleModeBtn(), battleModeView);
 
         focusingMap = new HashMap<>();
         focusingMap.put(mainView, () -> mainView.getStartBtn().grabFocus());
@@ -136,9 +132,7 @@ public class ViewController extends JFrame {
                 settingController.getDisplayMode());
         settingView.setIsColorBlindBtn(settingController.isColorBlindMode());
 
-        initSettingViewMap = new InitSettingViewMap(upKey, downKey, leftKey, rightKey, stackKey, up2Key, down2Key,
-                left2Key,
-                right2Key, stack2Key);
+        initSettingViewMap = new InitSettingViewMap(settingController.getSetting());
         initSettingViewMap.initAllKey();
         settingView.initKeyLabels(upKey, downKey, leftKey, rightKey, stackKey);
         settingView.init2KeyLabels(up2Key, down2Key, left2Key, right2Key, stack2Key);
@@ -402,36 +396,36 @@ public class ViewController extends JFrame {
 
         private void initStackKey() {
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
-                singleGameController.setDiffMode(GameController.EASY_MODE);
+                gameController.setDiffMode(GameController.EASY_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                singleGameController.startSingleGame(settingController.getSetting());
+                gameController.startSingleGame(settingController.getSetting());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
-                singleGameController.setDiffMode(GameController.NORMAL_MODE);
+                gameController.setDiffMode(GameController.NORMAL_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                singleGameController.startSingleGame(settingController.getSetting());
+                gameController.startSingleGame(settingController.getSetting());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
-                singleGameController.setDiffMode(GameController.HARD_MODE);
+                gameController.setDiffMode(GameController.HARD_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                singleGameController.startSingleGame(settingController.getSetting());
+                gameController.startSingleGame(settingController.getSetting());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getLocalGameBtn()), () -> {
                 transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectMultiGamePanel());
-                multiGameController.startLocalGame(settingController.getSetting());
+                gameController.startLocalGame(settingController.getSetting());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                singleGameController.setDiffMode(GameController.GENERAL_GAME_MODE);
+                gameController.setDiffMode(GameController.GENERAL_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                singleGameController.setDiffMode(GameController.ITEM_GAME_MODE);
+                gameController.setDiffMode(GameController.ITEM_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                singleGameController.setDiffMode(GameController.TIME_ATTACK_MODE);
+                gameController.setDiffMode(GameController.TIME_ATTACK_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
 
@@ -453,7 +447,7 @@ public class ViewController extends JFrame {
         private void initOtherKeys() {
             gameViewKeyMap.put(new KeyPair(KeyEvent.VK_ENTER, gameView.getInputName()),
                     () -> {
-                        singleGameController.saveUserName();
+                        gameController.saveUserName();
                         transitView(contentPane, scoreView, gameView);
                         gameView.getInputName().setText("");
                     });
@@ -476,20 +470,19 @@ public class ViewController extends JFrame {
         int stack2Key;
         List<Integer> keyList;
 
-        private InitSettingViewMap(int upKey, int downKey, int leftKey, int rightKey, int stackKey, int up2Key,
-                int down2Key, int left2Key, int right2Key, int stack2Key) {
+        private InitSettingViewMap(Setting setting) {
             resetMap();
 
-            this.upKey = upKey;
-            this.downKey = downKey;
-            this.leftKey = leftKey;
-            this.rightKey = rightKey;
-            this.stackKey = stackKey;
-            this.up2Key = up2Key;
-            this.down2Key = down2Key;
-            this.left2Key = left2Key;
-            this.right2Key = right2Key;
-            this.stack2Key = stack2Key;
+            this.upKey = setting.getRotateKey();
+            this.downKey = setting.getMoveDownKey();
+            this.leftKey = setting.getMoveLeftKey();
+            this.rightKey = setting.getMoveRightKey();
+            this.stackKey = setting.getStackKey();
+            this.up2Key = setting.getRotate2Key();
+            this.down2Key = setting.getMoveDown2Key();
+            this.left2Key = setting.getMoveLeft2Key();
+            this.right2Key = setting.getMoveRight2Key();
+            this.stack2Key = setting.getStack2Key();
 
             initKeyList();
             btnmap = new HashMap<>();
@@ -503,7 +496,6 @@ public class ViewController extends JFrame {
             btnmap.put(settingView.getSetLeft2KeyBtn(), this::setLeft2Key);
             btnmap.put(settingView.getSetRight2KeyBtn(), this::setRight2Key);
             btnmap.put(settingView.getSetStack2KeyBtn(), this::setStack2Key);
-            // initAllKey();
         }
 
         private void initAllKey() {

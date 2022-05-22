@@ -32,18 +32,16 @@ public abstract class GameController {
     private static final int OVERLAP_BLOCK_NUMBER = UNFIXED_BLOCK_NUMBER + FIXED_BLOCK_NUMBER;
     private static final int FULL_LINE = FIXED_BLOCK_NUMBER * BOARD_WIDTH;
     public static final int EASY_MODE = 1;
-    public static final int NORMAL_MODE = 1;
-    public static final int HARD_MODE = 1;
+    public static final int NORMAL_MODE = 0;
+    public static final int HARD_MODE = 2;
     public static final int GENERAL_GAME_MODE = 0;
     public static final int ITEM_GAME_MODE = 1;
     public static final int TIME_ATTACK_MODE = 2;
 
     private Timer gameDelayTimer;
-    private Timer gameTimer;
     private boolean isBottomFlag;
     private boolean isItemFlag;
     private int delay;
-    private int gameTime;
     private int diffMode; // 난이도 설정
     private int gameMode; // 게임모드 설정
     private Block currentBlock;
@@ -71,11 +69,9 @@ public abstract class GameController {
     private JTextPane nextBlockPane;
     private JTextPane attackLinePane;
     private JLabel scoreLabel;
-    private JLabel gameOverText; // 게임 종료를 나타내주는 문구
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
     private SimpleAttributeSet attackBoardAttributeSet;
-    private Container contentPane;
     private Component focusing;
     KeyListener gameKeyListener;
 
@@ -86,7 +82,6 @@ public abstract class GameController {
     private Map<Integer, Character> blockCharMap;
     private List<List<WallKick>> wallKickList;
 
-    private Setting setting;
     private boolean isColorBlindMode;
 
     protected GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
@@ -109,7 +104,6 @@ public abstract class GameController {
         attackLineBoard = new int[BOARD_HEIGHT][BOARD_WIDTH];
         attackLinesDeque = new ArrayDeque<>();
         blockDeque = new ArrayDeque<>();
-        gameOverText = new JLabel("Game Over");
         x = START_X;
         y = START_Y;
 
@@ -168,7 +162,6 @@ public abstract class GameController {
     }
 
     public void loadSetting(Setting setting) {
-        this.setting = setting;
         isColorBlindMode = setting.isColorBlindMode();
     }
 
@@ -281,8 +274,6 @@ public abstract class GameController {
             drawGameBoard();
             delay -= delay > 250 ? 1 : 0;
             gameDelayTimer.setDelay(delay);
-            // String msg = "현재 딜레이: " + delay;
-            // log.info(msg);
         });
         gameDelayTimer.start();
     }
@@ -566,7 +557,6 @@ public abstract class GameController {
         for (int j = 0; j < blockBuffer.getHeight(); j++) {
             for (int i = 0; i < blockBuffer.getWidth(); i++) {
                 if (boardBuffer[y + j][x + i] > FIXED_BLOCK_NUMBER) {
-                    // log.info("충돌발생");
                     return true;
                 }
             }
@@ -885,7 +875,6 @@ public abstract class GameController {
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
         isBottomFlag = checkIsItBottom();
-        System.out.println("바닥플래그: " + isBottomFlag);
     }
 
     /* 아이템블록 구현 메소드 */
@@ -1007,9 +996,7 @@ public abstract class GameController {
         }
 
         private void initOtherKeys() {
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, focusing), () -> {
-                showESCMessage();
-            });
+            gameKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, focusing), GameController.this::showESCMessage);
         }
     }
 
@@ -1083,9 +1070,6 @@ public abstract class GameController {
                         board[i][j] = FULL_LINE;
                     visualBoard[i][j] = currentBlock.getIdentifynumber();
                 }
-                // else if (board[i][j] == 3) {
-                // board[i][j] = 2;
-                // } 잠시 보관 (이후 현재 블록을 제외한 줄 수를 알기 위해서)
             }
         }
     }
@@ -1094,15 +1078,9 @@ public abstract class GameController {
         gameDelayTimer.stop();
     }
 
-    public void stopGameTimer() {
-        gameTimer.stop();
-    }
-
     public void endGame() {
         Timer endGameTimer = new Timer(2, e -> {
-            stopGameTimer();
             stopGameDelayTimer();
-            gameTimer = null;
             gameDelayTimer = null;
             initZeroBoard(board);
             initZeroBoard(visualBoard);
@@ -1112,17 +1090,17 @@ public abstract class GameController {
             nextBlock = null;
             blockBuffer = null;
             blockDeque.clear();
-
         });
         endGameTimer.setRepeats(false);
         endGameTimer.start();
     }
 
     private void showCurrent(int[][] board, Block block) {
-        String msg = "블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
+        String msg = "\n블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
                 + block.getHeight() + " rotateCount: " + block.getRotateCount();
         log.info(msg);
         StringBuilder sb = new StringBuilder();
+        sb.append('\n');
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 sb.append(board[i][j] + " ");

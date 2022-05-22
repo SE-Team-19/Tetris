@@ -1,6 +1,5 @@
 package tetris.controller;
 
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.util.*;
@@ -26,6 +25,7 @@ public class SingleGameController {
     protected List<Integer> randomBlockList;
 
     public SingleGameController(PlayerController playerController) {
+        randomBlockList = new ArrayList<>();
         this.playerController = playerController;
         this.gameView = GameView.getInstance();
         scoreView = ScoreView.getInstance();
@@ -42,6 +42,7 @@ public class SingleGameController {
                 gameView.remove(gameView.getSingleGameDisplayPane());
                 gameView.getInputName().requestFocus();
                 gamePlayer.endGame();
+                gameTimer.stop();
             }
 
             @Override
@@ -89,13 +90,10 @@ public class SingleGameController {
             difficulty = "hard";
         String userName = gameView.getInputName().getText();
         playerController.addPlayer(userName, gamePlayer.score, difficulty);
-        System.out.println("선수의 점수: " + gamePlayer.score);
         playerController.savePlayerList();
         playerController.loadPlayerList();
         scoreView.resetRankingPane();
         scoreView.resetRankingList();
-        playerController.getPlayerList()
-                .forEach(player -> System.out.println(player.getName() + player.getScore() + player.getDifficulty()));
 
         playerController.getPlayerList()
                 .forEach(player -> scoreView.addRankingList(new ArrayList<>(Arrays.asList(player.getName(),
@@ -113,7 +111,7 @@ public class SingleGameController {
         int oBlock = Block.OBLOCK_IDENTIFY_NUMBER;
         int iBlock = Block.IBLOCK_IDENTIFY_NUMBER;
 
-        randomBlockList = new ArrayList<>();
+        randomBlockList.clear();
         for (int i = 0; i < 4; i++) {
             List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
             Collections.shuffle(blockList);
@@ -121,7 +119,7 @@ public class SingleGameController {
         }
 
         // easy mode
-        if (mode == 1) {
+        if (mode == GameController.EASY_MODE) {
             List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
             Collections.shuffle(blockList);
             randomBlockList.addAll(blockList);
@@ -129,7 +127,7 @@ public class SingleGameController {
         }
 
         // hard mode
-        else if (mode == 2) {
+        else if (mode == GameController.HARD_MODE) {
             List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock);
             Collections.shuffle(blockList);
             randomBlockList.addAll(blockList);

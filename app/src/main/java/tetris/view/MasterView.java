@@ -15,6 +15,7 @@ public class MasterView extends JPanel {
     public static final Color WARNING_FONT_COLOR = Color.RED;
     public static final String BASIC_FONT_FAMILY = "맑은 고딕";
     public static final int BASIC_FONT_SIZE = 20;
+    private static final String SPACE = "SPACE";
 
     public MasterView() {
         super();
@@ -35,7 +36,7 @@ public class MasterView extends JPanel {
 
     protected void deleteKeyBinding(JComponent... comps) {
         for (JComponent comp : comps)
-            comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
+            comp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(SPACE), "none");
     }
 
     /* GridBaglayout에 간편하게 넣기 위한 함수들 (overloading) */
@@ -78,7 +79,7 @@ public class MasterView extends JPanel {
             super.setFont(new Font(BASIC_FONT_FAMILY, Font.BOLD, BASIC_FONT_SIZE));
             super.setBorder(BorderFactory.createEmptyBorder());
             super.setFocusPainted(false);
-            super.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
+            super.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(SPACE), "none");
             super.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -101,7 +102,7 @@ public class MasterView extends JPanel {
             super.setFont(new Font(BASIC_FONT_FAMILY, Font.BOLD, BASIC_FONT_SIZE));
             super.setBorder(BorderFactory.createEmptyBorder());
             super.setFocusPainted(false);
-            super.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "none");
+            super.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(SPACE), "none");
             super.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {

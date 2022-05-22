@@ -1,27 +1,16 @@
 package tetris.controller;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.Timer;
-import java.util.*;
-import java.util.List;
 
 import tetris.model.*;
-import tetris.view.*;
 
-public class MultiGameController {
+public class MultiGameController extends SingleGameController {
 
     GameController gamePlayer1;
     GameController gamePlayer2;
-    GameView gameView = GameView.getInstance();
 
-    private List<Integer> randomBlockList;
-
-    protected int gameTime;
-    protected Timer gameTimer;
-
-    public MultiGameController() {
+    public MultiGameController(PlayerController playerController) {
+        super(playerController);
         JTextPane gamepane1 = gameView.getPlayerOneGameBoardPane();
         JTextPane nextBlockPane1 = gameView.getPlayerOneNextBlockPane();
         JTextPane attackLinePane1 = gameView.getPlayerOneAttackLinePane();
@@ -91,61 +80,5 @@ public class MultiGameController {
         gameTime = 0;
         showTime();
         startStopWatch();
-    }
-
-    void generateBlockRandomizer(int mode) {
-        int jBlock = Block.JBLOCK_IDENTIFY_NUMBER;
-        int lBlock = Block.LBLOCK_IDENTIFY_NUMBER;
-        int zBlock = Block.ZBLOCK_IDENTIFY_NUMBER;
-        int sBlock = Block.SBLOCK_IDENTIFY_NUMBER;
-        int tBlock = Block.TBLOCK_IDENTIFY_NUMBER;
-        int oBlock = Block.OBLOCK_IDENTIFY_NUMBER;
-        int iBlock = Block.IBLOCK_IDENTIFY_NUMBER;
-
-        randomBlockList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
-            Collections.shuffle(blockList);
-            randomBlockList.addAll(blockList);
-        }
-
-        // easy mode
-        if (mode == 1) {
-            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock, iBlock);
-            Collections.shuffle(blockList);
-            randomBlockList.addAll(blockList);
-            randomBlockList.add(iBlock);
-        }
-
-        // hard mode
-        else if (mode == 2) {
-            List<Integer> blockList = Arrays.asList(jBlock, lBlock, zBlock, sBlock, tBlock, oBlock);
-            Collections.shuffle(blockList);
-            randomBlockList.addAll(blockList);
-        }
-    }
-
-    protected void startStopWatch() {
-        gameTimer = new Timer(1000, e -> {
-            gameTime++;
-            showTime();
-        });
-        gameTimer.start();
-    }
-
-    protected void startTimeAttack() {
-        gameTimer = new Timer(1000, e -> {
-            gameTime--;
-            showTime();
-            if (gameTime == 0) {
-                // TimeAttack 이후 할 일
-                gamePlayer1.doAfterGameOver();
-            }
-        });
-        gameTimer.start();
-    }
-
-    protected void showTime() {
-        gameView.getTimeLabel().setText(String.format("%d", gameTime));
     }
 }
