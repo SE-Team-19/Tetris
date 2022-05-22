@@ -1,0 +1,29 @@
+{
+  "displayMode": 0,
+  "displayList": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "width": 380,
+      "height": 350
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "width": 640,
+      "height": 960
+    }
+  ],
+  "colorBlindMode": false,
+  "moveLeftKey": 37,
+  "moveRightKey": 39,
+  "moveDownKey": 40,
+  "rotateKey": 38,
+  "stackKey": 32
+}

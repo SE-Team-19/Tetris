@@ -33,6 +33,7 @@ public class ViewController extends JFrame {
 
     private MainView mainView;
     private GameView gameView;
+    private BattleModeView battleModeView;
     private ScoreView scoreView;
     private SettingView settingView;
 
@@ -50,6 +51,7 @@ public class ViewController extends JFrame {
     private void initViewAndController() {
         mainView = MainView.getInstance();
         gameView = GameView.getInstance();
+        battleModeView = BattleModeView.getInstance();
         scoreView = ScoreView.getInstance();
         settingView = SettingView.getInstance();
         settingController = new SettingController();
@@ -73,9 +75,9 @@ public class ViewController extends JFrame {
     }
 
     private void initView() {
-        // View Mapping
         viewMap = new HashMap<>();
         viewMap.put(mainView.getStartBtn(), gameView);
+        viewMap.put(mainView.getBattleModeBtn(), battleModeView);
         viewMap.put(mainView.getScoreBoardBtn(), scoreView);
         viewMap.put(mainView.getSettingBtn(), settingView);
 
@@ -155,18 +157,18 @@ public class ViewController extends JFrame {
     }
 
     private void addMainViewEventListener() {
-        MainKeyListener mainKeyEventListner = new MainKeyListener();
+        MainKeyListener mainKeyEventListener = new MainKeyListener();
         mainView.getStartBtn().requestFocus();
         for (Component buttonComp : mainView.getButtonPanel().getComponents()) {
             AbstractButton button = (AbstractButton) buttonComp;
             if (button == mainView.getExitBtn()) {
                 button.addActionListener(e -> System.exit(0));
-                button.addKeyListener(mainKeyEventListner);
+                button.addKeyListener(mainKeyEventListener);
                 continue;
             }
             button.addActionListener(
                     e -> transitView(contentPane, viewMap.get(e.getSource()), mainView));
-            buttonComp.addKeyListener(mainKeyEventListner);
+            buttonComp.addKeyListener(mainKeyEventListener);
         }
     }
 
@@ -185,19 +187,19 @@ public class ViewController extends JFrame {
     }
 
     private void addSettingViewEventListener() {
-        SettingKeyListner settingEventListner = new SettingKeyListner();
+        SettingKeyListener settingEventListener = new SettingKeyListener();
 
         settingView.getReturnSettingToMainBtn()
                 .addActionListener(e -> transitView(contentPane, mainView, settingView));
         for (Component viewComp : settingView.getComponents()) {
             if (viewComp instanceof JPanel) {
                 for (Component panelComp : ((JPanel) viewComp).getComponents()) {
-                    panelComp.addKeyListener(settingEventListner);
+                    panelComp.addKeyListener(settingEventListener);
                 }
             }
             if (viewComp.getClass().equals(JLabel.class))
                 continue;
-            viewComp.addKeyListener(settingEventListner);
+            viewComp.addKeyListener(settingEventListener);
         }
     }
 
@@ -505,6 +507,12 @@ public class ViewController extends JFrame {
             initLeftKey(leftKey);
             initRightKey(rightKey);
             initStackKey(stackKey);
+
+            initUp2Key(up2Key);
+            initDown2Key(down2Key);
+            initLeft2Key(left2Key);
+            initRight2Key(right2Key);
+            initStack2Key(stack2Key);
         }
 
         private void initKeyList() {
@@ -543,6 +551,7 @@ public class ViewController extends JFrame {
                 int b = settingController.getDisplayList().size();
                 displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
                 displayComboBox.hidePopup();
+
             });
         }
 
@@ -725,7 +734,52 @@ public class ViewController extends JFrame {
         }
 
         private void setKeyByToggleButton(JToggleButton btn, int key) {
-            btnmap.get(btn).domapping(key);
+            btnmap.get(btn).doMapping(key);
+        }
+
+        private void initUp2Key(int up2Key) {
+            settingMap.put(new KeyPair(up2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initDown2Key(int down2Key) {
+            settingMap.put(new KeyPair(down2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initLeft2Key(int left2Key) {
+            settingMap.put(new KeyPair(left2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initRight2Key(int right2Key) {
+            settingMap.put(new KeyPair(right2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
+        }
+
+        private void initStack2Key(int stack2Key) {
+            settingMap.put(new KeyPair(stack2Key, displayComboBox), () -> {
+                int a = displayComboBox.getSelectedIndex();
+                int b = settingController.getDisplayList().size();
+                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
+                displayComboBox.hidePopup();
+            });
         }
 
         private void setUpKey(int upKey) {
@@ -825,11 +879,10 @@ public class ViewController extends JFrame {
 
     @FunctionalInterface
     private interface KeyMapping {
-        void domapping(int key);
+        void doMapping(int key);
     }
 
     private class MainKeyListener extends KeyAdapter {
-
         @Override
         public void keyPressed(KeyEvent e) {
             KeyPair key = new KeyPair(e.getKeyCode(), e.getComponent());
@@ -848,8 +901,7 @@ public class ViewController extends JFrame {
         }
     }
 
-    private class SettingKeyListner extends KeyAdapter {
-
+    private class SettingKeyListener extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
             Component comp = e.getComponent();

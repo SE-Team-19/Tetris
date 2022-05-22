@@ -93,6 +93,7 @@ public class GameControllerTest {
 
     @Test
     public void getIBlockLessThan20Pct() {
+
         int IBlockCount = 0;
         int JBlockCount = 0;
         int LBlockCount = 0;
@@ -171,4 +172,5 @@ public class GameControllerTest {
         testAllView.getGameView().getPlayerOneGameBoardPane().setText("");
         frame.dispose();
     }
+
 }
