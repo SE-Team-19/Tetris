@@ -73,15 +73,13 @@ public class MultiGameController extends SingleGameController {
             nextBlockPane2.setPreferredSize(new Dimension(85, 128));
             attackLinePane2.setPreferredSize(new Dimension(85, 84));
             System.out.println("GameView is " + ViewController.screenWidthNum);
-        }
-        else if (ViewController.screenWidthNum == 1) {
+        } else if (ViewController.screenWidthNum == 1) {
             nextBlockPane1.setPreferredSize(new Dimension(87, 175));
             attackLinePane1.setPreferredSize(new Dimension(87, 116));
             nextBlockPane2.setPreferredSize(new Dimension(87, 175));
             attackLinePane2.setPreferredSize(new Dimension(87, 116));
             System.out.println("GameView is " + ViewController.screenWidthNum);
-        }
-        else {
+        } else {
             nextBlockPane1.setPreferredSize(new Dimension(100, 150));
             attackLinePane1.setPreferredSize(new Dimension(100, 100));
             nextBlockPane2.setPreferredSize(new Dimension(100, 150));

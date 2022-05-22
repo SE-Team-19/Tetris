@@ -17,6 +17,8 @@ public class ViewController extends JFrame {
 
     public static final int REFRESH_RATE = 17; // 60FPS
 
+    private int mode = 0;
+
     private Container contentPane;
     private Map<JButton, Container> viewMap;
     private transient Map<KeyPair, PressedKeyEvent> mainViewKeyMap;
@@ -38,7 +40,7 @@ public class ViewController extends JFrame {
 
     private transient PlayerController playerController = new PlayerController();
     private transient SettingController settingController = new SettingController();
-    private transient MultiGameController gameController;
+    private transient MultiGameController multiGameController;
 
     public static int screenWidthNum = 0;
 
@@ -47,7 +49,6 @@ public class ViewController extends JFrame {
         initViewAndController();
         initView();
         addEventListener();
-
     }
 
     private void initViewAndController() {
@@ -57,7 +58,7 @@ public class ViewController extends JFrame {
         settingView = SettingView.getInstance();
         settingController = new SettingController();
         playerController = new PlayerController();
-        gameController = new MultiGameController(playerController);
+        multiGameController = new MultiGameController(playerController);
     }
 
     private void initJFrame() {
@@ -81,15 +82,13 @@ public class ViewController extends JFrame {
     // ScreenSize 를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameController 로 전달한다.
     private void checkJFrame() {
         List<Rectangle> checkRectSize = Arrays.asList(new Rectangle(0, 0, 1366, 768),
-            new Rectangle(0, 0, 1400, 1050),
-            new Rectangle(0, 0, 1600, 900));
+                new Rectangle(0, 0, 1400, 1050),
+                new Rectangle(0, 0, 1600, 900));
         if (settingController.getScreenSize().equals(checkRectSize.get(0))) {
             screenWidthNum = 0;
-        }
-        else if (settingController.getScreenSize().equals(checkRectSize.get(1))) {
+        } else if (settingController.getScreenSize().equals(checkRectSize.get(1))) {
             screenWidthNum = 1;
-        }
-        else if (settingController.getScreenSize().equals(checkRectSize.get(2))) {
+        } else if (settingController.getScreenSize().equals(checkRectSize.get(2))) {
             screenWidthNum = 2;
         }
 
@@ -207,6 +206,36 @@ public class ViewController extends JFrame {
             comp.addKeyListener(gameKeyListener);
         for (Component comp : gameView.getGameOverPanel().getComponents())
             comp.addKeyListener(gameKeyListener);
+        gameView.getPlayerOneGameBoardPane().addKeyListener(new StopKeyListener());
+        gameView.getPlayerTwoGameBoardPane().addKeyListener(new StopKeyListener());
+    }
+
+    public class StopKeyListener extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                int inputValue = JOptionPane.showConfirmDialog(gameView, "Do you want to end the game?",
+                        "Option", JOptionPane.YES_NO_OPTION);
+
+                if (inputValue == JOptionPane.YES_OPTION) {
+                    if (mode == 0) {
+                        multiGameController.gamePlayer.stopGame();
+                    } else if (mode == 1) {
+                        multiGameController.gamePlayer1.stopGame();
+                        multiGameController.gamePlayer2.stopGame();
+                    }
+
+                    gameView.resetGameView();
+                    transitView(contentPane, mainView, gameView);
+                    // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
+                } else if (inputValue == -1) {
+                    multiGameController.gamePlayer.restart();
+                    // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작 ## 게임마다 요구하는 조건이 달라 하나의 메소드로 구현하기 힘들것 같음)
+                }
+                // 그 외에는 중단된 상태에서 재시작
+            }
+        }
     }
 
     private void addSettingViewEventListener() {
@@ -421,43 +450,49 @@ public class ViewController extends JFrame {
 
         private void initStackKey() {
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getEasyBtn()), () -> {
-                gameController.setDiffMode(GameController.EASY_MODE);
+                multiGameController.setDiffMode(GameController.EASY_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                gameController.startSingleGame(settingController.getSetting());
+                multiGameController.startSingleGame(settingController.getSetting());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getNormalBtn()), () -> {
-                gameController.setDiffMode(GameController.NORMAL_MODE);
+                multiGameController.setDiffMode(GameController.NORMAL_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                gameController.startSingleGame(settingController.getSetting());
+                multiGameController.startSingleGame(settingController.getSetting());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getHardBtn()), () -> {
-                gameController.setDiffMode(GameController.HARD_MODE);
+                multiGameController.setDiffMode(GameController.HARD_MODE);
                 transitView(gameView, gameView.getSingleGameDisplayPane(), gameView.getSelectDiffPane());
-                gameController.startSingleGame(settingController.getSetting());
+                multiGameController.startSingleGame(settingController.getSetting());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getLocalGameBtn()), () -> {
                 transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectMultiGamePanel());
-                gameController.startLocalGame(settingController.getSetting());
+                multiGameController.startLocalGame(settingController.getSetting());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameController.setDiffMode(GameController.GENERAL_GAME_MODE);
+                multiGameController.setDiffMode(GameController.GENERAL_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameController.setDiffMode(GameController.ITEM_GAME_MODE);
+                multiGameController.setDiffMode(GameController.ITEM_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameController.setDiffMode(GameController.TIME_ATTACK_MODE);
+                multiGameController.setDiffMode(GameController.TIME_ATTACK_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getSingleGameBtn()),
-                    () -> transitView(gameView, gameView.getSelectModePane(), gameView.getSelectGamePanel()));
+                    () -> {
+                        mode = 0;
+                        transitView(gameView, gameView.getSelectModePane(), gameView.getSelectGamePanel());
+                    });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getMulitiGameBtn()),
-                    () -> transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectGamePanel()));
+                    () -> {
+                        mode = 1;
+                        transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectGamePanel());
+                    });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getDiffReturnBtn()),
                     () -> transitView(gameView, gameView.getSelectModePane(), gameView.getSelectDiffPane()));
@@ -472,7 +507,7 @@ public class ViewController extends JFrame {
         private void initOtherKeys() {
             gameViewKeyMap.put(new KeyPair(KeyEvent.VK_ENTER, gameView.getInputName()),
                     () -> {
-                        gameController.saveUserName();
+                        multiGameController.saveUserName();
                         transitView(contentPane, scoreView, gameView);
                         gameView.getInputName().setText("");
                     });
