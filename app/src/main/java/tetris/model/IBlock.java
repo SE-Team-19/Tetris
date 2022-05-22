@@ -8,12 +8,6 @@ public class IBlock extends Block {
         initIBlock();
     }
 
-    public IBlock(boolean isAttachItem) {
-        initIBlock();
-        if (isAttachItem)
-            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
-    }
-
     private void initIBlock() {
         shape = new int[][] { { 1, 1, 1, 1 } };
         color = Color.RED;

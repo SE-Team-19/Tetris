@@ -8,12 +8,6 @@ public class ZBlock extends Block {
         initZBlock();
     }
 
-    public ZBlock(boolean isAttachItem) {
-        initZBlock();
-        if (isAttachItem)
-            attachItem(BOMBBLOCK_IDENTIFY_NUMBER);
-    }
-
     private void initZBlock() {
         shape = new int[][] { { 1, 1, 0 }, { 0, 1, 1 } };
         color = Color.GREEN;
