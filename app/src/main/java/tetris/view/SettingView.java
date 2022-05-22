@@ -10,6 +10,7 @@ import javax.swing.plaf.basic.*;
 
 public class SettingView extends MasterView {
 
+    private GridBagLayout gridBagLayout;
     private JComboBox<String> displayComboBox;
     private JButton returnSettingToMainBtn;
     private JButton initKeyBtn;
@@ -24,12 +25,22 @@ public class SettingView extends MasterView {
     private JLabel leftKeyLabel;
     private JLabel rightKeyLabel;
     private JLabel stackKeyLabel;
+    private JLabel up2KeyLabel;
+    private JLabel down2KeyLabel;
+    private JLabel left2KeyLabel;
+    private JLabel right2KeyLabel;
+    private JLabel stack2KeyLabel;
     private JLabel isColorBlindLabel;
     private JToggleButton setUpKeyBtn;
     private JToggleButton setDownKeyBtn;
     private JToggleButton setLeftKeyBtn;
     private JToggleButton setRightKeyBtn;
     private JToggleButton setStackKeyBtn;
+    private JToggleButton setUp2KeyBtn;
+    private JToggleButton setDown2KeyBtn;
+    private JToggleButton setLeft2KeyBtn;
+    private JToggleButton setRight2KeyBtn;
+    private JToggleButton setStack2KeyBtn;
     private JToggleButton isColorBlindBtn;
     private Map<JToggleButton, JLabel> setKeyMap;
     private JPanel initSettingPane;
@@ -72,6 +83,7 @@ public class SettingView extends MasterView {
 
         GridBagConstraints gblReturnMenuBtn = addGridBagComponents(0, 4);
         gblReturnMenuBtn.gridwidth = 2;
+
         super.add(returnSettingToMainBtn, gblReturnMenuBtn);
     }
 
@@ -84,19 +96,30 @@ public class SettingView extends MasterView {
         returnSettingToMainBtn = initAndSetName("returnSettingToMainBtn", new JButton("메인메뉴로"));
 
         /* 키 초기화 버튼과 라벨 */
-        setUpKeyBtn = initAndSetName("setUpKeyBtn", new JToggleButton("UP"));
-        setDownKeyBtn = initAndSetName("setDownKeyBtn", new JToggleButton("DOWN"));
-        setLeftKeyBtn = initAndSetName("setLeftKeyBtn", new JToggleButton("LEFT"));
-        setRightKeyBtn = initAndSetName("setRightKeyBtn", new JToggleButton("RIGHT"));
-        setStackKeyBtn = initAndSetName("setStackKeyBtn", new JToggleButton("STACK"));
+        setUpKeyBtn = initAndSetName("setUpKeyBtn", new JToggleButton("1p UP"));
+        setDownKeyBtn = initAndSetName("setDownKeyBtn", new JToggleButton("1p DOWN"));
+        setLeftKeyBtn = initAndSetName("setLeftKeyBtn", new JToggleButton("1p LEFT"));
+        setRightKeyBtn = initAndSetName("setRightKeyBtn", new JToggleButton("1p RIGHT"));
+        setStackKeyBtn = initAndSetName("setStackKeyBtn", new JToggleButton("1p STACK"));
+
+        setUp2KeyBtn = initAndSetName("setUp2KeyBtn", new JToggleButton("2p UP"));
+        setDown2KeyBtn = initAndSetName("setDown2KeyBtn", new JToggleButton("2p DOWN"));
+        setLeft2KeyBtn = initAndSetName("setLeft2KeyBtn", new JToggleButton("2p LEFT"));
+        setRight2KeyBtn = initAndSetName("setRight2KeyBtn", new JToggleButton("2p RIGHT"));
+        setStack2KeyBtn = initAndSetName("setStack2KeyBtn", new JToggleButton("2p STACK"));
         initKeyGridReturnBtn = initAndSetName("initKeyGridReturnBtn", new JButton("Return"));
 
+        upKeyLabel = initAndSetName("upKeyLabel", new JLabel("1p 방향키:위"));
+        downKeyLabel = initAndSetName("downKeyLabel", new JLabel("1p 방향키:아래"));
+        leftKeyLabel = initAndSetName("leftKeyLabel", new JLabel("1p 방향키:왼쪽"));
+        rightKeyLabel = initAndSetName("rightKeyLabel", new JLabel("1p 방향키:오른쪽"));
+        stackKeyLabel = initAndSetName("stackKeyLabel", new JLabel("1p 스페이스"));
 
-        upKeyLabel = initAndSetName("upKeyLabel", new JLabel("방향키:위"));
-        downKeyLabel = initAndSetName("downKeyLabel", new JLabel("방향키:아래"));
-        leftKeyLabel = initAndSetName("leftKeyLabel", new JLabel("방향키:왼쪽"));
-        rightKeyLabel = initAndSetName("rightKeyLabel", new JLabel("방향키:오른쪽"));
-        stackKeyLabel = initAndSetName("stackKeyLabel", new JLabel("스페이스"));
+        up2KeyLabel = initAndSetName("up2KeyLabel", new JLabel("2p 방향키:위"));
+        down2KeyLabel = initAndSetName("down2KeyLabel", new JLabel("2p 방향키:아래"));
+        left2KeyLabel = initAndSetName("left2KeyLabel", new JLabel("2p 방향키:왼쪽"));
+        right2KeyLabel = initAndSetName("right2KeyLabel", new JLabel("2p 방향키:오른쪽"));
+        stack2KeyLabel = initAndSetName("stack2KeyLabel", new JLabel("2p 스페이스"));
 
         setKeyMap = new HashMap<>();
         setKeyMap.put(setUpKeyBtn, upKeyLabel);
@@ -104,6 +127,12 @@ public class SettingView extends MasterView {
         setKeyMap.put(setLeftKeyBtn, leftKeyLabel);
         setKeyMap.put(setRightKeyBtn, rightKeyLabel);
         setKeyMap.put(setStackKeyBtn, stackKeyLabel);
+
+        setKeyMap.put(setUp2KeyBtn, up2KeyLabel);
+        setKeyMap.put(setDown2KeyBtn, down2KeyLabel);
+        setKeyMap.put(setLeft2KeyBtn, left2KeyLabel);
+        setKeyMap.put(setRight2KeyBtn, right2KeyLabel);
+        setKeyMap.put(setStack2KeyBtn, stack2KeyLabel);
 
         inputMessage = "키를 입력하세요";
 
@@ -145,14 +174,18 @@ public class SettingView extends MasterView {
         }
     }
 
+    public GridBagLayout getGridBagLayout() {
+        return this.gridBagLayout;
+    }
+
     private void initSetKeyGrid() {
         initKeyGridPane = new JPanel();
-        GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        gbl.rowHeights = new int[] { 0, 0, 0 };
-        gbl.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 0.1, Double.MIN_VALUE };
-        gbl.rowWeights = new double[] { 1.0, 1.0, Double.MIN_VALUE };
-        initKeyGridPane.setLayout(gbl);
+        gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 0.1, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        initKeyGridPane.setLayout(gridBagLayout);
         setInitKeyBtnsFocusable(false);
 
         addGridBagComponents(initKeyGridPane, setUpKeyBtn, 0, 0);
@@ -166,9 +199,20 @@ public class SettingView extends MasterView {
         addGridBagComponents(initKeyGridPane, rightKeyLabel, 3, 1);
         addGridBagComponents(initKeyGridPane, stackKeyLabel, 4, 1);
 
+        addGridBagComponents(initKeyGridPane, setUp2KeyBtn, 0, 2);
+        addGridBagComponents(initKeyGridPane, setDown2KeyBtn, 1, 2);
+        addGridBagComponents(initKeyGridPane, setLeft2KeyBtn, 2, 2);
+        addGridBagComponents(initKeyGridPane, setRight2KeyBtn, 3, 2);
+        addGridBagComponents(initKeyGridPane, setStack2KeyBtn, 4, 2);
+        addGridBagComponents(initKeyGridPane, up2KeyLabel, 0, 3);
+        addGridBagComponents(initKeyGridPane, down2KeyLabel, 1, 3);
+        addGridBagComponents(initKeyGridPane, left2KeyLabel, 2, 3);
+        addGridBagComponents(initKeyGridPane, right2KeyLabel, 3, 3);
+        addGridBagComponents(initKeyGridPane, stack2KeyLabel, 4, 3);
+
         GridBagConstraints gbcInitKeyGridReturnBtn = new GridBagConstraints();
         gbcInitKeyGridReturnBtn.insets = new Insets(0, 0, 0, 0);
-        gbcInitKeyGridReturnBtn.gridheight = 2;
+        gbcInitKeyGridReturnBtn.gridheight = 4;
         gbcInitKeyGridReturnBtn.gridx = 5;
         gbcInitKeyGridReturnBtn.gridy = 0;
         gbcInitKeyGridReturnBtn.fill = GridBagConstraints.BOTH;
@@ -259,6 +303,26 @@ public class SettingView extends MasterView {
         return this.stackKeyLabel;
     }
 
+    public JLabel getUp2KeyLabel() {
+        return this.up2KeyLabel;
+    }
+
+    public JLabel getDown2KeyLabel() {
+        return this.down2KeyLabel;
+    }
+
+    public JLabel getLeft2KeyLabel() {
+        return this.left2KeyLabel;
+    }
+
+    public JLabel getRight2KeyLabel() {
+        return this.right2KeyLabel;
+    }
+
+    public JLabel getStack2KeyLabel() {
+        return this.stack2KeyLabel;
+    }
+
     public JLabel getIsColorBlindLabel() {
         return this.isColorBlindLabel;
     }
@@ -283,6 +347,26 @@ public class SettingView extends MasterView {
         return this.setStackKeyBtn;
     }
 
+    public JToggleButton getSetUp2KeyBtn() {
+        return this.setUp2KeyBtn;
+    }
+
+    public JToggleButton getSetDown2KeyBtn() {
+        return this.setDown2KeyBtn;
+    }
+
+    public JToggleButton getSetLeft2KeyBtn() {
+        return this.setLeft2KeyBtn;
+    }
+
+    public JToggleButton getSetRight2KeyBtn() {
+        return this.setRight2KeyBtn;
+    }
+
+    public JToggleButton getSetStack2KeyBtn() {
+        return this.setStack2KeyBtn;
+    }
+
     public Map<JToggleButton, JLabel> getSetKeyMap() {
         return this.setKeyMap;
     }
@@ -305,7 +389,8 @@ public class SettingView extends MasterView {
 
     public void setInitKeyBtnsFocusable(boolean bool) {
         setFocusableComponents(bool, setUpKeyBtn, setDownKeyBtn, setLeftKeyBtn, setRightKeyBtn,
-                setStackKeyBtn, initKeyGridReturnBtn);
+                setStackKeyBtn, initKeyGridReturnBtn, setUp2KeyBtn, setDown2KeyBtn, setLeft2KeyBtn, setRight2KeyBtn,
+                setStack2KeyBtn);
     }
 
     public void setSettingBtnsFocusable(boolean bool) {
@@ -317,12 +402,20 @@ public class SettingView extends MasterView {
         setFocusableComponents(bool, initScoreBtn, initReturnBtn, initSettingBtn);
     }
 
-    public void initKetLabels(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
+    public void initKeyLabels(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
         upKeyLabel.setText(KeyEvent.getKeyText(upKey));
         downKeyLabel.setText(KeyEvent.getKeyText(downKey));
         leftKeyLabel.setText(KeyEvent.getKeyText(leftKey));
         rightKeyLabel.setText(KeyEvent.getKeyText(rightKey));
         stackKeyLabel.setText(KeyEvent.getKeyText(stackKey));
+    }
+
+    public void init2KeyLabels(int up2Key, int down2Key, int left2Key, int right2Key, int stack2Key) {
+        up2KeyLabel.setText(KeyEvent.getKeyText(up2Key));
+        down2KeyLabel.setText(KeyEvent.getKeyText(down2Key));
+        left2KeyLabel.setText(KeyEvent.getKeyText(left2Key));
+        right2KeyLabel.setText(KeyEvent.getKeyText(right2Key));
+        stack2KeyLabel.setText(KeyEvent.getKeyText(stack2Key));
     }
 
     public void setIsColorBlindBtn(boolean bool) {

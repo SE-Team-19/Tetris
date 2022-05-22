@@ -1,9 +1,6 @@
 package tetris.view;
 
-import javax.swing.*;
 import static javax.swing.SwingConstants.CENTER;
-
-import java.awt.Color;
 import java.awt.GridLayout;
 
 import java.util.*;

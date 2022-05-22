@@ -30,6 +30,12 @@ public class ScoreView extends MasterView {
 
     /***********************************************/
 
+    public void resetRankingPane() {
+        super.remove(rankingPane);
+        initRankingPane();
+        super.add(rankingPane, addGridBagComponents(0, 1));
+    }
+
     private void initView() {
         GridBagLayout gridBag = new GridBagLayout();
         gridBag.columnWidths = new int[] { 0, 0 };
@@ -66,8 +72,6 @@ public class ScoreView extends MasterView {
         addGridBagComponents(rankingPane, new JLabel("이름"), 1, 0);
         addGridBagComponents(rankingPane, new JLabel("점수"), 2, 0);
         addGridBagComponents(rankingPane, new JLabel("난이도"), 3, 0);
-
-        // rankingList.add(new ArrayList<>(Arrays.asList("NULL", "NULL", "789")));
     }
 
     private void addRankInfo(Container pane, List<String> array, int y) {
@@ -89,7 +93,7 @@ public class ScoreView extends MasterView {
         for (String a : array) {
             JLabel user = new JLabel(a);
             if (a.equals(userName)) {
-                user.setBackground(Color.BLUE);
+                user.setForeground(Color.BLUE);
             }
             addGridBagComponents(pane, user, i, y);
             i++;
@@ -97,8 +101,6 @@ public class ScoreView extends MasterView {
         rankingPane.repaint();
         rankingPane.revalidate();
     }
-
-    /**********************************************************/
 
     public void fillScoreBoard() {
         ListIterator<List<String>> iter = rankingList.listIterator();

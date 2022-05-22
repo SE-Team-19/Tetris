@@ -37,6 +37,7 @@ public abstract class Block {
     public static final int WEIGHTBLOCK_IDENTIFY_NUMBER = 9;
     public static final int ONELINEBLOCK_IDENTIFY_NUMBER = 10;
     public static final int BOMBBLOCK_IDENTIFY_NUMBER = 11;
+    public static final int ATTACK_BLOCK_IDENTIFY_NUMBER = 12;
 
     protected Block() {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };

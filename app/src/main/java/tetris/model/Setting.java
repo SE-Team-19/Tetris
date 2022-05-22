@@ -2,7 +2,7 @@ package tetris.model;
 
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.util.*;
 
 public class Setting {
 
@@ -22,6 +22,9 @@ public class Setting {
 
     public Setting() {
         displayMode = 0;
+        displayList = Arrays.asList(new Rectangle(0, 0, 1366, 768),
+                new Rectangle(0, 0, 380, 350),
+                new Rectangle(0, 0, 640, 960));
         colorBlindMode = false;
         moveLeftKey = KeyEvent.VK_LEFT;
         moveRightKey = KeyEvent.VK_RIGHT;

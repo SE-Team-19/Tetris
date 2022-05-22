@@ -7,7 +7,7 @@ import static java.awt.event.KeyEvent.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.AWTException;
-
+import java.util.Deque;
 import tetris.TestAllView;
 import tetris.TestRobot;
 
@@ -16,13 +16,11 @@ import tetris.model.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameControllerTest {
 
-    GameController gameController = new GameController(
-            new Setting(0, false, VK_LEFT, VK_RIGHT, VK_DOWN,
-                    VK_UP, VK_SPACE),
-            new PlayerController(), new Container());
+    SingleGameController gameController = new SingleGameController(new PlayerController());
     ViewController frame;
     TestAllView testAllView;
     TestRobot testRobot;
+    Deque<Integer> queue;
 
     @BeforeAll
     public static void setUpOnce() {
@@ -50,22 +48,38 @@ public class GameControllerTest {
         int SBlockCount = 0;
         int TBlockCount = 0;
         int OBlockCount = 0;
-        for (int i = 0; i < 3600000; i++) {
-            Block randomBlock = gameController.getBlock(0);
-            if (randomBlock instanceof IBlock)
-                IBlockCount++;
-            else if (randomBlock instanceof JBlock)
-                JBlockCount++;
-            else if (randomBlock instanceof LBlock)
-                LBlockCount++;
-            else if (randomBlock instanceof ZBlock)
-                ZBlockCount++;
-            else if (randomBlock instanceof SBlock)
-                SBlockCount++;
-            else if (randomBlock instanceof TBlock)
-                TBlockCount++;
-            else if (randomBlock instanceof OBlock)
-                OBlockCount++;
+        for (int i = 0; i < 100000; i++) {
+            gameController.generateBlockRandomizer(GameController.EASY_MODE);
+            // System.out.println("현재크기" + gameController.randomBlockList.size());
+            for (int j = 0; j < gameController.randomBlockList.size(); j++) {
+                // System.out.println("현재값 randomBlockList.get(" + j + "): " +
+                // gameController.randomBlockList.get(j));
+                switch (gameController.randomBlockList.get(j)) {
+                    case Block.IBLOCK_IDENTIFY_NUMBER:
+                        IBlockCount++;
+                        continue;
+                    case Block.JBLOCK_IDENTIFY_NUMBER:
+                        JBlockCount++;
+                        continue;
+                    case Block.LBLOCK_IDENTIFY_NUMBER:
+                        LBlockCount++;
+                        continue;
+                    case Block.OBLOCK_IDENTIFY_NUMBER:
+                        OBlockCount++;
+                        continue;
+                    case Block.SBLOCK_IDENTIFY_NUMBER:
+                        SBlockCount++;
+                        continue;
+                    case Block.TBLOCK_IDENTIFY_NUMBER:
+                        TBlockCount++;
+                        continue;
+                    case Block.ZBLOCK_IDENTIFY_NUMBER:
+                        ZBlockCount++;
+                        continue;
+                    default:
+                        continue;
+                }
+            }
         }
 
         assertThat(IBlockCount).isGreaterThan(570000).isLessThan(630000);
@@ -87,33 +101,52 @@ public class GameControllerTest {
         int SBlockCount = 0;
         int TBlockCount = 0;
         int OBlockCount = 0;
-
-        for (int i = 0; i < 4100000; i++) {
-            Block randomBlock = gameController.getBlock(0);
-
-            if (randomBlock instanceof IBlock)
-                IBlockCount++;
-            else if (randomBlock instanceof JBlock)
-                JBlockCount++;
-            else if (randomBlock instanceof LBlock)
-                LBlockCount++;
-            else if (randomBlock instanceof ZBlock)
-                ZBlockCount++;
-            else if (randomBlock instanceof SBlock)
-                SBlockCount++;
-            else if (randomBlock instanceof TBlock)
-                TBlockCount++;
-            else if (randomBlock instanceof OBlock)
-                OBlockCount++;
+        for (int i = 0; i < 100000; i++) {
+            gameController.generateBlockRandomizer(GameController.HARD_MODE);
+            System.out.println("현재크기" + gameController.randomBlockList.size());
+            for (int j = 0; j < gameController.randomBlockList.size(); j++) {
+                switch (gameController.randomBlockList.get(j)) {
+                    case Block.IBLOCK_IDENTIFY_NUMBER:
+                        IBlockCount++;
+                        continue;
+                    case Block.JBLOCK_IDENTIFY_NUMBER:
+                        JBlockCount++;
+                        continue;
+                    case Block.LBLOCK_IDENTIFY_NUMBER:
+                        LBlockCount++;
+                        continue;
+                    case Block.OBLOCK_IDENTIFY_NUMBER:
+                        OBlockCount++;
+                        continue;
+                    case Block.SBLOCK_IDENTIFY_NUMBER:
+                        SBlockCount++;
+                        continue;
+                    case Block.TBLOCK_IDENTIFY_NUMBER:
+                        TBlockCount++;
+                        continue;
+                    case Block.ZBLOCK_IDENTIFY_NUMBER:
+                        ZBlockCount++;
+                        continue;
+                    default:
+                        continue;
+                }
+            }
         }
 
-        assertThat(IBlockCount).isGreaterThan(475000).isLessThan(525000);
-        assertThat(JBlockCount).isGreaterThan(570000).isLessThan(630000);
-        assertThat(LBlockCount).isGreaterThan(570000).isLessThan(630000);
-        assertThat(ZBlockCount).isGreaterThan(570000).isLessThan(630000);
-        assertThat(SBlockCount).isGreaterThan(570000).isLessThan(630000);
-        assertThat(TBlockCount).isGreaterThan(570000).isLessThan(630000);
-        assertThat(OBlockCount).isGreaterThan(570000).isLessThan(630000);
+        System.out.println("IBlockCount:" + IBlockCount);
+        System.out.println("JBlockCount:" + JBlockCount);
+        System.out.println("LBlockCount:" + LBlockCount);
+        System.out.println("OBlockCount:" + OBlockCount);
+        System.out.println("SBlockCount:" + SBlockCount);
+        System.out.println("TBlockCount:" + TBlockCount);
+
+        assertThat(IBlockCount).isGreaterThan(380000).isLessThan(420000);
+        assertThat(JBlockCount).isGreaterThan(475000).isLessThan(525000);
+        assertThat(LBlockCount).isGreaterThan(475000).isLessThan(525000);
+        assertThat(ZBlockCount).isGreaterThan(475000).isLessThan(525000);
+        assertThat(SBlockCount).isGreaterThan(475000).isLessThan(525000);
+        assertThat(TBlockCount).isGreaterThan(475000).isLessThan(525000);
+        assertThat(OBlockCount).isGreaterThan(475000).isLessThan(525000);
     }
 
     @Test
@@ -136,8 +169,7 @@ public class GameControllerTest {
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
-        testAllView.getGameView().getGameBoardPane().setText("");
-        frame.stopTimer();
+        testAllView.getGameView().getPlayerOneGameBoardPane().setText("");
         frame.dispose();
     }
 

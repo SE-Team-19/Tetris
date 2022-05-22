@@ -1,6 +1,7 @@
 package tetris.controller;
 
 import java.io.*;
+import java.util.logging.Logger;
 import java.nio.charset.StandardCharsets;
 import java.awt.Rectangle;
 import javax.swing.*;
@@ -13,6 +14,7 @@ import tetris.model.Setting;
 public class SettingController {
 
     private Setting setting;
+    private final Logger log = Logger.getGlobal();
 
     public SettingController() {
         initSetting();
@@ -20,12 +22,7 @@ public class SettingController {
     }
 
     private void initSetting() {
-        List<Rectangle> displayList = new ArrayList<>();
-        displayList.add(new Rectangle(0, 0, 1366, 768));
-        displayList.add(new Rectangle(0, 0, 380, 350));
-        displayList.add(new Rectangle(0, 0, 640, 960));
         setting = new Setting();
-        setting.setDisplayList(displayList);
     }
 
     public void resetSetting() {
@@ -53,7 +50,7 @@ public class SettingController {
             gson.toJson(setting, sw);
 
         } catch (IOException e) {
-            System.out.println(e);
+            log.warning(e.toString());
             JOptionPane.showMessageDialog(new JFrame(), "setting.json파일을 저장하는데 실패하였습니다.",
                     "File cannot save error", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
