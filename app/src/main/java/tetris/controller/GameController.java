@@ -277,7 +277,6 @@ public abstract class GameController {
             gameDelayTimer.setDelay(delay);
         });
         gameDelayTimer.start();
-        startStopWatch();
     }
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {

@@ -507,12 +507,6 @@ public class ViewController extends JFrame {
             initLeftKey(leftKey);
             initRightKey(rightKey);
             initStackKey(stackKey);
-
-            initUp2Key(up2Key);
-            initDown2Key(down2Key);
-            initLeft2Key(left2Key);
-            initRight2Key(right2Key);
-            initStack2Key(stack2Key);
         }
 
         private void initKeyList() {
@@ -735,51 +729,6 @@ public class ViewController extends JFrame {
 
         private void setKeyByToggleButton(JToggleButton btn, int key) {
             btnmap.get(btn).doMapping(key);
-        }
-
-        private void initUp2Key(int up2Key) {
-            settingMap.put(new KeyPair(up2Key, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
-            });
-        }
-
-        private void initDown2Key(int down2Key) {
-            settingMap.put(new KeyPair(down2Key, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
-            });
-        }
-
-        private void initLeft2Key(int left2Key) {
-            settingMap.put(new KeyPair(left2Key, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
-            });
-        }
-
-        private void initRight2Key(int right2Key) {
-            settingMap.put(new KeyPair(right2Key, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
-            });
-        }
-
-        private void initStack2Key(int stack2Key) {
-            settingMap.put(new KeyPair(stack2Key, displayComboBox), () -> {
-                int a = displayComboBox.getSelectedIndex();
-                int b = settingController.getDisplayList().size();
-                displayComboBox.setSelectedIndex((b - (a % (b + 1))) - ((1 + a) % b));
-                displayComboBox.hidePopup();
-            });
         }
 
         private void setUpKey(int upKey) {
