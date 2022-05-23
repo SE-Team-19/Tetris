@@ -653,7 +653,7 @@ public class ViewController extends JFrame {
                 settingController.saveSetting();
                 resizeJFrame();
                 checkJFrame();
-                initViewAndController();
+                //initViewAndController();
 
                 settingView.getSetDisplayBtn().requestFocus();
             });
