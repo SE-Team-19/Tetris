@@ -137,9 +137,9 @@ public abstract class GameController implements GameMethod {
         nextBoardAttributeSet = new SimpleAttributeSet();
         attackBoardAttributeSet = new SimpleAttributeSet();
 
-        setAttributeSet(boardAttributeSet);
-        setAttributeSet(nextBoardAttributeSet);
-        setAttributeSet(attackBoardAttributeSet);
+//        setAttributeSet(boardAttributeSet);
+//        setAttributeSet(nextBoardAttributeSet);
+//        setAttributeSet(attackBoardAttributeSet);
     }
 
     public void setOpponentPlayer(GameController opponent) {
@@ -157,6 +157,11 @@ public abstract class GameController implements GameMethod {
         blockBuffer = getBlock(blockDeque.getFirst());
         currentBlock = getBlock(blockDeque.removeFirst());
         nextBlock = getBlock(blockDeque.removeFirst());
+
+        // 위치 이동시킴
+        setAttributeSet(boardAttributeSet);
+        setAttributeSet(nextBoardAttributeSet);
+        setAttributeSet(attackBoardAttributeSet);
 
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
