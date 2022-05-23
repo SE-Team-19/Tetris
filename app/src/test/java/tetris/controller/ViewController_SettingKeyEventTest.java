@@ -36,15 +36,18 @@ public class ViewController_SettingKeyEventTest {
     @Test
     @Order(1)
     public void testSettingKeys() {
+
         int keyInput[] = { VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_DOWN, VK_SPACE,
                 VK_DOWN, VK_SPACE, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN,
                 VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT,
                 VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN, VK_SPACE,
+
                 VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN,
                 VK_SPACE, VK_SPACE, VK_DOWN };
         testRobot.pressAndReleaseKeys(keyInput);
         assertThat(frame.getFocusOwner())
                 .isEqualTo(testAllView.getSettingView().getReturnSettingToMainBtn());
+
         testRobot.pressAndReleaseKeys(VK_SPACE);
     }
 
@@ -61,6 +64,7 @@ public class ViewController_SettingKeyEventTest {
         sb.append(String.valueOf((int) frame.getBounds().getHeight()));
         assertThat(sb.toString()).hasToString(
                 (String) testAllView.getSettingView().getDisplayComboBox().getSelectedItem());
+
     }
 
     @Test

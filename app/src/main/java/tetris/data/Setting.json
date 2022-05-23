@@ -1,0 +1,34 @@
+{
+  "displayMode": 2,
+  "displayList": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1400,
+      "height": 1050
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "colorBlindMode": false,
+  "moveLeftKey": 37,
+  "moveRightKey": 39,
+  "moveDownKey": 40,
+  "rotateKey": 38,
+  "stackKey": 32,
+  "moveLeft2Key": 65,
+  "moveRight2Key": 68,
+  "moveDown2Key": 83,
+  "rotate2Key": 87,
+  "stack2Key": 82
+}

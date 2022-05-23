@@ -15,9 +15,11 @@ public class PlayerController {
 
     public PlayerController() {
         playerList = new ArrayList<>();
+
         for (int i = 0; i < 10; i++) {
             playerList.add(new Player("없음", 0, "없음"));
         }
+
     }
 
     public void addPlayer(String name, int score, String difficulty) {
@@ -39,7 +41,6 @@ public class PlayerController {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(), "score.json파일 저장에 실패하였습니다.",
                     "File cannot save error", JOptionPane.ERROR_MESSAGE);
-
         }
     }
 
@@ -62,7 +63,6 @@ public class PlayerController {
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(new JFrame(), "score.json파일을 불러오는데 실패하였습니다.",
                         "File Not Found error", JOptionPane.ERROR_MESSAGE);
-
             }
         }
     }

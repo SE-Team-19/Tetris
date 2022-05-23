@@ -55,12 +55,14 @@ public abstract class GameController implements GameMethod {
     protected Deque<Integer> blockDeque;
     protected Deque<Integer> opponentBlockDeque;
     private Deque<int[]> attackLinesDeque;
+  
     private StringBuilder boardStringBuilder;
     private StringBuilder nextBlockStringBuilder;
     private StringBuilder attackLineStringBuilder;
     int x;
     int y;
     int ghostY;
+  
     protected int score; // game 점수와 관련된 변수
     protected int attackLines;
     private int deleteLines;
@@ -90,7 +92,8 @@ public abstract class GameController implements GameMethod {
     private boolean isColorBlindMode;
     private boolean isNotDropDownState;
 
-    protected GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane, JLabel scoreLabel,
+    protected GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane,
+            JLabel scoreLabel,
             Component focusing) {
         this.gamePane = gamePane;
         this.nextBlockPane = nextBlockPane;
@@ -98,6 +101,7 @@ public abstract class GameController implements GameMethod {
         this.scoreLabel = scoreLabel;
         this.focusing = focusing;
         initGameController();
+        // setDisplayWidth();
     }
 
     private void initGameController() {
@@ -264,22 +268,30 @@ public abstract class GameController implements GameMethod {
          * 음수로 치환해야 한다.)
          */
         wallKickList.add(new ArrayList<>( // 0 >> 1
-                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, -1), new WallKick(0, 2), new WallKick(-1, 2))));
+                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, -1), new WallKick(0, 2),
+                        new WallKick(-1, 2))));
         wallKickList.add(new ArrayList<>( // 1 >> 2
-                Arrays.asList(new WallKick(1, 0), new WallKick(1, 1), new WallKick(0, -2), new WallKick(1, -2))));
+                Arrays.asList(new WallKick(1, 0), new WallKick(1, 1), new WallKick(0, -2),
+                        new WallKick(1, -2))));
         wallKickList.add(new ArrayList<>( // 2 >> 3
-                Arrays.asList(new WallKick(1, 0), new WallKick(1, -1), new WallKick(0, 2), new WallKick(1, 2))));
+                Arrays.asList(new WallKick(1, 0), new WallKick(1, -1), new WallKick(0, 2),
+                        new WallKick(1, 2))));
         wallKickList.add(new ArrayList<>( // 3 >> 0
-                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, 1), new WallKick(0, -2), new WallKick(-1, -2))));
+                Arrays.asList(new WallKick(-1, 0), new WallKick(-1, 1), new WallKick(0, -2),
+                        new WallKick(-1, -2))));
         /* IBlock testcase */
         wallKickList.add(new ArrayList<>( // 0 >> 1
-                Arrays.asList(new WallKick(-2, 0), new WallKick(1, 0), new WallKick(-2, 1), new WallKick(1, -2))));
+                Arrays.asList(new WallKick(-2, 0), new WallKick(1, 0), new WallKick(-2, 1),
+                        new WallKick(1, -2))));
         wallKickList.add(new ArrayList<>( // 1 >> 2
-                Arrays.asList(new WallKick(-1, 0), new WallKick(2, 0), new WallKick(-1, -2), new WallKick(2, 1))));
+                Arrays.asList(new WallKick(-1, 0), new WallKick(2, 0), new WallKick(-1, -2),
+                        new WallKick(2, 1))));
         wallKickList.add(new ArrayList<>( // 2 >> 3
-                Arrays.asList(new WallKick(2, 0), new WallKick(-1, 0), new WallKick(2, -1), new WallKick(-1, 2))));
+                Arrays.asList(new WallKick(2, 0), new WallKick(-1, 0), new WallKick(2, -1),
+                        new WallKick(-1, 2))));
         wallKickList.add(new ArrayList<>( // 3 >> 0
-                Arrays.asList(new WallKick(1, 0), new WallKick(-2, 0), new WallKick(1, 2), new WallKick(-2, -1))));
+                Arrays.asList(new WallKick(1, 0), new WallKick(-2, 0), new WallKick(1, 2),
+                        new WallKick(-2, -1))));
     }
 
     public void startGameDelayTimer(int startDelay) {
@@ -293,12 +305,49 @@ public abstract class GameController implements GameMethod {
     }
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
-        StyleConstants.setFontSize(attributeSet, 20);
-        StyleConstants.setFontFamily(attributeSet, "Courier New");
-        StyleConstants.setBold(attributeSet, true);
-        StyleConstants.setForeground(attributeSet, Color.WHITE);
-        StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
-        StyleConstants.setLineSpacing(attributeSet, -0.5f);
+        // 1366 * 768
+        if (ViewController.screenWidthNum == 0) {
+            StyleConstants.setFontSize(attributeSet, 53);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -85);
+            StyleConstants.setRightIndent(attributeSet, -85);
+            StyleConstants.setLineSpacing(attributeSet, -0.45f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            System.out.println(
+                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
+        }
+        // 1400 * 1050
+        else if (ViewController.screenWidthNum == 1) {
+            StyleConstants.setFontSize(attributeSet, 53);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -85);
+            StyleConstants.setRightIndent(attributeSet, -85);
+            StyleConstants.setLineSpacing(attributeSet, -0.23f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            System.out.println(
+                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
+        }
+        // 1600 * 900
+        else {
+            StyleConstants.setFontSize(attributeSet, 60);
+            StyleConstants.setFontFamily(attributeSet, "Courier New");
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.WHITE);
+            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setLeftIndent(attributeSet, -105);
+            StyleConstants.setRightIndent(attributeSet, -105);
+            StyleConstants.setLineSpacing(attributeSet, -0.42f);
+            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
+            System.out.println(
+                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
+        }
+
     }
 
     public void drawGameBoard() {
@@ -395,7 +444,8 @@ public abstract class GameController implements GameMethod {
             visualBoard[ghostY + e[1]][x + e[0]] = Block.GHOST_IDENTIFIY_NUMBER;
         });
         // foreach는 병렬적으로 연산하므로 순서대로 하기 위해서 이리함
-        block.getCoordiList().forEach(e -> visualBoard[y + e[1]][x + e[0]] = block.getVisualShape(e[0], e[1]));
+        block.getCoordiList()
+                .forEach(e -> visualBoard[y + e[1]][x + e[0]] = block.getVisualShape(e[0], e[1]));
     }
 
     // 주어진 board에 Block을 놓아주는 메소드(오버로딩)
@@ -570,6 +620,7 @@ public abstract class GameController implements GameMethod {
     }
 
     private class WallKick {
+
         int xKick;
         int yKick;
 
@@ -653,7 +704,8 @@ public abstract class GameController implements GameMethod {
         // 구멍난 공격줄을 stack에 넣어주고 4-> 테트리미노 블록개수
         for (int j = 0; j < MAX_BLOCK_HEIGHT; j++) {
             if (Arrays.stream(temp[j]).sum() > FULL_LINE) {
-                attackLinesDeque.push(Arrays.stream(temp[j]).map(e -> e % OVERLAP_BLOCK_NUMBER).toArray());
+                attackLinesDeque.push(
+                        Arrays.stream(temp[j]).map(e -> e % OVERLAP_BLOCK_NUMBER).toArray());
             }
         }
 
@@ -754,9 +806,11 @@ public abstract class GameController implements GameMethod {
         int aniDelay = ANIMATION_INTERVAL;
         for (count = 0; count < 10; count++) {
             if (count % 2 == 0)
-                aniTimer = new Timer(count * aniDelay, e -> paintLines(index, lines, Color.WHITE));
+                aniTimer = new Timer(count * aniDelay,
+                        e -> paintLines(index, lines, Color.WHITE));
             else
-                aniTimer = new Timer(count * aniDelay, e -> paintLines(index, lines, Color.BLACK));
+                aniTimer = new Timer(count * aniDelay,
+                        e -> paintLines(index, lines, Color.BLACK));
             aniTimer.setRepeats(false);
             aniTimer.start();
         }
@@ -779,7 +833,8 @@ public abstract class GameController implements GameMethod {
         StyleConstants.setForeground(blockAttributeSet, color);
         for (int i = 0; i < lines; i++) {
             doc.setCharacterAttributes(
-                    (BOARD_WIDTH + 4) + (index + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3), BOARD_WIDTH,
+                    (BOARD_WIDTH + 4) + (index + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3),
+                    BOARD_WIDTH,
                     blockAttributeSet, true);
         }
     }
@@ -797,9 +852,11 @@ public abstract class GameController implements GameMethod {
         drawGameBoard();
         for (count = 0; count < 10; count++) {
             if (count % 2 == 0)
-                aniTimer = new Timer(count * aniDelay, e -> paintSquare(xbuffer, ybuffer, Color.RED));
+                aniTimer = new Timer(count * aniDelay,
+                        e -> paintSquare(xbuffer, ybuffer, Color.RED));
             else
-                aniTimer = new Timer(count * aniDelay, e -> paintSquare(xbuffer, ybuffer, Color.YELLOW));
+                aniTimer = new Timer(count * aniDelay,
+                        e -> paintSquare(xbuffer, ybuffer, Color.YELLOW));
             aniTimer.setRepeats(false);
             aniTimer.start();
         }
@@ -830,7 +887,8 @@ public abstract class GameController implements GameMethod {
             if (ybuffer + i < BOARD_END_HEIGHT) {
                 for (int j = 0; j < BOMB_RANGE; j++) {
                     if (xbuffer + j > -1 && xbuffer + j < BOARD_WIDTH) {
-                        doc.setCharacterAttributes(offset + i * (BOARD_WIDTH + 3) + j, 1, blockAttributeSet, true);
+                        doc.setCharacterAttributes(offset + i * (BOARD_WIDTH + 3) + j, 1,
+                                blockAttributeSet, true);
                     }
                 }
             }
@@ -944,22 +1002,6 @@ public abstract class GameController implements GameMethod {
         drawNextBlock();
     }
 
-    // ESC 키를 누를 경우 게임 메세지를 출력
-    void showESCMessage() {
-        int inputValue = JOptionPane.showConfirmDialog(gameView, "Do you want to end the game?",
-                "Option", JOptionPane.YES_NO_OPTION);
-
-        if (inputValue == JOptionPane.YES_OPTION) {
-            // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
-            System.exit(0);
-        } else if (inputValue == -1) {
-            // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작)
-            gameDelayTimer.restart();
-            restart();
-        }
-        // 그 외에는 중단된 상태에서 재시작
-    }
-
     private class InitGameKeyMap {
 
         int upKey;
@@ -967,6 +1009,11 @@ public abstract class GameController implements GameMethod {
         int leftKey;
         int rightKey;
         int stackKey;
+        int up2Key;
+        int down2Key;
+        int left2Key;
+        int right2Key;
+        int stack2Key;
 
         private void initAllKey() {
             initUpKey();
@@ -974,10 +1021,10 @@ public abstract class GameController implements GameMethod {
             initLeftKey();
             initRightKey();
             initStackKey();
-            initOtherKeys();
         }
 
-        private void setAllKey(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
+        private void setAllKey(int upKey, int downKey, int leftKey, int rightKey,
+                int stackKey) {
             resetMap();
             this.upKey = upKey;
             this.downKey = downKey;
@@ -1022,13 +1069,10 @@ public abstract class GameController implements GameMethod {
         private void initStackKey() {
             gameKeyMap.put(new KeyPair(stackKey, focusing), GameController.this::dropDown);
         }
-
-        private void initOtherKeys() {
-            gameKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, focusing), GameController.this::showESCMessage);
-        }
     }
 
     public class GameKeyListener extends KeyAdapter {
+
         @Override
         public void keyPressed(KeyEvent e) {
             KeyPair key = new KeyPair(e.getKeyCode(), e.getComponent());
@@ -1103,7 +1147,9 @@ public abstract class GameController implements GameMethod {
     }
 
     public void stopGameDelayTimer() {
-        gameDelayTimer.stop();
+        if (gameDelayTimer != null) {
+            gameDelayTimer.stop();
+        }
     }
 
     public void endGame() {
@@ -1146,5 +1192,9 @@ public abstract class GameController implements GameMethod {
 
     private void showScore() {
         scoreLabel.setText(String.format("%d", score));
+    }
+
+    public void restartGameDelayTimer() {
+        gameDelayTimer.restart();
     }
 }
