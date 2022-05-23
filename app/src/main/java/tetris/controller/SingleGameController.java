@@ -25,6 +25,8 @@ public class SingleGameController {
     protected List<Integer> randomBlockList;
 
     public SingleGameController(PlayerController playerController) {
+        diffMode = 0;
+        gameMode = 0;
         randomBlockList = new ArrayList<>();
         this.playerController = playerController;
         this.gameView = GameView.getInstance();
@@ -37,7 +39,7 @@ public class SingleGameController {
         gamePlayer = new GameController(gamepane, nextBlockPane, attackLinePane, scoreLabel,
                 gamepane) {
             @Override
-            void doAfterGameOver() {
+            public void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
                 gameView.remove(gameView.getSingleGameDisplayPane());
                 gameView.getInputName().requestFocus();
@@ -46,7 +48,7 @@ public class SingleGameController {
             }
 
             @Override
-            void doBeforeTakeOutNextBlock() {
+            public void doBeforeTakeOutNextBlock() {
                 if (blockDeque.size() < 3) {
                     generateBlockRandomizer(diffMode);
                     blockDeque.addAll(randomBlockList);
@@ -57,6 +59,7 @@ public class SingleGameController {
     }
 
     protected void startSingleGame(Setting setting) {
+
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
         generateBlockRandomizer(diffMode);

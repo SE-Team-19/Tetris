@@ -6,7 +6,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.*;
 
 import tetris.model.Setting;
 import tetris.view.*;
@@ -16,6 +15,7 @@ import tetris.view.MasterView.JLabel;
 public class ViewController extends JFrame {
 
     public static final int REFRESH_RATE = 17; // 60FPS
+    static final String OVERLAP_KEY_MSG = "키 중복!";
 
     private Container contentPane;
     private Map<JButton, Container> viewMap;
@@ -26,7 +26,6 @@ public class ViewController extends JFrame {
     private transient InitMainViewMap initMainViewKeyMap;
     private transient InitGameViewKeyMap initGameViewKeyMap;
     private transient InitSettingViewMap initSettingViewMap;
-    transient ScheduledExecutorService executor;
     transient Timer refreshTimer;
 
     boolean settingFlag;
@@ -417,15 +416,15 @@ public class ViewController extends JFrame {
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameController.setDiffMode(GameController.GENERAL_GAME_MODE);
+                gameController.setGameMode(GameController.GENERAL_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameController.setDiffMode(GameController.ITEM_GAME_MODE);
+                gameController.setGameMode(GameController.ITEM_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameController.setDiffMode(GameController.TIME_ATTACK_MODE);
+                gameController.setGameMode(GameController.TIME_ATTACK_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
 
@@ -616,6 +615,7 @@ public class ViewController extends JFrame {
             settingViewKeyMap.put(new KeyPair(stackKey, settingView.getInitSettingBtn()), () -> {
                 settingController.resetSetting();
                 initSettingView();
+                initGameView();
                 initJFrame();
                 settingView.getReturnSettingToMainBtn().requestFocus();
             });
@@ -704,6 +704,10 @@ public class ViewController extends JFrame {
                     settingViewKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
                 }
             }
+
+            Component[] keyComponents = settingView.getInitKeyGridPane().getComponents();
+            settingViewKeyMap.put(new KeyPair(leftKey, keyComponents[0]), keyComponents[4]::transferFocus);
+
             for (Component comp : settingView.getInitSettingPane().getComponents()) {
                 settingViewKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
             }
@@ -859,7 +863,7 @@ public class ViewController extends JFrame {
             if (settingFlag) {
                 setKeymap.keySet().stream().filter(AbstractButton::isSelected).forEach(x -> {
                     if (initSettingViewMap.checkKeyOverlap(pressedKey)) {
-                        setKeymap.get(x).setText("키 중복!.");
+                        setKeymap.get(x).setText(OVERLAP_KEY_MSG);
                     } else {
                         initSettingViewMap.setKeyByToggleButton(x, pressedKey);
                         setKeymap.get(x).setText(KeyEvent.getKeyText(pressedKey));

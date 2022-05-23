@@ -26,6 +26,7 @@ public class GameView extends MasterView {
     private JTextPane playerTwoAttackLinePane;
     private JLabel playerTwoScoreLabel;
 
+    private JPanel gameDisplayPanel;
     private JPanel singleGameDisplayPanel;
     private JPanel playerTwoGameDisplayPanel;
     private JPanel multiGameDisplayPanel;
@@ -53,7 +54,7 @@ public class GameView extends MasterView {
 
     private GameView() {
         initGameDisplayComponents();
-        initSingleGameDisplayPane();
+        initSingleGameDisplayPanel();
         initMultiGameDisplayPane();
         initSelectGamePane();
         initSelectMultiGamePane();
@@ -67,6 +68,7 @@ public class GameView extends MasterView {
         super.removeAll();
         multiGameDisplayPanel.removeAll();
         playerOneGameBoardPane.setText(null);
+        playerTwoGameBoardPane.setText(null);
         multiGameDisplayPanel.add(singleGameDisplayPanel);
         multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
         super.add(selectGamePanel);
@@ -87,6 +89,14 @@ public class GameView extends MasterView {
     }
 
     private void initGameDisplayComponents() {
+        gameDisplayPanel = initAndSetName("gameDisplayPanel", new JPanel());
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 0.2, 1.0, Double.MIN_VALUE };
+        gameDisplayPanel.setLayout(gridBagLayout);
+
         playerOneGameBoardPane = initAndSetName("playerOneGameBoardPane", new JTextPane());
         playerOneGameBoardPane.setBackground(Color.BLACK);
         playerOneGameBoardPane.setEditable(false);
@@ -137,7 +147,11 @@ public class GameView extends MasterView {
         timeLabel.setFocusable(false);
     }
 
-    private void initSingleGameDisplayPane() {
+    private void initGameDisplayPanel() {
+
+    }
+
+    private void initSingleGameDisplayPanel() {
         singleGameDisplayPanel = initAndSetName("singleGameDisplayPanel", new JPanel());
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
