@@ -13,18 +13,18 @@ import java.util.*;
 import tetris.model.*;
 import tetris.view.*;
 
-public abstract class GameController {
+public abstract class GameController implements GameMethod {
 
-    private final Logger log = Logger.getGlobal();
+    static final Logger log = Logger.getGlobal();
 
     private static final int ANIMATION_INTERVAL = 50;
     private static final int LOCK_DELAY_TIME = 500;
-    private static final int BOARD_START_HEIGHT = 5;
-    private static final int BOARD_END_HEIGHT = GameView.BORDER_HEIGHT + BOARD_START_HEIGHT;
-    private static final int BOARD_HEIGHT = BOARD_END_HEIGHT - BOARD_START_HEIGHT;
-    private static final int BOARD_WIDTH = GameView.BORDER_WIDTH;
-    private static final int START_X = 3;
-    private static final int START_Y = BOARD_START_HEIGHT - 1;
+    static final int BOARD_START_HEIGHT = 5;
+    static final int BOARD_END_HEIGHT = GameView.BORDER_HEIGHT + BOARD_START_HEIGHT;
+    static final int BOARD_HEIGHT = BOARD_END_HEIGHT - BOARD_START_HEIGHT;
+    static final int BOARD_WIDTH = GameView.BORDER_WIDTH;
+    static final int START_X = 3;
+    static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
     private static final int MAX_BLOCK_HEIGHT = 4;
     private static final int UNFIXED_BLOCK_NUMBER = 1;
@@ -44,9 +44,9 @@ public abstract class GameController {
     private int delay;
     private int diffMode; // 난이도 설정
     private int gameMode; // 게임모드 설정
-    private Block currentBlock;
-    private Block nextBlock;
-    private Block blockBuffer;
+    Block currentBlock;
+    Block nextBlock;
+    Block blockBuffer;
 
     protected int[][] visualBoard;
     protected int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
@@ -55,11 +55,14 @@ public abstract class GameController {
     protected Deque<Integer> blockDeque;
     protected Deque<Integer> opponentBlockDeque;
     private Deque<int[]> attackLinesDeque;
-    private Stack<int[]> attackLinesStack;
-
-    private int x;
-    private int y;
-    private int ghostY;
+  
+    private StringBuilder boardStringBuilder;
+    private StringBuilder nextBlockStringBuilder;
+    private StringBuilder attackLineStringBuilder;
+    int x;
+    int y;
+    int ghostY;
+  
     protected int score; // game 점수와 관련된 변수
     protected int attackLines;
     private int deleteLines;
@@ -70,6 +73,9 @@ public abstract class GameController {
     private JTextPane nextBlockPane;
     private JTextPane attackLinePane;
     private JLabel scoreLabel;
+
+    private StyledDocument gamePaneDoc;
+    private StyledDocument nextBlockPaneDoc;
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
     private SimpleAttributeSet attackBoardAttributeSet;
@@ -84,6 +90,7 @@ public abstract class GameController {
     private List<List<WallKick>> wallKickList;
 
     private boolean isColorBlindMode;
+    private boolean isNotDropDownState;
 
     protected GameController(JTextPane gamePane, JTextPane nextBlockPane, JTextPane attackLinePane,
             JLabel scoreLabel,
@@ -118,6 +125,13 @@ public abstract class GameController {
         gameKeyMap = new HashMap<>();
         initGameKeyMap = new InitGameKeyMap();
         addGameKeyListener();
+
+        gamePaneDoc = gamePane.getStyledDocument();
+        nextBlockPaneDoc = nextBlockPane.getStyledDocument();
+
+        boardStringBuilder = new StringBuilder();
+        nextBlockStringBuilder = new StringBuilder();
+        attackLineStringBuilder = new StringBuilder();
 
         boardAttributeSet = new SimpleAttributeSet();
         nextBoardAttributeSet = new SimpleAttributeSet();
@@ -155,6 +169,7 @@ public abstract class GameController {
         delay = 1000;
         deleteLines = 0;
         isItemFlag = false;
+        isNotDropDownState = true;
 
         showScore();
         startGameDelayTimer(delay);
@@ -336,28 +351,29 @@ public abstract class GameController {
     }
 
     public void drawGameBoard() {
-        StringBuilder sb = new StringBuilder();
+
+        boardStringBuilder.setLength(0);
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
-            sb.append(GameView.BORDER_CHAR);
+            boardStringBuilder.append(GameView.BORDER_CHAR);
         }
 
-        sb.append("\n");
+        boardStringBuilder.append("\n");
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
-            sb.append(GameView.BORDER_CHAR);
+            boardStringBuilder.append(GameView.BORDER_CHAR);
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                sb.append(blockCharMap.get(visualBoard[i][j])); // currentBlock 의 모양을 그려준다.
+                boardStringBuilder.append(blockCharMap.get(visualBoard[i][j])); // currentBlock 의 모양을 그려준다.
             }
-            sb.append(GameView.BORDER_CHAR);
-            sb.append("\n");
+            boardStringBuilder.append(GameView.BORDER_CHAR);
+            boardStringBuilder.append("\n");
         }
 
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
-            sb.append(GameView.BORDER_CHAR);
+            boardStringBuilder.append(GameView.BORDER_CHAR);
         }
-        gamePane.setText(sb.toString());
+        gamePane.setText(boardStringBuilder.toString());
 
-        StyledDocument doc = gamePane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), boardAttributeSet, true);
+        gamePaneDoc = gamePane.getStyledDocument();
+        gamePaneDoc.setParagraphAttributes(0, gamePaneDoc.getLength(), boardAttributeSet, true);
         paintBlock();
     }
 
@@ -365,23 +381,21 @@ public abstract class GameController {
         int nextHeight = nextBlock.getHeight();
         int nextWidth = nextBlock.getWidth();
 
-        StringBuilder sb = new StringBuilder();
+        nextBlockStringBuilder.setLength(0);
         for (int j = 0; j < nextHeight; j++) {
             for (int i = 0; i < nextWidth; i++) {
-                sb.append(blockCharMap.get(nextBlock.getVisualShape(i, j)));
+                nextBlockStringBuilder.append(blockCharMap.get(nextBlock.getVisualShape(i, j)));
             }
-            sb.append("\n");
+            nextBlockStringBuilder.append("\n");
         }
-        nextBlockPane.setText(sb.toString());
+        nextBlockPane.setText(nextBlockStringBuilder.toString());
 
-        StyledDocument doc = nextBlockPane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), nextBoardAttributeSet, false);
+        nextBlockPaneDoc.setParagraphAttributes(0, nextBlockPaneDoc.getLength(), nextBoardAttributeSet, false);
         SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         for (int j = 0; j < nextHeight; j++) {
             for (int i = 0; i < nextWidth; i++) {
-                StyleConstants.setForeground(blockAttributeSet,
-                        colorMap.get(nextBlock.getVisualShape(i, j)));
-                doc.setCharacterAttributes(i + j + j * nextWidth, 1, blockAttributeSet, false);
+                StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getVisualShape(i, j)));
+                nextBlockPaneDoc.setCharacterAttributes(i + j + j * nextWidth, 1, blockAttributeSet, false);
             }
         }
 
@@ -409,14 +423,12 @@ public abstract class GameController {
     }
 
     private void paintBlock() {
-        StyledDocument doc = gamePane.getStyledDocument();
         SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 if (visualBoard[i][j] > 0) {
-                    StyleConstants.setForeground(blockAttributeSet,
-                            colorMap.get(visualBoard[i][j]));
-                    doc.setCharacterAttributes(
+                    StyleConstants.setForeground(blockAttributeSet, colorMap.get(visualBoard[i][j]));
+                    gamePaneDoc.setCharacterAttributes(
                             (BOARD_WIDTH + 4) + (i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + j, 1,
                             blockAttributeSet, false);
                 }
@@ -425,7 +437,7 @@ public abstract class GameController {
     }
 
     // 주어진 board에 Block을 놓아주는 메소드
-    private void placeBlock(int[][] board, int[][] visualBoard, Block block, int x, int y) {
+    void placeBlock(int[][] board, int[][] visualBoard, Block block, int x, int y) {
         getGhostY();
         block.getCoordiList().forEach(e -> {
             board[y + e[1]][x + e[0]] += 1;
@@ -437,12 +449,12 @@ public abstract class GameController {
     }
 
     // 주어진 board에 Block을 놓아주는 메소드(오버로딩)
-    private void placeBlock(int[][] board, Block block, int x, int y) {
+    void placeBlock(int[][] board, Block block, int x, int y) {
         block.getCoordiList().forEach(e -> board[y + e[1]][x + e[0]] += 1);
     }
 
     // board에서 블록을 지워주는 method
-    private void eraseBlock(int[][] board, Block block) {
+    void eraseBlock(int[][] board, Block block, int x, int y) {
         block.getCoordiList().forEach(e -> {
             board[y + e[1]][x + e[0]] = 0;
             visualBoard[y + e[1]][x + e[0]] = 0;
@@ -456,7 +468,7 @@ public abstract class GameController {
             lockDelay();
             return;
         }
-        eraseBlock(board, currentBlock);
+        eraseBlock(board, currentBlock, x, y);
         y++;
         placeBlock(board, visualBoard, currentBlock, x, y);
         gamePane.revalidate();
@@ -470,8 +482,26 @@ public abstract class GameController {
         }
     }
 
+    void dropDown() {
+        if (isNotDropDownState) {
+            eraseBlock(board, currentBlock, x, y);
+            score += (201 - delay / 5) * ghostY - y;
+            showScore();
+            y = ghostY;
+            placeBlock(board, visualBoard, currentBlock, x, y);
+            drawGameBoard();
+            if (!isBottomFlag) {
+                isBottomFlag = true;
+                stopGameDelayTimer();
+                startGameDelayTimer(LOCK_DELAY_TIME);
+            }
+            isNotDropDownState = false;
+            // moveDown(); hard drop 적용
+        }
+    }
+
     // Ghost piece의 Y좌표 구하는 메소드
-    private void getGhostY() {
+    void getGhostY() {
         if (currentBlock == null)
             return;
         int limit = BOARD_END_HEIGHT - currentBlock.getHeight();
@@ -483,11 +513,10 @@ public abstract class GameController {
         }
         if (checkBlockCollision(x, ghostY))
             ghostY--;
-
     }
 
     public void moveRight() {
-        eraseBlock(board, currentBlock);
+        eraseBlock(board, currentBlock, x, y);
         if (currentBlock == null) {
             return;
         }
@@ -502,7 +531,7 @@ public abstract class GameController {
     }
 
     public void moveLeft() {
-        eraseBlock(board, currentBlock);
+        eraseBlock(board, currentBlock, x, y);
         if (currentBlock == null) {
             return;
         }
@@ -516,7 +545,7 @@ public abstract class GameController {
     }
 
     public void moveRotate() {
-        eraseBlock(board, currentBlock);
+        eraseBlock(board, currentBlock, x, y);
         testRotation();
         placeBlock(board, visualBoard, currentBlock, x, y);
         boolean flag = checkIsItBottom();
@@ -638,10 +667,16 @@ public abstract class GameController {
     }
 
     // 게임오버시 발동 메소드
-    abstract void doAfterGameOver();
+    public void doAfterGameOver() {
+    }
 
     // 바닥 도달시 발동 메소드
-    abstract void doBeforeTakeOutNextBlock();
+    public void doBeforeTakeOutNextBlock() {
+    }
+
+    // 다음블록 놓은 후 메소드
+    public void doAfterTakeOutNextBlock() {
+    }
 
     // 삭제줄 복사 메소드
     private void drawAttackLine(int lines) {
@@ -682,14 +717,14 @@ public abstract class GameController {
         }
 
         // 그리고 그걸 attackLinePane에 표현한다.
-        StringBuilder sb = new StringBuilder();
+        attackLineStringBuilder.setLength(0);
         for (int j = 0; j < BOARD_HEIGHT; j++) {
             for (int i = 0; i < BOARD_WIDTH; i++) {
-                sb.append(blockCharMap.get(attackLineBoard[j][i]));
+                attackLineStringBuilder.append(blockCharMap.get(attackLineBoard[j][i]));
             }
-            sb.append("\n");
+            attackLineStringBuilder.append("\n");
         }
-        opponent.attackLinePane.setText(sb.toString());
+        opponent.attackLinePane.setText(attackLineStringBuilder.toString());
         StyleConstants.setFontSize(attackBoardAttributeSet, 20);
 
         StyledDocument doc = opponent.attackLinePane.getStyledDocument();
@@ -699,7 +734,7 @@ public abstract class GameController {
         opponent.attackLines += lines;
 
         log.info("공격줄 추가 후");
-        showCurrent(attackLineBoard, currentBlock);
+        showCurrent(attackLineBoard, currentBlock, x, y);
     }
 
     // 공격받는중
@@ -715,7 +750,7 @@ public abstract class GameController {
         copyBoard(visualBoard, boardBuffer);
         copyBoard(attackLineBoard, visualBoard, BOARD_END_HEIGHT - 1);
         copyBoard(boardBuffer, visualBoard, BOARD_END_HEIGHT - attackLines - 1);
-        showCurrent(visualBoard, currentBlock);
+        showCurrent(visualBoard, currentBlock, x, y);
         attackLines = 0;
         attackLinesDeque.clear();
         initZeroBoard(attackLineBoard);
@@ -751,10 +786,11 @@ public abstract class GameController {
         }
         if (fullyLines > 0) {
             startindex = startindex - fullyLines + 1;
-            drawAttackLine(fullyLines);
+            if (fullyLines > 1)
+                drawAttackLine(fullyLines);
             launchDeleteLineAnimation(startindex, fullyLines);
             delay -= delay > 250 ? 5 - 2 * diffMode % 2 : 0;
-            score += 25;
+            score += 20 * fullyLines;
             showScore();
         }
         deleteLines += fullyLines;
@@ -934,6 +970,8 @@ public abstract class GameController {
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
         isBottomFlag = checkIsItBottom();
+        isNotDropDownState = true;
+        doAfterTakeOutNextBlock();
     }
 
     /* 아이템블록 구현 메소드 */
@@ -951,10 +989,10 @@ public abstract class GameController {
 
     // 게임 중단 상태에서 다시 실행하는 경우
     public void restart() {
-        board = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
+        initZeroBoard(board);
         x = START_X;
         y = START_Y;
-        blockDeque = new ArrayDeque<>();
+        blockDeque.clear();
         blockBuffer = getBlock(blockDeque.getFirst());
         currentBlock = getBlock(blockDeque.removeFirst());
         nextBlock = getBlock(blockDeque.removeFirst());
@@ -1029,18 +1067,7 @@ public abstract class GameController {
         }
 
         private void initStackKey() {
-            gameKeyMap.put(new KeyPair(stackKey, focusing), () -> {
-                eraseBlock(board, currentBlock);
-                y = ghostY;
-                placeBlock(board, visualBoard, currentBlock, x, y);
-                drawGameBoard();
-                if (!isBottomFlag) {
-                    isBottomFlag = true;
-                    stopGameDelayTimer();
-                    startGameDelayTimer(LOCK_DELAY_TIME);
-                }
-                // moveDown(); hard drop 적용
-            });
+            gameKeyMap.put(new KeyPair(stackKey, focusing), GameController.this::dropDown);
         }
     }
 
@@ -1145,10 +1172,9 @@ public abstract class GameController {
         initZeroBoard(boardBuffer);
         isBottomFlag = false;
         blockDeque.clear();
-        showCurrent(board, currentBlock);
     }
 
-    private void showCurrent(int[][] board, Block block) {
+    public static void showCurrent(int[][] board, Block block, int x, int y) {
         String msg = "\n블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
                 + block.getHeight() + " rotateCount: " + block.getRotateCount();
         log.info(msg);

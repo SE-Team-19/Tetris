@@ -8,6 +8,7 @@ public class MultiGameController extends SingleGameController {
 
     GameController gamePlayer1;
     GameController gamePlayer2;
+    AIController aiController;
 
     public MultiGameController(PlayerController playerController) {
         super(playerController);
@@ -19,9 +20,10 @@ public class MultiGameController extends SingleGameController {
         JTextPane nextBlockPane2 = gameView.getPlayerTwoNextBlockPane();
         JTextPane attackLinePane2 = gameView.getPlayerTwoAttackLinePane();
         JLabel scoreLabel2 = gameView.getPlayerTwoScoreLabel();
+        aiController = new AIController(this);
         gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, gamepane2) {
             @Override
-            void doAfterGameOver() {
+            public void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
                 gameView.remove(gameView.getMulitiGameDisplayPane());
                 gameView.getInputName().requestFocus();
@@ -29,7 +31,7 @@ public class MultiGameController extends SingleGameController {
             }
 
             @Override
-            void doBeforeTakeOutNextBlock() {
+            public void doBeforeTakeOutNextBlock() {
                 if (attackLines > 0) {
                     underAttack();
                 }
@@ -43,7 +45,7 @@ public class MultiGameController extends SingleGameController {
 
         gamePlayer2 = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, gamepane2) {
             @Override
-            void doAfterGameOver() {
+            public void doAfterGameOver() {
                 gameView.add(gameView.getGameOverPanel());
                 gameView.remove(gameView.getSingleGameDisplayPane());
                 gameView.getInputName().requestFocus();
@@ -51,7 +53,7 @@ public class MultiGameController extends SingleGameController {
             }
 
             @Override
-            void doBeforeTakeOutNextBlock() {
+            public void doBeforeTakeOutNextBlock() {
                 if (attackLines > 0) {
                     underAttack();
                 }
@@ -60,6 +62,13 @@ public class MultiGameController extends SingleGameController {
                     blockDeque.addAll(randomBlockList);
                     opponentBlockDeque.addAll(randomBlockList);
                 }
+                // aiController.findMove();
+            }
+
+            @Override
+            public void doAfterTakeOutNextBlock() {
+
+                // aiController.moveBlock();
             }
         };
 
@@ -89,6 +98,21 @@ public class MultiGameController extends SingleGameController {
     }
 
     public void startLocalGame(Setting setting) {
+        generateBlockRandomizer(GameController.NORMAL_MODE);
+
+        gamePlayer1.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
+                setting.getMoveRightKey(), setting.getStackKey());
+        gamePlayer2.setPlayerKeys(setting.getRotate2Key(), setting.getMoveDown2Key(), setting.getMoveLeft2Key(),
+                setting.getMoveRight2Key(), setting.getStack2Key());
+
+        gamePlayer1.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
+        gamePlayer2.startGame(GameController.NORMAL_MODE, GameController.GENERAL_GAME_MODE, randomBlockList);
+        gameTime = 0;
+        showTime();
+        startStopWatch();
+    }
+
+    public void startAiGame(Setting setting) {
         generateBlockRandomizer(GameController.NORMAL_MODE);
 
         gamePlayer1.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),

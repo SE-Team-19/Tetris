@@ -38,7 +38,8 @@ public class ViewController_SettingKeyEventTest {
     public void testSettingKeys() {
 
         int keyInput[] = { VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_DOWN, VK_SPACE,
-                VK_DOWN, VK_SPACE, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_RIGHT,
+                VK_DOWN, VK_SPACE, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN,
+                VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT, VK_UP, VK_DOWN, VK_RIGHT,
                 VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN, VK_SPACE,
 
                 VK_RIGHT, VK_RIGHT, VK_RIGHT, VK_LEFT, VK_LEFT, VK_LEFT, VK_SPACE, VK_DOWN,
@@ -69,18 +70,39 @@ public class ViewController_SettingKeyEventTest {
     @Test
     @Order(3)
     public void testKeymapping() {
-        int keyInput[] = { VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_SPACE, VK_RIGHT, VK_SPACE,
-
-                VK_SPACE, VK_W, VK_RIGHT, VK_SPACE, VK_S, VK_RIGHT, VK_SPACE, VK_A, VK_RIGHT,
-                VK_SPACE, VK_D, VK_D, VK_SPACE, VK_R, VK_D, VK_R };
-        testRobot.pressAndReleaseKeys(keyInput);
-        assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo("W");
+        testRobot.pressAndReleaseKeys(new int[] { VK_DOWN, VK_SPACE, VK_DOWN, VK_DOWN, VK_SPACE });
+        testRobot.pressAndReleaseKeys(new int[] { VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT, VK_LEFT });
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_W });
+        assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo(ViewController.OVERLAP_KEY_MSG);
+        testRobot.pressAndReleaseKeys(new int[] { VK_Z, VK_RIGHT, VK_SPACE, VK_X });
+        assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo("Z");
+        assertThat(testAllView.getSettingView().getDownKeyLabel().getText()).isEqualTo("X");
+        testRobot.pressAndReleaseKeys(new int[] { VK_RIGHT, VK_SPACE, VK_C });
+        assertThat(testAllView.getSettingView().getLeftKeyLabel().getText()).isEqualTo("C");
+        testRobot.pressAndReleaseKeys(new int[] { VK_RIGHT, VK_SPACE, VK_V });
+        assertThat(testAllView.getSettingView().getRightKeyLabel().getText()).isEqualTo("V");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_SPACE, VK_1 });
+        assertThat(testAllView.getSettingView().getStackKeyLabel().getText()).isEqualTo("1");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_V, VK_1, VK_X });
+        assertThat(testAllView.getSettingView().getUp2KeyLabel().getText()).isEqualTo(ViewController.OVERLAP_KEY_MSG);
+        testRobot.pressAndReleaseKeys(new int[] { VK_UP, VK_V, VK_1, VK_DOWN });
+        assertThat(testAllView.getSettingView().getUp2KeyLabel().getText()).isEqualTo("Up");
+        assertThat(testAllView.getSettingView().getDown2KeyLabel().getText()).isEqualTo("Down");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_1, VK_LEFT });
+        assertThat(testAllView.getSettingView().getLeft2KeyLabel().getText()).isEqualTo("Left");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_1, VK_RIGHT });
+        assertThat(testAllView.getSettingView().getRight2KeyLabel().getText()).isEqualTo("Right");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_1, VK_SPACE });
+        assertThat(testAllView.getSettingView().getStack2KeyLabel().getText()).isEqualTo("Space");
+        testRobot.pressAndReleaseKeys(new int[] { VK_V, VK_1 });
+        assertThat(frame.getFocusOwner())
+                .isEqualTo(testAllView.getSettingView().getInitKeyBtn());
     }
 
     @Test
     @Order(4)
     public void testResetSettings() {
-        int keyInput[] = { VK_S, VK_R, VK_W, VK_W, VK_R, VK_D, VK_R };
+        int keyInput[] = { VK_X, VK_1, VK_Z, VK_Z, VK_1, VK_V, VK_1 };
         testRobot.pressAndReleaseKeys(keyInput);
         assertThat(testAllView.getSettingView().getUpKeyLabel().getText()).isEqualTo("Up");
     }

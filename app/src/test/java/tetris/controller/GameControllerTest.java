@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import static java.awt.event.KeyEvent.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.AWTException;
 import java.util.Deque;
 import tetris.TestAllView;
@@ -132,14 +131,6 @@ public class GameControllerTest {
                 }
             }
         }
-
-        System.out.println("IBlockCount:" + IBlockCount);
-        System.out.println("JBlockCount:" + JBlockCount);
-        System.out.println("LBlockCount:" + LBlockCount);
-        System.out.println("OBlockCount:" + OBlockCount);
-        System.out.println("SBlockCount:" + SBlockCount);
-        System.out.println("TBlockCount:" + TBlockCount);
-
         assertThat(IBlockCount).isGreaterThan(380000).isLessThan(420000);
         assertThat(JBlockCount).isGreaterThan(475000).isLessThan(525000);
         assertThat(LBlockCount).isGreaterThan(475000).isLessThan(525000);
@@ -152,8 +143,8 @@ public class GameControllerTest {
     @Test
     @Order(1)
     public void testGameController() {
-        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP,
-                VK_UP };
+        int keyInput[] = { VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE, VK_UP, VK_UP, VK_UP,
+                VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE };
         testRobot.pressAndReleaseKeys(keyInput);
         testRobot.pressAndReleaseKeys(VK_SPACE);
     }
