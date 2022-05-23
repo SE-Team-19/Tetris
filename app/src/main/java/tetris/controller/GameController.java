@@ -163,6 +163,18 @@ public abstract class GameController implements GameMethod {
         setAttributeSet(nextBoardAttributeSet);
         setAttributeSet(attackBoardAttributeSet);
 
+        // 게임 오른쪽 부분 배치 고정; 블럭이 쌓일 때 흔들림 방지
+        if (ViewController.screenWidthNum == 0) {
+            nextBlockPane.setPreferredSize(new Dimension(85, 128));
+            attackLinePane.setPreferredSize(new Dimension(85, 84));
+        } else if (ViewController.screenWidthNum == 1) {
+            nextBlockPane.setPreferredSize(new Dimension(87, 175));
+            attackLinePane.setPreferredSize(new Dimension(87, 116));
+        } else {
+            nextBlockPane.setPreferredSize(new Dimension(100, 150));
+            attackLinePane.setPreferredSize(new Dimension(100, 100));
+        }
+
         placeBlock(board, visualBoard, currentBlock, x, y);
         drawGameBoard();
         drawNextBlock();
