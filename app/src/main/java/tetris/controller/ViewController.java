@@ -470,15 +470,15 @@ public class ViewController extends JFrame {
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
-                gameController.setGameMode(GameController.GENERAL_GAME_MODE);
+                multiGameController.setGameMode(GameController.GENERAL_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
-                gameController.setGameMode(GameController.ITEM_GAME_MODE);
+                multiGameController.setGameMode(GameController.ITEM_GAME_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
-                gameController.setGameMode(GameController.TIME_ATTACK_MODE);
+                multiGameController.setGameMode(GameController.TIME_ATTACK_MODE);
                 transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
             });
 
