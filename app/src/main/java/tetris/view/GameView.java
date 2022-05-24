@@ -1,9 +1,9 @@
 package tetris.view;
 
 import java.awt.*;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
-import tetris.controller.ViewController;
 
 public class GameView extends MasterView {
 
@@ -52,6 +52,7 @@ public class GameView extends MasterView {
     private JButton timeAttackBtn;
     private JButton singleGameBtn;
     private JButton mulitiGameBtn;
+    private ArrayList<JButton> buttonArrayList;
 
     private GameView() {
         initGameDisplayComponents();
@@ -146,6 +147,8 @@ public class GameView extends MasterView {
 
         timeLabel = new JLabel("");
         timeLabel.setFocusable(false);
+
+        buttonArrayList = new ArrayList<>();
     }
 
     private void initGameDisplayPanel() {
@@ -247,6 +250,10 @@ public class GameView extends MasterView {
         selectGamePanel.add(singleGameBtn, addGridBagComponents(0, 0));
         selectGamePanel.add(mulitiGameBtn, addGridBagComponents(1, 0));
         selectGamePanel.add(gameReturnBtn, addGridBagComponents(0, 1, 2, 1));
+
+        buttonArrayList.add(singleGameBtn);
+        buttonArrayList.add(mulitiGameBtn);
+        buttonArrayList.add(gameReturnBtn);
     }
 
     private void initSelectMultiGamePane() {
@@ -267,6 +274,11 @@ public class GameView extends MasterView {
         selectMultiGamePanel.add(localGameBtn, addGridBagComponents(1, 0));
         selectMultiGamePanel.add(onlineGameBtn, addGridBagComponents(2, 0));
         selectMultiGamePanel.add(multiGameReturnBtn, addGridBagComponents(0, 1, 3, 1));
+
+        buttonArrayList.add(robotGameBtn);
+        buttonArrayList.add(localGameBtn);
+        buttonArrayList.add(onlineGameBtn);
+        buttonArrayList.add(multiGameReturnBtn);
     }
 
     private void initSelectModePane() {
@@ -287,6 +299,11 @@ public class GameView extends MasterView {
         selectModePanel.add(itemModeBtn, addGridBagComponents(1, 0));
         selectModePanel.add(timeAttackBtn, addGridBagComponents(2, 0));
         selectModePanel.add(modeReturnBtn, addGridBagComponents(0, 1, 3, 1));
+
+        buttonArrayList.add(generalModeBtn);
+        buttonArrayList.add(itemModeBtn);
+        buttonArrayList.add(timeAttackBtn);
+        buttonArrayList.add(modeReturnBtn);
     }
 
     private void initSelectDiffPane() {
@@ -307,6 +324,11 @@ public class GameView extends MasterView {
         selectDiffPanel.add(normalBtn, addGridBagComponents(1, 0));
         selectDiffPanel.add(hardBtn, addGridBagComponents(2, 0));
         selectDiffPanel.add(diffReturnBtn, addGridBagComponents(0, 1, 3, 1));
+
+        buttonArrayList.add(easyBtn);
+        buttonArrayList.add(normalBtn);
+        buttonArrayList.add(hardBtn);
+        buttonArrayList.add(diffReturnBtn);
     }
 
     public JPanel getSingleGameDisplayPane() {
@@ -436,4 +458,9 @@ public class GameView extends MasterView {
     public JTextField getInputName() {
         return this.inputName;
     }
+
+    public ArrayList<JButton> getButtonArrayList() {
+        return buttonArrayList;
+    }
+
 }

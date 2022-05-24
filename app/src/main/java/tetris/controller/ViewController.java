@@ -2,6 +2,7 @@ package tetris.controller;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.Font;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.util.List;
@@ -74,8 +75,6 @@ public class ViewController extends JFrame {
     private void resizeJFrame() {
         super.setBounds(settingController.getScreenSize());
         super.setLocationRelativeTo(null);
-        Dimension frameSize = this.getSize();
-
     }
 
     // ScreenSize 를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameController 로 전달한다.
@@ -94,6 +93,75 @@ public class ViewController extends JFrame {
         // test용. 추후 지울 것
         System.out.println("ScreenNum : " + screenWidthNum);
         System.out.println("ScreenNum : " + screenWidthNum);
+    }
+
+    // ScreenSize 변경 이후, 각 View 들의 Font 크기를 조정한다.
+    private void resizeViewFont() {
+        if (screenWidthNum == 0) {
+            for (JButton mj : mainView.getButtonList()) {
+                mj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            }
+            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 60));
+
+            for (JButton gj : gameView.getButtonArrayList()) {
+                gj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            }
+
+            for (JButton sj: settingView.getButtonArrayList()) {
+                sj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            }
+            for (JLabel sl: settingView.getLabelArrayList()) {
+                sl.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            }
+            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
+                st.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+            }
+
+
+        } else if (screenWidthNum == 1) {
+            for (JButton mj : mainView.getButtonList()) {
+                mj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            }
+            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 80));
+
+            for (JButton gj : gameView.getButtonArrayList()) {
+                gj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            }
+
+            for (JButton sj: settingView.getButtonArrayList()) {
+                sj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            }
+            for (JLabel sl: settingView.getLabelArrayList()) {
+                sl.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            }
+            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
+                st.setFont(new Font("맑은 고딕", Font.BOLD, 28));
+            }
+
+
+        } else if (screenWidthNum == 2) {
+            for (JButton mj : mainView.getButtonList()) {
+                mj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            }
+            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 70));
+
+            for (JButton gj : gameView.getButtonArrayList()) {
+                gj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            }
+
+            for (JButton sj: settingView.getButtonArrayList()) {
+                sj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            }
+            for (JLabel sl: settingView.getLabelArrayList()) {
+                sl.setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            }
+            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
+                st.setFont(new Font("맑은 고딕", Font.BOLD, 25));
+            }
+        }
     }
 
     private void initView() {
@@ -652,7 +720,7 @@ public class ViewController extends JFrame {
                 settingController.saveSetting();
                 resizeJFrame();
                 checkJFrame();
-                //initViewAndController();
+                resizeViewFont();
 
                 settingView.getSetDisplayBtn().requestFocus();
             });

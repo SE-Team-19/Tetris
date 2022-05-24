@@ -12,6 +12,7 @@ public class MainView extends MasterView {
     private JButton settingBtn;
     private JButton scoreBoardBtn;
     private JButton exitBtn;
+    private JLabel appNameLabel;
     private ArrayList<JButton> buttonList;
 
     private MainView() {
@@ -43,11 +44,11 @@ public class MainView extends MasterView {
 
         addAButton(buttonList, buttonPanel);
 
-        JLabel appName = new JLabel("Tetris");
-        appName.setHorizontalAlignment(CENTER);
+        appNameLabel = new JLabel("Tetris");
+        appNameLabel.setHorizontalAlignment(CENTER);
 
         super.setLayout(new GridLayout(2, 0, 0, 0));
-        super.add(appName);
+        super.add(appNameLabel);
         super.add(buttonPanel);
     }
 
@@ -73,5 +74,9 @@ public class MainView extends MasterView {
 
     public JButton getExitBtn() {
         return this.exitBtn;
+    }
+
+    public JLabel getAppNameLabel() {
+        return this.appNameLabel;
     }
 }

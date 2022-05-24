@@ -47,6 +47,10 @@ public class SettingView extends MasterView {
     private JPanel initKeyGridPane;
     private String inputMessage;
 
+    private ArrayList<JButton> buttonArrayList;
+    private ArrayList<JLabel> labelArrayList;
+    private ArrayList<JToggleButton> toggleButtonArrayList;
+
     private SettingView() {
         initView();
     }
@@ -60,6 +64,10 @@ public class SettingView extends MasterView {
     }
 
     private void initView() {
+        buttonArrayList = new ArrayList<>();
+        labelArrayList = new ArrayList<>();
+        toggleButtonArrayList = new ArrayList<>();
+
         initComponent();
         initSetKeyGrid();
         initSettingGrid();
@@ -166,6 +174,39 @@ public class SettingView extends MasterView {
 
         /* 색맹모드 관련 */
         isColorBlindLabel = initAndSetName("isColorBlindLabel", new JLabel("색맹모드"));
+
+        buttonArrayList.add(setDisplayBtn);
+        buttonArrayList.add(initKeyBtn);
+        buttonArrayList.add(initMenuBtn);
+        buttonArrayList.add(returnSettingToMainBtn);
+        buttonArrayList.add(initKeyGridReturnBtn);
+        buttonArrayList.add(initScoreBtn);
+        buttonArrayList.add(initSettingBtn);
+        buttonArrayList.add(initReturnBtn);
+
+        labelArrayList.add(upKeyLabel);
+        labelArrayList.add(downKeyLabel);
+        labelArrayList.add(leftKeyLabel);
+        labelArrayList.add(rightKeyLabel);
+        labelArrayList.add(stackKeyLabel);
+        labelArrayList.add(up2KeyLabel);
+        labelArrayList.add(down2KeyLabel);
+        labelArrayList.add(left2KeyLabel);
+        labelArrayList.add(right2KeyLabel);
+        labelArrayList.add(stack2KeyLabel);
+        labelArrayList.add(isColorBlindLabel);
+
+        toggleButtonArrayList.add(isColorBlindBtn);
+        toggleButtonArrayList.add(setUpKeyBtn);
+        toggleButtonArrayList.add(setDownKeyBtn);
+        toggleButtonArrayList.add(setLeftKeyBtn);
+        toggleButtonArrayList.add(setRightKeyBtn);
+        toggleButtonArrayList.add(setStackKeyBtn);
+        toggleButtonArrayList.add(setUp2KeyBtn);
+        toggleButtonArrayList.add(setDown2KeyBtn);
+        toggleButtonArrayList.add(setLeft2KeyBtn);
+        toggleButtonArrayList.add(setRight2KeyBtn);
+        toggleButtonArrayList.add(setStack2KeyBtn);
     }
 
     private void setFocusableComponents(boolean bool, JComponent... comp) {
@@ -426,4 +467,15 @@ public class SettingView extends MasterView {
             this.isColorBlindBtn.setText("OFF");
     }
 
+    public ArrayList<JButton> getButtonArrayList() {
+        return buttonArrayList;
+    }
+
+    public ArrayList<JLabel> getLabelArrayList() {
+        return labelArrayList;
+    }
+
+    public ArrayList<JToggleButton> getToggleButtonArrayList() {
+        return toggleButtonArrayList;
+    }
 }

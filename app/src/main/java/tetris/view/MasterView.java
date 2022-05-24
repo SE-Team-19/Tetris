@@ -14,7 +14,7 @@ public class MasterView extends JPanel {
     public static final Color BASIC_BACKGROUND_COLOR = Color.BLACK;
     public static final Color WARNING_FONT_COLOR = Color.RED;
     public static final String BASIC_FONT_FAMILY = "맑은 고딕";
-    public static final int BASIC_FONT_SIZE = 10;
+    public static final int BASIC_FONT_SIZE = 20;
     private static final String SPACE = "SPACE";
 
     public MasterView() {
