@@ -2,6 +2,7 @@ package tetris.controller;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -12,39 +13,43 @@ public class SingleGameController {
 
     protected GameView gameView;
     protected ScoreView scoreView;
+    protected MainView mainView;
 
     JTextPane gamepane;
     protected Timer gameTimer;
+    protected JLabel singleTimeLabel;
 
     GameController gamePlayer;
     protected PlayerController playerController;
+    protected ViewController viewController;
 
     protected int diffMode;
     protected int gameMode;
     protected int gameTime;
     protected List<Integer> randomBlockList;
 
-    public SingleGameController(PlayerController playerController) {
+    public SingleGameController(PlayerController playerController, ViewController viewController) {
         diffMode = 0;
         gameMode = 0;
         randomBlockList = new ArrayList<>();
         this.playerController = playerController;
+        this.viewController = viewController;
         this.gameView = GameView.getInstance();
         scoreView = ScoreView.getInstance();
-        gamepane = gameView.getPlayerOneGameBoardPane();
-        JTextPane nextBlockPane = gameView.getPlayerOneNextBlockPane();
-        JTextPane attackLinePane = gameView.getPlayerOneAttackLinePane();
-        JLabel scoreLabel = gameView.getPlayerOneScoreLabel();
+        mainView = MainView.getInstance();
+        gamepane = gameView.getSinglePlayerGameBoardPane();
+        singleTimeLabel = gameView.getSingleGameTimeLabel();
+        JTextPane nextBlockPane = gameView.getSinglePlayerOneNextBlockPane();
+        JLabel scoreLabel = gameView.getSingleScoreLabel();
         gameTime = 0;
-        gamePlayer = new GameController(gamepane, nextBlockPane, attackLinePane, scoreLabel,
+        gamePlayer = new GameController(gamepane, nextBlockPane, new JTextPane(), scoreLabel,
                 gamepane) {
             @Override
             public void doAfterGameOver() {
-                gameView.add(gameView.getGameOverPanel());
-                gameView.remove(gameView.getSingleGameDisplayPane());
-                gameView.getInputName().requestFocus();
                 gamePlayer.endGame();
                 gameTimer.stop();
+                gameView.setGameOver();
+                gameView.getGameOverLabel().requestFocus();
             }
 
             @Override
@@ -55,24 +60,31 @@ public class SingleGameController {
                 }
             }
         };
+
+        gameView.getGameOverLabel().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                transitGameOver();
+            }
+        });
+
     }
 
     protected void startSingleGame(Setting setting) {
 
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
+
         generateBlockRandomizer(diffMode);
-        gamePlayer.startGame(diffMode, gameMode, randomBlockList);
+        int currentResoultion = gameView.getWidth() * gameView.getHeight();
+        System.out.println(currentResoultion);
+        gamePlayer.startGame(diffMode, gameMode, randomBlockList, currentResoultion);
         gamepane.requestFocus(true);
-        showTime();
-        if (gameMode == GameController.TIME_ATTACK_MODE) {
-            gameTime = 100;
-            showTime();
-            startTimeAttack();
-        } else {
-            showTime();
-            startStopWatch();
-        }
+        gamePlayer.setDeleteLines(gameView.getSingleLinesLabel());
+        gamePlayer.showDeleteLines();
+        showMode();
+        showTime(singleTimeLabel);
+        startTimer(gameView.getSingleGameDisplayTimeLabel(), singleTimeLabel);
     }
 
     protected void setDiffMode(int diffMode) {
@@ -81,6 +93,14 @@ public class SingleGameController {
 
     protected void setGameMode(int gameMode) {
         this.gameMode = gameMode;
+    }
+
+    protected void transitGameOver() {
+        gameView.resetSingleGameDisplayPane();
+        gameView.add(gameView.getGameOverPanel());
+        gameView.remove(gameView.getSingleGameDisplayPane());
+        gameView.getInputName().requestFocus();
+
     }
 
     // 유저 저장 메소드
@@ -136,18 +156,36 @@ public class SingleGameController {
         }
     }
 
-    protected void startStopWatch() {
+    protected void startTimer(JLabel timeDescribtion, JLabel timeLabel) {
+        if (gameMode == GameController.TIME_ATTACK_MODE) {
+            gameTime = 100;
+            showTime(timeLabel);
+            timeDescribtion.setText(GameView.TIME_ATTACK_STRING);
+            startTimeAttack(timeLabel);
+        } else {
+            showTime(timeLabel);
+            timeDescribtion.setText(GameView.STOP_WATCH_STRING);
+            startStopWatch(timeLabel);
+        }
+    }
+
+    public void stopTimer() {
+        gameTimer.setRepeats(false);
+        gameTimer.stop();
+    }
+
+    protected void startStopWatch(JLabel timeLabel) {
         gameTimer = new Timer(1000, e -> {
             gameTime++;
-            showTime();
+            showTime(timeLabel);
         });
         gameTimer.start();
     }
 
-    protected void startTimeAttack() {
+    protected void startTimeAttack(JLabel timeLabel) {
         gameTimer = new Timer(1000, e -> {
             gameTime--;
-            showTime();
+            showTime(timeLabel);
             if (gameTime == 0) {
                 gamePlayer.doAfterGameOver();
             }
@@ -155,8 +193,24 @@ public class SingleGameController {
         gameTimer.start();
     }
 
-    protected void showTime() {
-        gameView.getTimeLabel().setText(String.format("%d", gameTime));
+    protected void showTime(JLabel timeLabel) {
+        timeLabel.setText(String.format("%d초", gameTime));
+    }
+
+    protected void showMode() {
+        String difficulty = "normal";
+        if (diffMode == GameController.EASY_MODE)
+            difficulty = "easy";
+        else if (diffMode == GameController.HARD_MODE)
+            difficulty = "hard";
+        String mode = "일반 모드";
+        if (gameMode == GameController.ITEM_GAME_MODE)
+            mode = "아이템모드";
+        else if (gameMode == GameController.TIME_ATTACK_MODE)
+            mode = "시간제한모드";
+        gameView.getGameDiffLabel().setText(difficulty);
+        gameView.getMultiGameModeLabel().setText(mode);
+        gameView.getSingleGameModeLabel().setText(mode);
     }
 
 }

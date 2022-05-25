@@ -18,9 +18,10 @@ public class ViewController extends JFrame {
     public static final int REFRESH_RATE = 17; // 60FPS
     static final String OVERLAP_KEY_MSG = "키 중복!";
 
-    private int mode = 0;
+    private boolean isSingleGameModeFlag;
+    private int currentResoultion;
 
-    private Container contentPane;
+    Container contentPane;
     private Map<JButton, Container> viewMap;
     private transient Map<KeyPair, PressedKeyEvent> mainViewKeyMap;
     private transient Map<KeyPair, PressedKeyEvent> settingViewKeyMap;
@@ -29,6 +30,7 @@ public class ViewController extends JFrame {
     private transient InitMainViewMap initMainViewKeyMap;
     private transient InitGameViewKeyMap initGameViewKeyMap;
     private transient InitSettingViewMap initSettingViewMap;
+    private transient List<Component> allComponents;
     transient Timer refreshTimer;
 
     boolean settingFlag;
@@ -42,13 +44,12 @@ public class ViewController extends JFrame {
     private transient SettingController settingController = new SettingController();
     private transient MultiGameController multiGameController;
 
-    public static int screenWidthNum = 0;
-
     public ViewController() {
         initJFrame();
         initViewAndController();
         initView();
         addEventListener();
+        resizeViewFont();
     }
 
     private void initViewAndController() {
@@ -58,7 +59,9 @@ public class ViewController extends JFrame {
         settingView = SettingView.getInstance();
         settingController = new SettingController();
         playerController = new PlayerController();
-        multiGameController = new MultiGameController(playerController);
+        multiGameController = new MultiGameController(playerController, this);
+        allComponents = new LinkedList<>();
+        isSingleGameModeFlag = true;
     }
 
     private void initJFrame() {
@@ -66,7 +69,6 @@ public class ViewController extends JFrame {
         super.setResizable(false); // 창의 크기 조정 가능 여부
         setDefaultCloseOperation(EXIT_ON_CLOSE); // 창을 닫으면 더 이상 실행(run)되지 않는다
         resizeJFrame();
-        checkJFrame();
         super.setVisible(true);
         contentPane = super.getContentPane(); // contentPane 부르기
         super.rootPane.setFocusable(false);
@@ -75,91 +77,16 @@ public class ViewController extends JFrame {
     private void resizeJFrame() {
         super.setBounds(settingController.getScreenSize());
         super.setLocationRelativeTo(null);
-    }
-
-    // ScreenSize 를 적용받은 뒤, 식별 번호(screenWidthNum)를 GameController 로 전달한다.
-    private void checkJFrame() {
-        List<Rectangle> checkRectSize = Arrays.asList(new Rectangle(0, 0, 1366, 768),
-                new Rectangle(0, 0, 1400, 1050),
-                new Rectangle(0, 0, 1600, 900));
-        if (settingController.getScreenSize().equals(checkRectSize.get(0))) {
-            screenWidthNum = 0;
-        } else if (settingController.getScreenSize().equals(checkRectSize.get(1))) {
-            screenWidthNum = 1;
-        } else if (settingController.getScreenSize().equals(checkRectSize.get(2))) {
-            screenWidthNum = 2;
-        }
-
-        // test용. 추후 지울 것
-        System.out.println("ScreenNum : " + screenWidthNum);
-        System.out.println("ScreenNum : " + screenWidthNum);
+        currentResoultion = super.getWidth() * super.getHeight();
     }
 
     // ScreenSize 변경 이후, 각 View 들의 Font 크기를 조정한다.
     private void resizeViewFont() {
-        if (screenWidthNum == 0) {
-            for (JButton mj : mainView.getButtonList()) {
-                mj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            }
-            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 60));
-
-            for (JButton gj : gameView.getButtonArrayList()) {
-                gj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            }
-
-            for (JButton sj : settingView.getButtonArrayList()) {
-                sj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            }
-            for (JLabel sl : settingView.getLabelArrayList()) {
-                sl.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            }
-            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
-                st.setFont(new Font("맑은 고딕", Font.BOLD, 20));
-            }
-
-        } else if (screenWidthNum == 1) {
-            for (JButton mj : mainView.getButtonList()) {
-                mj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            }
-            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 80));
-
-            for (JButton gj : gameView.getButtonArrayList()) {
-                gj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            }
-
-            for (JButton sj : settingView.getButtonArrayList()) {
-                sj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            }
-            for (JLabel sl : settingView.getLabelArrayList()) {
-                sl.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            }
-            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
-                st.setFont(new Font("맑은 고딕", Font.BOLD, 28));
-            }
-
-        } else if (screenWidthNum == 2) {
-            for (JButton mj : mainView.getButtonList()) {
-                mj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            }
-            mainView.getButtonPanel().setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, 70));
-
-            for (JButton gj : gameView.getButtonArrayList()) {
-                gj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            }
-
-            for (JButton sj : settingView.getButtonArrayList()) {
-                sj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            }
-            for (JLabel sl : settingView.getLabelArrayList()) {
-                sl.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            }
-            for (JToggleButton st : settingView.getToggleButtonArrayList()) {
-                st.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-            }
-        }
+        int fontSize = currentResoultion / 23040;
+        allComponents.forEach(e -> e.setFont(new Font("맑은 고딕", Font.BOLD, fontSize)));
+        settingView.getIsColorBlindLabel().setFont(new Font("맑은 고딕", Font.BOLD, fontSize));
+        mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, fontSize * 3));
+        System.out.println("현재폰트사이즈: " + fontSize);
     }
 
     private void initView() {
@@ -195,6 +122,7 @@ public class ViewController extends JFrame {
         initGameView();
         initSettingView();
         initScoreView();
+
     }
 
     private void initMainView() {
@@ -247,6 +175,7 @@ public class ViewController extends JFrame {
         MainKeyListener mainKeyEventListener = new MainKeyListener();
         mainView.getStartBtn().requestFocus();
         for (Component buttonComp : mainView.getButtonPanel().getComponents()) {
+            allComponents.add(buttonComp);
             AbstractButton button = (AbstractButton) buttonComp;
             if (button == mainView.getExitBtn()) {
                 button.addActionListener(e -> System.exit(0));
@@ -261,19 +190,29 @@ public class ViewController extends JFrame {
 
     private void addGameViewEventListener() {
         GameKeyListener gameKeyListener = new GameKeyListener();
-        for (Component comp : gameView.getSelectGamePanel().getComponents())
+        for (Component comp : gameView.getSelectGamePanel().getComponents()) {
             comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectDiffPane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectModePane().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getSelectMultiGamePanel().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        for (Component comp : gameView.getGameOverPanel().getComponents())
-            comp.addKeyListener(gameKeyListener);
-        gameView.getPlayerOneGameBoardPane().addKeyListener(new StopKeyListener());
-        gameView.getPlayerTwoGameBoardPane().addKeyListener(new StopKeyListener());
+            allComponents.add(comp);
+        }
 
+        for (Component comp : gameView.getSelectDiffPane().getComponents()) {
+            comp.addKeyListener(gameKeyListener);
+            allComponents.add(comp);
+        }
+        for (Component comp : gameView.getSelectModePane().getComponents()) {
+            comp.addKeyListener(gameKeyListener);
+            allComponents.add(comp);
+        }
+        for (Component comp : gameView.getSelectMultiGamePanel().getComponents()) {
+            comp.addKeyListener(gameKeyListener);
+            allComponents.add(comp);
+        }
+        for (Component comp : gameView.getGameOverPanel().getComponents()) {
+            comp.addKeyListener(gameKeyListener);
+            allComponents.add(comp);
+        }
+        gameView.getSinglePlayerGameBoardPane().addKeyListener(new StopKeyListener());
+        gameView.getPlayerTwoGameBoardPane().addKeyListener(new StopKeyListener());
         JTextArea gameOverTextArea = gameView.getGameOverTextArea();
         gameOverTextArea.addKeyListener(new KeyAdapter() {
             @Override
@@ -293,12 +232,11 @@ public class ViewController extends JFrame {
                         "Option", JOptionPane.YES_NO_OPTION);
 
                 if (inputValue == JOptionPane.YES_OPTION) {
-                    if (mode == 0) {
-                        multiGameController.gamePlayer.stopGame();
-                    } else if (mode == 1) {
-                        multiGameController.gamePlayer1.stopGame();
-                        multiGameController.gamePlayer2.stopGame();
-                    }
+                    multiGameController.gamePlayer.endGame();
+                    multiGameController.gamePlayer1.endGame();
+                    multiGameController.gamePlayer2.endGame();
+                    multiGameController.gameRobot.endGame();
+                    multiGameController.stopTimer();
 
                     gameView.resetGameView();
                     transitView(contentPane, mainView, gameView);
@@ -321,11 +259,13 @@ public class ViewController extends JFrame {
             if (viewComp instanceof JPanel) {
                 for (Component panelComp : ((JPanel) viewComp).getComponents()) {
                     panelComp.addKeyListener(settingEventListener);
+                    allComponents.add(panelComp);
                 }
             }
             if (viewComp.getClass().equals(JLabel.class))
                 continue;
             viewComp.addKeyListener(settingEventListener);
+            allComponents.add(viewComp);
         }
     }
 
@@ -342,10 +282,11 @@ public class ViewController extends JFrame {
                         scoreView.repaint();
                     }
                 });
+        allComponents.add(scoreView.getReturnScoreToMainBtn());
     }
 
     // 전환함수
-    private void transitView(Container pane, Container to, Container from) {
+    void transitView(Container pane, Container to, Container from) {
         pane.add(to);
         pane.remove(from);
         focus(to);
@@ -412,6 +353,7 @@ public class ViewController extends JFrame {
         int leftKey;
         int rightKey;
         int stackKey;
+        boolean isSingleGameModeFlag;
 
         private InitGameViewKeyMap() {
             loadSetting();
@@ -543,29 +485,42 @@ public class ViewController extends JFrame {
                 transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectMultiGamePanel());
                 multiGameController.startLocalGame(settingController.getSetting());
             });
+            gameViewKeyMap.put(new KeyPair(stackKey, gameView.getRobotGameBtn()), () -> {
+                transitView(gameView, gameView.getMulitiGameDisplayPane(), gameView.getSelectMultiGamePanel());
+                multiGameController.startRobotGame(settingController.getSetting());
+            });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGeneralModeBtn()), () -> {
                 multiGameController.setGameMode(GameController.GENERAL_GAME_MODE);
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                if (isSingleGameModeFlag)
+                    transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                else
+                    transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getItemModeBtn()), () -> {
                 multiGameController.setGameMode(GameController.ITEM_GAME_MODE);
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                if (isSingleGameModeFlag)
+                    transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                else
+                    transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectModePane());
             });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getTimeAttackBtn()), () -> {
                 multiGameController.setGameMode(GameController.TIME_ATTACK_MODE);
-                transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                if (isSingleGameModeFlag)
+                    transitView(gameView, gameView.getSelectDiffPane(), gameView.getSelectModePane());
+                else
+                    transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectModePane());
             });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getSingleGameBtn()),
                     () -> {
-                        mode = 0;
+                        isSingleGameModeFlag = true;
                         transitView(gameView, gameView.getSelectModePane(), gameView.getSelectGamePanel());
                     });
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getMulitiGameBtn()),
                     () -> {
-                        mode = 1;
-                        transitView(gameView, gameView.getSelectMultiGamePanel(), gameView.getSelectGamePanel());
+                        isSingleGameModeFlag = false;
+                        transitView(gameView, gameView.getSelectModePane(), gameView.getSelectGamePanel());
                     });
 
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getDiffReturnBtn()),
@@ -575,7 +530,7 @@ public class ViewController extends JFrame {
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getGameReturnBtn()),
                     () -> transitView(contentPane, mainView, gameView));
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getMultiGameReturnBtn()),
-                    () -> transitView(gameView, gameView.getSelectGamePanel(), gameView.getSelectMultiGamePanel()));
+                    () -> transitView(gameView, gameView.getSelectModePane(), gameView.getSelectMultiGamePanel()));
         }
 
         private void initOtherKeys() {
@@ -584,6 +539,7 @@ public class ViewController extends JFrame {
                         multiGameController.saveUserName();
                         transitView(contentPane, scoreView, gameView);
                         gameView.getInputName().setText("");
+                        gameView.resetGameView();
                     });
         }
     }
@@ -726,7 +682,6 @@ public class ViewController extends JFrame {
                 settingController.setDisplayMode(displayComboBox.getSelectedIndex());
                 settingController.saveSetting();
                 resizeJFrame();
-                checkJFrame();
                 resizeViewFont();
 
                 settingView.getSetDisplayBtn().requestFocus();

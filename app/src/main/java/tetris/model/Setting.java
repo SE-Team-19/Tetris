@@ -22,9 +22,9 @@ public class Setting {
 
     public Setting() {
         displayMode = 0;
-        displayList = Arrays.asList(new Rectangle(0, 0, 1366, 768),
-                new Rectangle(0, 0, 1400, 1050),
-                new Rectangle(0, 0, 1600, 900));
+        displayList = Arrays.asList(new Rectangle(0, 0, 1280, 720),
+                new Rectangle(0, 0, 1120, 630),
+                new Rectangle(0, 0, 960, 540));
         colorBlindMode = false;
         moveLeftKey = KeyEvent.VK_LEFT;
         moveRightKey = KeyEvent.VK_RIGHT;

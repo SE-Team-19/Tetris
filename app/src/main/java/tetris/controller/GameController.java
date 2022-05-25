@@ -27,6 +27,7 @@ public abstract class GameController implements GameMethod {
     static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
     private static final int MAX_BLOCK_HEIGHT = 4;
+    private static final int NEXT_BLOCK_WIDTH = 6;
     private static final int UNFIXED_BLOCK_NUMBER = 1;
     private static final int FIXED_BLOCK_NUMBER = 2;
     private static final int OVERLAP_BLOCK_NUMBER = UNFIXED_BLOCK_NUMBER + FIXED_BLOCK_NUMBER;
@@ -39,6 +40,7 @@ public abstract class GameController implements GameMethod {
     public static final int TIME_ATTACK_MODE = 2;
 
     private Timer gameDelayTimer;
+    private boolean delayFlag;
     private boolean isBottomFlag;
     private boolean isItemFlag;
     private int delay;
@@ -58,27 +60,33 @@ public abstract class GameController implements GameMethod {
 
     private StringBuilder boardStringBuilder;
     private StringBuilder nextBlockStringBuilder;
-    private StringBuilder attackLineStringBuilder;
+    private StringBuilder attackLinesStringBuilder;
+    private StringBuilder attackLineSB;
     int x;
     int y;
     int ghostY;
 
     protected int score; // game 점수와 관련된 변수
     protected int attackLines;
-    private int deleteLines;
+    private int itemLines;
+    int deleteLines;
 
-    private GameView gameView = GameView.getInstance();
     private GameController opponent;
     private JTextPane gamePane;
     private JTextPane nextBlockPane;
     private JTextPane attackLinePane;
     private JLabel scoreLabel;
+    private JLabel linesLabel;
 
     private StyledDocument gamePaneDoc;
     private StyledDocument nextBlockPaneDoc;
+    private StyledDocument attackLinePaneDoc;
+    private StyledDocument opponentAttackLinePaneDoc;
+
     private SimpleAttributeSet boardAttributeSet;
     private SimpleAttributeSet nextBoardAttributeSet;
     private SimpleAttributeSet attackBoardAttributeSet;
+    private SimpleAttributeSet blockAttributeSet;
     private Component focusing;
     KeyListener gameKeyListener;
 
@@ -97,11 +105,10 @@ public abstract class GameController implements GameMethod {
             Component focusing) {
         this.gamePane = gamePane;
         this.nextBlockPane = nextBlockPane;
-        this.attackLinePane = attackLinePane;
         this.scoreLabel = scoreLabel;
         this.focusing = focusing;
+        this.attackLinePane = attackLinePane;
         initGameController();
-        // setDisplayWidth();
     }
 
     private void initGameController() {
@@ -117,6 +124,8 @@ public abstract class GameController implements GameMethod {
         x = START_X;
         y = START_Y;
 
+        delayFlag = true;
+
         initBlockCharMap();
         initColorMap();
         initRotateMap();
@@ -128,28 +137,27 @@ public abstract class GameController implements GameMethod {
 
         gamePaneDoc = gamePane.getStyledDocument();
         nextBlockPaneDoc = nextBlockPane.getStyledDocument();
+        attackLinePaneDoc = attackLinePane.getStyledDocument();
 
         boardStringBuilder = new StringBuilder();
         nextBlockStringBuilder = new StringBuilder();
-        attackLineStringBuilder = new StringBuilder();
+        attackLinesStringBuilder = new StringBuilder();
+        attackLineSB = new StringBuilder();
 
         boardAttributeSet = new SimpleAttributeSet();
+        blockAttributeSet = new SimpleAttributeSet();
         nextBoardAttributeSet = new SimpleAttributeSet();
         attackBoardAttributeSet = new SimpleAttributeSet();
 
-        // setAttributeSet(boardAttributeSet);
-        // setAttributeSet(nextBoardAttributeSet);
-        // setAttributeSet(attackBoardAttributeSet);
     }
 
     public void setOpponentPlayer(GameController opponent) {
         this.opponent = opponent;
-        this.attackLines = opponent.attackLines;
         this.opponentBlockDeque = opponent.blockDeque;
-        this.attackLineBoard = opponent.attackLineBoard;
+        this.opponentAttackLinePaneDoc = opponent.attackLinePane.getStyledDocument();
     }
 
-    public void startGame(int diffMode, int gameMode, List<Integer> randomBlockList) {
+    public void startGame(int diffMode, int gameMode, List<Integer> randomBlockList, int resoultion) {
         this.diffMode = diffMode;
         this.gameMode = gameMode;
 
@@ -158,25 +166,27 @@ public abstract class GameController implements GameMethod {
         currentBlock = getBlock(blockDeque.removeFirst());
         nextBlock = getBlock(blockDeque.removeFirst());
 
-        // 위치 이동시킴
         setAttributeSet(boardAttributeSet);
         setAttributeSet(nextBoardAttributeSet);
         setAttributeSet(attackBoardAttributeSet);
-
-        // 게임 오른쪽 부분 배치 고정; 블럭이 쌓일 때 흔들림 방지
-        if (ViewController.screenWidthNum == 0) {
-            nextBlockPane.setPreferredSize(new Dimension(85, 128));
-            attackLinePane.setPreferredSize(new Dimension(85, 84));
-        } else if (ViewController.screenWidthNum == 1) {
-            nextBlockPane.setPreferredSize(new Dimension(87, 175));
-            attackLinePane.setPreferredSize(new Dimension(87, 116));
+        if (resoultion > 860783) {
+            StyleConstants.setFontSize(boardAttributeSet, 45);
+            StyleConstants.setFontSize(nextBoardAttributeSet, 35);
+            StyleConstants.setFontSize(attackBoardAttributeSet, 21);
+        } else if (resoultion > 652463) {
+            StyleConstants.setFontSize(boardAttributeSet, 39);
+            StyleConstants.setFontSize(nextBoardAttributeSet, 33);
+            StyleConstants.setFontSize(attackBoardAttributeSet, 17);
         } else {
-            nextBlockPane.setPreferredSize(new Dimension(100, 150));
-            attackLinePane.setPreferredSize(new Dimension(100, 100));
+            StyleConstants.setFontSize(boardAttributeSet, 32);
+            StyleConstants.setFontSize(nextBoardAttributeSet, 30);
+            StyleConstants.setFontSize(attackBoardAttributeSet, 14);
         }
 
+        initGameBoard();
+        initAttackLines();
+        resetNextBlockPane();
         placeBlock(board, visualBoard, currentBlock, x, y);
-        drawGameBoard();
         drawNextBlock();
 
         nextBlockPane.repaint();
@@ -184,12 +194,16 @@ public abstract class GameController implements GameMethod {
 
         score = 0;
         delay = 1000;
+        itemLines = 0;
         deleteLines = 0;
+        attackLines = 0;
         isItemFlag = false;
         isNotDropDownState = true;
+        delayFlag = true;
 
         showScore();
         startGameDelayTimer(delay);
+        doWhenGameStart();
     }
 
     public void setPlayerKeys(int upKey, int downKey, int leftKey, int rightKey, int stackKey) {
@@ -314,61 +328,38 @@ public abstract class GameController implements GameMethod {
     public void startGameDelayTimer(int startDelay) {
         gameDelayTimer = new Timer(startDelay, e -> {
             moveDown();
-            drawGameBoard();
             delay -= delay > 250 ? 1 : 0;
-            gameDelayTimer.setDelay(delay);
+            if (delayFlag)
+                gameDelayTimer.setDelay(delay);
+            else {
+                // gameDelayTimer.setRepeats(false);
+                gameDelayTimer.stop();
+            }
+
         });
+        /// gameDelayTimer.setRepeats(true);
         gameDelayTimer.start();
     }
 
     private void setAttributeSet(SimpleAttributeSet attributeSet) {
-        // 1366 * 768
-        if (ViewController.screenWidthNum == 0) {
-            StyleConstants.setFontSize(attributeSet, 53);
-            StyleConstants.setFontFamily(attributeSet, "Courier New");
-            StyleConstants.setBold(attributeSet, true);
-            StyleConstants.setForeground(attributeSet, Color.WHITE);
-            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
-            StyleConstants.setLeftIndent(attributeSet, -85);
-            StyleConstants.setRightIndent(attributeSet, -85);
-            StyleConstants.setLineSpacing(attributeSet, -0.45f);
-            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-            System.out.println(
-                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
-        }
-        // 1400 * 1050
-        else if (ViewController.screenWidthNum == 1) {
-            StyleConstants.setFontSize(attributeSet, 53);
-            StyleConstants.setFontFamily(attributeSet, "Courier New");
-            StyleConstants.setBold(attributeSet, true);
-            StyleConstants.setForeground(attributeSet, Color.WHITE);
-            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
-            StyleConstants.setLeftIndent(attributeSet, -85);
-            StyleConstants.setRightIndent(attributeSet, -85);
-            StyleConstants.setLineSpacing(attributeSet, -0.23f);
-            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-            System.out.println(
-                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
-        }
-        // 1600 * 900
-        else {
-            StyleConstants.setFontSize(attributeSet, 60);
-            StyleConstants.setFontFamily(attributeSet, "Courier New");
-            StyleConstants.setBold(attributeSet, true);
-            StyleConstants.setForeground(attributeSet, Color.WHITE);
-            StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
-            StyleConstants.setLeftIndent(attributeSet, -105);
-            StyleConstants.setRightIndent(attributeSet, -105);
-            StyleConstants.setLineSpacing(attributeSet, -0.42f);
-            StyleConstants.setSpaceAbove(attributeSet, -3.5f);
-            System.out.println(
-                    "GameController is " + ViewController.screenWidthNum); // test용. 추후 지울 것
-        }
 
+        // 1366 * 768
+
+        StyleConstants.setFontFamily(attributeSet, "Courier New");
+        StyleConstants.setBold(attributeSet, true);
+        StyleConstants.setForeground(attributeSet, Color.WHITE);
+        StyleConstants.setAlignment(attributeSet, StyleConstants.ALIGN_CENTER);
+        StyleConstants.setLeftIndent(attributeSet, -85);
+        StyleConstants.setRightIndent(attributeSet, -85);
+        StyleConstants.setLineSpacing(attributeSet, -0.45f);
+        StyleConstants.setSpaceAbove(attributeSet, -3.5f);
     }
 
-    public void drawGameBoard() {
+    private void setFontAttributeSet(SimpleAttributeSet attributeSet, int resoultion) {
+        StyleConstants.setFontSize(attributeSet, 45);
+    }
 
+    public void initGameBoard() {
         boardStringBuilder.setLength(0);
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
             boardStringBuilder.append(GameView.BORDER_CHAR);
@@ -388,34 +379,102 @@ public abstract class GameController implements GameMethod {
             boardStringBuilder.append(GameView.BORDER_CHAR);
         }
         gamePane.setText(boardStringBuilder.toString());
-
-        gamePaneDoc = gamePane.getStyledDocument();
+        StyleConstants.setForeground(blockAttributeSet, Color.WHITE);
         gamePaneDoc.setParagraphAttributes(0, gamePaneDoc.getLength(), boardAttributeSet, true);
+        gamePaneDoc.setCharacterAttributes(0, gamePaneDoc.getLength(), blockAttributeSet, true);
         paintBlock();
     }
 
-    public void drawNextBlock() {
-        int nextHeight = nextBlock.getHeight();
-        int nextWidth = nextBlock.getWidth();
+    public void initAttackLines() {
+        attackLinesStringBuilder.setLength(0);
+        for (int t = 0; t < BOARD_WIDTH + 2; t++) {
+            attackLinesStringBuilder.append(GameView.BORDER_CHAR);
+        }
+
+        attackLinesStringBuilder.append("\n");
+        for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
+            attackLinesStringBuilder.append(GameView.BORDER_CHAR);
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                attackLinesStringBuilder.append(' ');
+            }
+            attackLinesStringBuilder.append(GameView.BORDER_CHAR);
+            attackLinesStringBuilder.append("\n");
+        }
+        for (int t = 0; t < BOARD_WIDTH + 2; t++) {
+            attackLinesStringBuilder.append(GameView.BORDER_CHAR);
+        }
+        attackLinePane.setText(attackLinesStringBuilder.toString());
+
+        attackLinePaneDoc.setParagraphAttributes(0, attackLinePaneDoc.getLength(), attackBoardAttributeSet, true);
+
+    }
+
+    public void resetNextBlockPane() {
 
         nextBlockStringBuilder.setLength(0);
-        for (int j = 0; j < nextHeight; j++) {
-            for (int i = 0; i < nextWidth; i++) {
-                nextBlockStringBuilder.append(blockCharMap.get(nextBlock.getVisualShape(i, j)));
+        for (int t = 0; t < NEXT_BLOCK_WIDTH + 2; t++) {
+            nextBlockStringBuilder.append(GameView.BORDER_CHAR);
+        }
+        nextBlockStringBuilder.append("\n");
+        for (int i = 0; i < NEXT_BLOCK_WIDTH; i++) {
+            nextBlockStringBuilder.append(GameView.BORDER_CHAR);
+            for (int j = 0; j < NEXT_BLOCK_WIDTH; j++) {
+                nextBlockStringBuilder.append(' ');
             }
+            nextBlockStringBuilder.append(GameView.BORDER_CHAR);
             nextBlockStringBuilder.append("\n");
         }
+        for (int t = 0; t < NEXT_BLOCK_WIDTH + 2; t++) {
+            nextBlockStringBuilder.append(GameView.BORDER_CHAR);
+        }
         nextBlockPane.setText(nextBlockStringBuilder.toString());
-
         nextBlockPaneDoc.setParagraphAttributes(0, nextBlockPaneDoc.getLength(), nextBoardAttributeSet, false);
-        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
-        for (int j = 0; j < nextHeight; j++) {
-            for (int i = 0; i < nextWidth; i++) {
-                StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getVisualShape(i, j)));
-                nextBlockPaneDoc.setCharacterAttributes(i + j + j * nextWidth, 1, blockAttributeSet, false);
-            }
+
+    }
+
+    public void drawNextBlock() {
+        currentBlock.getCoordiList().forEach(e -> {
+            int offset = (NEXT_BLOCK_WIDTH + 4) + ((e[1] + 2) * (NEXT_BLOCK_WIDTH + 3) + e[0] + 1);
+            nextBlockStringBuilder.setCharAt(
+                    offset,
+                    ' ');
+        });
+        nextBlock.getCoordiList().forEach(e -> {
+            int offset = (NEXT_BLOCK_WIDTH + 4) + ((e[1] + 2) * (NEXT_BLOCK_WIDTH + 3) + e[0] + 1);
+            nextBlockStringBuilder.setCharAt(
+                    offset,
+                    GameView.BLOCK_CHAR);
+        });
+        if (nextBlock.getAttachItemID() > 0) {
+            int[] itemCoordinate = nextBlock.getItemCoordinate();
+            int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
+                    + itemCoordinate[0] + 1;
+            nextBlockStringBuilder.setCharAt(
+                    offset,
+                    blockCharMap.get(nextBlock.getAttachItemID()));
         }
 
+        nextBlockPane.setText(nextBlockStringBuilder.toString());
+        nextBlockPaneDoc.setParagraphAttributes(0, nextBlockPaneDoc.getLength(), nextBoardAttributeSet, false);
+        StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getIdentifynumber()));
+        for (int i = 0; i < NEXT_BLOCK_WIDTH; i++) {
+            nextBlockPaneDoc.setCharacterAttributes(
+                    (NEXT_BLOCK_WIDTH + 4) + (i * (NEXT_BLOCK_WIDTH + 3)),
+                    NEXT_BLOCK_WIDTH,
+                    blockAttributeSet,
+                    false);
+        }
+        if (nextBlock.getAttachItemID() > 0) {
+            int[] itemCoordinate = nextBlock.getItemCoordinate();
+            StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getAttachItemID()));
+            int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
+                    + itemCoordinate[0] + 1;
+            nextBlockPaneDoc.setCharacterAttributes(offset, 1, blockAttributeSet, true);
+        }
+
+    }
+
+    public void initNextBlockPane() {
     }
 
     Block getBlock(int id) {
@@ -440,7 +499,6 @@ public abstract class GameController implements GameMethod {
     }
 
     private void paintBlock() {
-        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 if (visualBoard[i][j] > 0) {
@@ -451,18 +509,36 @@ public abstract class GameController implements GameMethod {
                 }
             }
         }
+        StyleConstants.setForeground(blockAttributeSet, Color.WHITE);
+        gamePane.setCharacterAttributes(blockAttributeSet, false);
     }
 
     // 주어진 board에 Block을 놓아주는 메소드
     void placeBlock(int[][] board, int[][] visualBoard, Block block, int x, int y) {
         getGhostY();
         block.getCoordiList().forEach(e -> {
+            int offset = (BOARD_WIDTH + 4) + (ghostY + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0];
             board[y + e[1]][x + e[0]] += 1;
             visualBoard[ghostY + e[1]][x + e[0]] = Block.GHOST_IDENTIFIY_NUMBER;
+            if (offset >= (BOARD_WIDTH + 4))
+                boardStringBuilder.setCharAt(
+                        offset,
+                        blockCharMap.get(Block.GHOST_IDENTIFIY_NUMBER));
+
         });
-        // foreach는 병렬적으로 연산하므로 순서대로 하기 위해서 이리함
         block.getCoordiList()
-                .forEach(e -> visualBoard[y + e[1]][x + e[0]] = block.getVisualShape(e[0], e[1]));
+                .forEach(e -> {
+                    int offset = (BOARD_WIDTH + 4) + (y + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x
+                            + e[0];
+                    visualBoard[y + e[1]][x + e[0]] = block.getVisualShape(e[0], e[1]);
+                    if (offset >= (BOARD_WIDTH + 4))
+                        boardStringBuilder.setCharAt(
+                                (BOARD_WIDTH + 4) + (y + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0],
+                                blockCharMap.get(block.getIdentifynumber()));
+                });
+        boardStringBuilder.replace(0, 12, "XXXXXXXXXXXX");
+        gamePane.setText(boardStringBuilder.toString());
+        paintBlock();
     }
 
     // 주어진 board에 Block을 놓아주는 메소드(오버로딩)
@@ -479,13 +555,32 @@ public abstract class GameController implements GameMethod {
         });
     }
 
+    // board에서 블록을 지워주는 method
+    void eraseBlock(int[][] board, Block block, int x, int y, StringBuilder boardStringBuilder) {
+        block.getCoordiList().forEach(e -> {
+            int offset = (BOARD_WIDTH + 4) + (y + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0];
+            board[y + e[1]][x + e[0]] = 0;
+            visualBoard[y + e[1]][x + e[0]] = 0;
+            visualBoard[ghostY + e[1]][x + e[0]] = 0;
+            if (offset >= (BOARD_WIDTH + 4)) {
+                boardStringBuilder.setCharAt(
+                        (BOARD_WIDTH + 4) + (y + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0],
+                        ' ');
+            }
+        });
+        block.getCoordiList().forEach(e -> boardStringBuilder.setCharAt(
+                (BOARD_WIDTH + 4) + (ghostY + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0],
+                ' '));
+        gamePane.setText(boardStringBuilder.toString());
+    }
+
     protected void moveDown() {
 
         if (isBottomFlag) {
             lockDelay();
             return;
         }
-        eraseBlock(board, currentBlock, x, y);
+        eraseBlock(board, currentBlock, x, y, boardStringBuilder);
         y++;
         placeBlock(board, visualBoard, currentBlock, x, y);
         gamePane.revalidate();
@@ -501,12 +596,11 @@ public abstract class GameController implements GameMethod {
 
     void dropDown() {
         if (isNotDropDownState) {
-            eraseBlock(board, currentBlock, x, y);
+            eraseBlock(board, currentBlock, x, y, boardStringBuilder);
             score += (201 - delay / 5) * ghostY - y;
             showScore();
             y = ghostY;
             placeBlock(board, visualBoard, currentBlock, x, y);
-            drawGameBoard();
             if (!isBottomFlag) {
                 isBottomFlag = true;
                 stopGameDelayTimer();
@@ -533,7 +627,7 @@ public abstract class GameController implements GameMethod {
     }
 
     public void moveRight() {
-        eraseBlock(board, currentBlock, x, y);
+        eraseBlock(board, currentBlock, x, y, boardStringBuilder);
         if (currentBlock == null) {
             return;
         }
@@ -548,7 +642,7 @@ public abstract class GameController implements GameMethod {
     }
 
     public void moveLeft() {
-        eraseBlock(board, currentBlock, x, y);
+        eraseBlock(board, currentBlock, x, y, boardStringBuilder);
         if (currentBlock == null) {
             return;
         }
@@ -562,7 +656,7 @@ public abstract class GameController implements GameMethod {
     }
 
     public void moveRotate() {
-        eraseBlock(board, currentBlock, x, y);
+        eraseBlock(board, currentBlock, x, y, boardStringBuilder);
         testRotation();
         placeBlock(board, visualBoard, currentBlock, x, y);
         boolean flag = checkIsItBottom();
@@ -683,6 +777,10 @@ public abstract class GameController implements GameMethod {
         return false;
     }
 
+    // 게임시작시 발동 메소드
+    public void doWhenGameStart() {
+    }
+
     // 게임오버시 발동 메소드
     public void doAfterGameOver() {
     }
@@ -696,18 +794,15 @@ public abstract class GameController implements GameMethod {
     }
 
     // 삭제줄 복사 메소드
-    private void drawAttackLine(int lines) {
+    private void drawAttackLines(int lines) {
+        attackLinesDeque.clear();
 
         if (opponent == null || opponent.attackLines > (BOARD_HEIGHT) / 2)
             return;
 
         // 만일 이번에 들어오는 줄로 공격할 줄이 10개를 넘어선다면
         if (opponent.attackLines + lines > (BOARD_HEIGHT) / 2)
-            lines = (BOARD_HEIGHT) / 2 - attackLines;
-
-        // 먼저 이미 공격 줄이 있다면 미리 스택에 넣어두고
-        for (int i = BOARD_HEIGHT - opponent.attackLines; i < BOARD_HEIGHT; i++)
-            attackLinesDeque.push(attackLineBoard[i].clone());
+            lines = (BOARD_HEIGHT) / 2 - opponent.attackLines;
 
         // 공격할 줄을 만들고 (구멍을 만드는 과정)
         int[][] temp = new int[MAX_BLOCK_HEIGHT][BOARD_WIDTH];
@@ -718,40 +813,56 @@ public abstract class GameController implements GameMethod {
         }
         placeBlock(temp, currentBlock, x, MAX_BLOCK_HEIGHT - currentBlock.getHeight());
 
-        // 구멍난 공격줄을 stack에 넣어주고 4-> 테트리미노 블록개수
-        for (int j = 0; j < MAX_BLOCK_HEIGHT; j++) {
+        // 구멍난 공격줄을 queue 넣어주고
+        for (int j = 3; j > 3 - lines; j--) {
             if (Arrays.stream(temp[j]).sum() > FULL_LINE) {
-                attackLinesDeque.push(
+                attackLinesDeque.offer(
                         Arrays.stream(temp[j]).map(e -> e % OVERLAP_BLOCK_NUMBER).toArray());
             }
         }
 
-        // stack에서 공격할 줄을 board에 넣어준다.
-        int size = attackLinesDeque.size();
-        for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1
-                - size; i--) {
-            attackLineBoard[i] = Arrays.copyOf(attackLinesDeque.pop(), BOARD_WIDTH);
-        }
+        System.out.println("현재 공격 줄 수 :" + opponent.attackLines);
 
-        // 그리고 그걸 attackLinePane에 표현한다.
-        attackLineStringBuilder.setLength(0);
-        for (int j = 0; j < BOARD_HEIGHT; j++) {
-            for (int i = 0; i < BOARD_WIDTH; i++) {
-                attackLineStringBuilder.append(blockCharMap.get(attackLineBoard[j][i]));
-            }
-            attackLineStringBuilder.append("\n");
-        }
-        opponent.attackLinePane.setText(attackLineStringBuilder.toString());
-        StyleConstants.setFontSize(attackBoardAttributeSet, 20);
-
-        StyledDocument doc = opponent.attackLinePane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), attackBoardAttributeSet, false);
+        // 그 다음 이미 있던 공격줄을 넣어주고
+        for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - opponent.attackLines - 1; i--)
+            attackLinesDeque.offer(Arrays.copyOf(opponent.attackLineBoard[i], BOARD_WIDTH));
 
         // 상대방 공격줄에 라인 추가
         opponent.attackLines += lines;
 
-        log.info("공격줄 추가 후");
-        showCurrent(attackLineBoard, currentBlock, x, y);
+        // stack에서 공격할 줄을 board에 넣어준다.
+        int size = attackLinesDeque.size();
+        System.out.println("이제 나올 공격 줄 수 :" + opponent.attackLines);
+        System.out.println("현재 큐 크기:" + size);
+        for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1
+                - size; i--) {
+            opponent.attackLineBoard[i] = Arrays.copyOf(attackLinesDeque.poll(), BOARD_WIDTH);
+        }
+
+        // 그리고 그걸 attackLinePane에 표현한다.
+        attackLineSB.setLength(0);
+        for (int j = 0; j < BOARD_HEIGHT; j++) {
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                attackLineSB.append(blockCharMap.get(opponent.attackLineBoard[j][i]));
+            }
+            attackLinesStringBuilder.replace((BOARD_WIDTH + 4) + (j * (BOARD_WIDTH + 3)),
+                    (BOARD_WIDTH + 4) + (j * (BOARD_WIDTH + 3)) + BOARD_WIDTH, attackLineSB.toString());
+            attackLineSB.setLength(0);
+        }
+
+        opponent.attackLinePane.setText(attackLinesStringBuilder.toString());
+
+        opponentAttackLinePaneDoc.setParagraphAttributes(0, opponentAttackLinePaneDoc.getLength(),
+                attackBoardAttributeSet, false);
+        StyleConstants.setForeground(blockAttributeSet, colorMap.get(Block.ATTACK_BLOCK_IDENTIFY_NUMBER));
+        for (int i = BOARD_HEIGHT - 1; i > BOARD_HEIGHT - 1 - opponent.attackLines; i--) {
+            opponent.attackLinePaneDoc.setCharacterAttributes(
+                    (BOARD_WIDTH + 4) + (i * (BOARD_WIDTH + 3)),
+                    BOARD_WIDTH,
+                    blockAttributeSet,
+                    true);
+        }
+
     }
 
     // 공격받는중
@@ -772,19 +883,9 @@ public abstract class GameController implements GameMethod {
         attackLinesDeque.clear();
         initZeroBoard(attackLineBoard);
 
-        // 그리고 그걸 attackLinePane에 표현한다.
-        StringBuilder sb = new StringBuilder();
-        for (int j = 0; j < BOARD_HEIGHT; j++) {
-            for (int i = 0; i < BOARD_WIDTH; i++) {
-                sb.append(" ");
-            }
-            sb.append("\n");
-        }
-        attackLinePane.setText(sb.toString());
-        StyleConstants.setFontSize(attackBoardAttributeSet, 20);
-
-        StyledDocument doc = attackLinePane.getStyledDocument();
-        doc.setParagraphAttributes(0, doc.getLength(), attackBoardAttributeSet, false);
+        // 나의 attacakLinePane 비워주기
+        initAttackLines();
+        initGameBoard();
 
     }
 
@@ -804,12 +905,13 @@ public abstract class GameController implements GameMethod {
         if (fullyLines > 0) {
             startindex = startindex - fullyLines + 1;
             if (fullyLines > 1)
-                drawAttackLine(fullyLines);
+                drawAttackLines(fullyLines);
             launchDeleteLineAnimation(startindex, fullyLines);
             delay -= delay > 250 ? 5 - 2 * diffMode % 2 : 0;
             score += 20 * fullyLines;
             showScore();
         }
+        itemLines += fullyLines;
         deleteLines += fullyLines;
         return existFullyLine;
     }
@@ -834,6 +936,7 @@ public abstract class GameController implements GameMethod {
         int totaldelay = count * aniDelay;
         aniTimer = new Timer(totaldelay, e -> {
             overWriteLines(index, lines);
+            showDeleteLines();
             takeOutNextBlock();
             gamePane.addKeyListener(gameKeyListener);
         });
@@ -845,11 +948,9 @@ public abstract class GameController implements GameMethod {
 
     // 줄색칠 메소드
     private void paintLines(int index, int lines, Color color) {
-        StyledDocument doc = gamePane.getStyledDocument();
-        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(blockAttributeSet, color);
         for (int i = 0; i < lines; i++) {
-            doc.setCharacterAttributes(
+            gamePaneDoc.setCharacterAttributes(
                     (BOARD_WIDTH + 4) + (index + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3),
                     BOARD_WIDTH,
                     blockAttributeSet, true);
@@ -866,7 +967,6 @@ public abstract class GameController implements GameMethod {
         int xbuffer = currentBlock.getItemCoordinate()[0] + x;
         int ybuffer = currentBlock.getItemCoordinate()[1] + y;
         placeSquare(xbuffer, ybuffer);
-        drawGameBoard();
         for (count = 0; count < 10; count++) {
             if (count % 2 == 0)
                 aniTimer = new Timer(count * aniDelay,
@@ -881,7 +981,6 @@ public abstract class GameController implements GameMethod {
         aniTimer = new Timer(totaldelay, e -> {
             deleteSquare(xbuffer, ybuffer);
             fixBoard();
-            drawGameBoard();
             takeOutNextBlock();
             isBottomFlag = checkBlockCollision(x, y);
             gamePane.addKeyListener(gameKeyListener);
@@ -893,8 +992,6 @@ public abstract class GameController implements GameMethod {
 
     // 사각형 색칠 메소드
     private void paintSquare(int x, int y, Color color) {
-        StyledDocument doc = gamePane.getStyledDocument();
-        SimpleAttributeSet blockAttributeSet = new SimpleAttributeSet();
         StyleConstants.setForeground(blockAttributeSet, color);
         int bombLength = ((BOMB_RANGE - 1) / 2);
         int xbuffer = x - bombLength;
@@ -904,7 +1001,7 @@ public abstract class GameController implements GameMethod {
             if (ybuffer + i < BOARD_END_HEIGHT) {
                 for (int j = 0; j < BOMB_RANGE; j++) {
                     if (xbuffer + j > -1 && xbuffer + j < BOARD_WIDTH) {
-                        doc.setCharacterAttributes(offset + i * (BOARD_WIDTH + 3) + j, 1,
+                        gamePaneDoc.setCharacterAttributes(offset + i * (BOARD_WIDTH + 3) + j, 1,
                                 blockAttributeSet, true);
                     }
                 }
@@ -934,6 +1031,10 @@ public abstract class GameController implements GameMethod {
                     if (x + j > -1 && x + j < BOARD_WIDTH) {
                         board[y + i][x + j] = 0;
                         visualBoard[y + i][x + j] = 0;
+                        int offset = (BOARD_WIDTH + 4) + (y + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + j;
+                        boardStringBuilder.setCharAt(offset, ' ');
+                        gamePane.setText(boardStringBuilder.toString());
+                        paintBlock();
                     }
                 }
         }
@@ -971,9 +1072,9 @@ public abstract class GameController implements GameMethod {
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
         nextBlock = getBlock(blockDeque.removeFirst());
-        if (gameMode == ITEM_GAME_MODE && deleteLines > 10) {
+        if (gameMode == ITEM_GAME_MODE && itemLines >= 10) {
             nextBlock.makeItemBlock();
-            deleteLines = 0;
+            itemLines = 0;
             isItemFlag = true;
         }
         drawNextBlock();
@@ -985,7 +1086,6 @@ public abstract class GameController implements GameMethod {
             y--;
         }
         placeBlock(board, visualBoard, currentBlock, x, y);
-        drawGameBoard();
         isBottomFlag = checkIsItBottom();
         isNotDropDownState = true;
         doAfterTakeOutNextBlock();
@@ -999,6 +1099,9 @@ public abstract class GameController implements GameMethod {
             for (int i = 0; i < block.getWidth(); i++) {
                 board[j][x + i] = 0;
                 visualBoard[j][x + i] = 0;
+                int offset = (BOARD_WIDTH + 4) + (j - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + i;
+                if (offset >= (BOARD_WIDTH + 4))
+                    boardStringBuilder.setCharAt(offset, ' ');
             }
         }
         placeBlock(board, visualBoard, block, x, yTemp);
@@ -1015,7 +1118,6 @@ public abstract class GameController implements GameMethod {
         nextBlock = getBlock(blockDeque.removeFirst());
 
         placeBlock(board, visualBoard, currentBlock, x, y);
-        drawGameBoard();
         drawNextBlock();
     }
 
@@ -1026,11 +1128,6 @@ public abstract class GameController implements GameMethod {
         int leftKey;
         int rightKey;
         int stackKey;
-        int up2Key;
-        int down2Key;
-        int left2Key;
-        int right2Key;
-        int stack2Key;
 
         private void initAllKey() {
             initUpKey();
@@ -1058,28 +1155,24 @@ public abstract class GameController implements GameMethod {
         private void initUpKey() {
             gameKeyMap.put(new KeyPair(upKey, focusing), () -> {
                 moveRotate();
-                drawGameBoard();
             });
         }
 
         private void initDownKey() {
             gameKeyMap.put(new KeyPair(downKey, focusing), () -> {
                 moveDown();
-                drawGameBoard();
             });
         }
 
         private void initLeftKey() {
             gameKeyMap.put(new KeyPair(leftKey, focusing), () -> {
                 moveLeft();
-                drawGameBoard();
             });
         }
 
         private void initRightKey() {
             gameKeyMap.put(new KeyPair(rightKey, focusing), () -> {
                 moveRight();
-                drawGameBoard();
             });
         }
 
@@ -1121,6 +1214,7 @@ public abstract class GameController implements GameMethod {
         int endIndex = startIndex + lines;
         for (int i = startIndex; i < endIndex; i++)
             overWriteLine(i);
+        initGameBoard();
     }
 
     private void overWriteLine(int index) {
@@ -1170,30 +1264,25 @@ public abstract class GameController implements GameMethod {
     }
 
     public void endGame() {
-        Timer endGameTimer = new Timer(2, e -> {
-            stopGameDelayTimer();
-            initZeroBoard(board);
-            initZeroBoard(visualBoard);
-            initZeroBoard(boardBuffer);
-            isBottomFlag = false;
-            blockDeque.clear();
+        Timer endGameTimer = new Timer(50, e -> {
+            stopGame();
+
         });
         endGameTimer.setRepeats(false);
         endGameTimer.start();
     }
 
     public void stopGame() {
-        x = START_X;
-        y = START_Y;
+        delayFlag = false;
         stopGameDelayTimer();
         initZeroBoard(board);
         initZeroBoard(visualBoard);
         initZeroBoard(boardBuffer);
         isBottomFlag = false;
         blockDeque.clear();
-        blockBuffer = null;
-        currentBlock = null;
-        nextBlock = null;
+        x = START_X;
+        y = START_Y;
+        boardStringBuilder.setLength(0);
     }
 
     public static void showCurrent(int[][] board, Block block, int x, int y) {
@@ -1214,6 +1303,15 @@ public abstract class GameController implements GameMethod {
 
     private void showScore() {
         scoreLabel.setText(String.format("%d", score));
+    }
+
+    protected void showDeleteLines() {
+        if (linesLabel != null)
+            linesLabel.setText(String.format("%d라인", deleteLines));
+    }
+
+    protected void setDeleteLines(JLabel linesLabel) {
+        this.linesLabel = linesLabel;
     }
 
     public void restartGameDelayTimer() {

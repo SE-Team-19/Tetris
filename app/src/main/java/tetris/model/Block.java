@@ -43,7 +43,7 @@ public abstract class Block {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };
         color = Color.YELLOW;
         identifynumber = 1;
-        attachItemID = 0;
+        attachItemID = -1;
         rotateCount = FIRST_ROTATE_STATE;
         initVisualShapeAndXYList(identifynumber);
         itemCoordinate = new int[] { 0, 0 };

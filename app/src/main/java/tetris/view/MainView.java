@@ -1,9 +1,12 @@
 package tetris.view;
 
 import static javax.swing.SwingConstants.CENTER;
-import java.awt.GridLayout;
+import java.awt.*;
 
 import java.util.*;
+import java.util.List;
+
+import javax.swing.JDialog;
 
 public class MainView extends MasterView {
 

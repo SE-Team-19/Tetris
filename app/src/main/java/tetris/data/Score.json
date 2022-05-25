@@ -1,7 +1,132 @@
 [
   {
+    "name": " 이름입니다.",
+    "score": 346,
+    "difficulty": "easy"
+  },
+  {
     "name": "adf ",
     "score": 275,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsf",
+    "score": 270,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 267,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfasf",
+    "score": 267,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 262,
+    "difficulty": "normal"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 256,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdafasdf",
+    "score": 250,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 148,
+    "difficulty": "easy"
+  },
+  {
+    "name": "ggdfg",
+    "score": 125,
+    "difficulty": "easy"
+  },
+  {
+    "name": " sdfsdf",
+    "score": 121,
+    "difficulty": "easy"
+  },
+  {
+    "name": " asdasd",
+    "score": 119,
+    "difficulty": "easy"
+  },
+  {
+    "name": "  sdfsdf",
+    "score": 119,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 119,
+    "difficulty": "easy"
+  },
+  {
+    "name": " sdfasdf",
+    "score": 118,
+    "difficulty": "easy"
+  },
+  {
+    "name": "dfsdf ",
+    "score": 113,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfasdf",
+    "score": 112,
+    "difficulty": "normal"
+  },
+  {
+    "name": "asdfasdf",
+    "score": 112,
+    "difficulty": "easy"
+  },
+  {
+    "name": "aaa",
+    "score": 112,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 112,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 111,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfasfd",
+    "score": 111,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sasdfasdf",
+    "score": 111,
+    "difficulty": "easy"
+  },
+  {
+    "name": "이유가 뭔데 대체",
+    "score": 110,
+    "difficulty": "easy"
+  },
+  {
+    "name": "dfsdf",
+    "score": 107,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdfsdd",
+    "score": 106,
     "difficulty": "easy"
   },
   {
@@ -63,5 +188,40 @@
     "name": "없음",
     "score": 0,
     "difficulty": "없음"
+  },
+  {
+    "name": "sdfsd",
+    "score": 0,
+    "difficulty": "normal"
+  },
+  {
+    "name": " sdf",
+    "score": 0,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sadfasdf",
+    "score": 0,
+    "difficulty": "easy"
+  },
+  {
+    "name": " sdfsd",
+    "score": 0,
+    "difficulty": "easy"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 0,
+    "difficulty": "easy"
+  },
+  {
+    "name": "ㄴㅇㄹㄴㅇㄹ",
+    "score": 0,
+    "difficulty": "easy"
+  },
+  {
+    "name": "   ㄴㅇㄹㄴㅇ",
+    "score": 0,
+    "difficulty": "easy"
   }
 ]

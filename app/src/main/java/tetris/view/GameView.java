@@ -1,10 +1,8 @@
 package tetris.view;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 
 public class GameView extends MasterView {
 
@@ -17,21 +15,36 @@ public class GameView extends MasterView {
     public static final char ONELINE_CHAR = 'L';
     public static final char GHOST_CHAR = 'G';
     public static final String RETURN_STRING = "Return";
+    public static final String TIME_ATTACK_STRING = "남은 시간";
+    public static final String STOP_WATCH_STRING = "진행 시간";
+
+    private JTextPane singlePlayerGameBoardPane;
+    private JTextPane singlePlayerNextBlockPane;
+    private JLabel singleScoreLabel;
+    private JLabel singleLinesLabel;
+    private JLabel singleGameDisplayTimeLabel;
+    private JLabel singleGameTimeLabel;
+    private JLabel gameOverLabel;
+    private JLabel victoryLabel;
+    private JLabel depeatLabel;
 
     private JTextPane playerOneGameBoardPane;
     private JTextPane playerOneNextBlockPane;
     private JTextPane playerOneAttackLinePane;
     private JLabel playerOneScoreLabel;
-    private JLabel timeLabel;
+    private JLabel multiGameDisplayTimeLabel;
+    private JLabel multiGameTimeLabel;
     private JTextPane playerTwoGameBoardPane;
     private JTextPane playerTwoNextBlockPane;
     private JTextPane playerTwoAttackLinePane;
     private JLabel playerTwoScoreLabel;
+    private JLabel singleGameModeLabel;
+    private JLabel mulitiGameModeLabel;
+    private JLabel gameDiffLabel;
+
     private JTextArea gameOverTextArea;
 
-    private JPanel gameDisplayPanel;
     private JPanel singleGameDisplayPanel;
-    private JPanel playerTwoGameDisplayPanel;
     private JPanel multiGameDisplayPanel;
     private JPanel selectGamePanel;
     private JPanel selectMultiGamePanel;
@@ -56,6 +69,10 @@ public class GameView extends MasterView {
     private JButton mulitiGameBtn;
     private ArrayList<JButton> buttonArrayList;
 
+    private JLabel dialogMsg;
+    private JButton dialogYesBtn;
+    private JButton dialogNoBtn;
+
     private GameView() {
         initGameDisplayComponents();
         initSingleGameDisplayPanel();
@@ -71,11 +88,12 @@ public class GameView extends MasterView {
 
     public void resetGameView() {
         super.removeAll();
-        multiGameDisplayPanel.removeAll();
+        singlePlayerGameBoardPane.setText(null);
         playerOneGameBoardPane.setText(null);
         playerTwoGameBoardPane.setText(null);
-        multiGameDisplayPanel.add(singleGameDisplayPanel);
-        multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
+
+        singleGameDisplayPanel.remove(gameOverLabel);
+        singleGameDisplayPanel.add(singlePlayerGameBoardPane, addGridBagComponents(0, 2, 2, 5));
         super.add(selectGamePanel);
     }
 
@@ -94,139 +112,138 @@ public class GameView extends MasterView {
     }
 
     private void initGameDisplayComponents() {
-        gameDisplayPanel = initAndSetName("gameDisplayPanel", new JPanel());
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[] { 0, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 0.2, 1.0, Double.MIN_VALUE };
-        gameDisplayPanel.setLayout(gridBagLayout);
+
+        singleGameDisplayPanel = new JPanel();
+
+        singlePlayerGameBoardPane = initAndSetName("singlePlayerGameBoardPane", new JTextPane());
+        singlePlayerGameBoardPane.setBackground(Color.BLACK);
+        singlePlayerGameBoardPane.setEditable(false);
+
+        singlePlayerNextBlockPane = initAndSetName("singlePlayerNextBlockPane", new JTextPane());
+        singlePlayerNextBlockPane.setBackground(Color.BLACK);
+        singlePlayerNextBlockPane.setEditable(false);
+
+        singleScoreLabel = new JLabel("0");
+        singleScoreLabel.setFocusable(false);
+        singleScoreLabel.setBackground(BASIC_BACKGROUND_COLOR);
+        singleScoreLabel.setForeground(BASIC_FONT_COLOR);
+
+        singleLinesLabel = new JLabel("0");
+        singleLinesLabel.setFocusable(false);
+        singleLinesLabel.setBackground(BASIC_BACKGROUND_COLOR);
+        singleLinesLabel.setForeground(BASIC_FONT_COLOR);
+
+        singleGameDisplayTimeLabel = new JLabel("TIME");
+
+        singleGameTimeLabel = new JLabel("0");
+        singleGameTimeLabel.setFocusable(false);
+        singleGameTimeLabel.setBackground(BASIC_BACKGROUND_COLOR);
+        singleGameTimeLabel.setForeground(BASIC_FONT_COLOR);
 
         playerOneGameBoardPane = initAndSetName("playerOneGameBoardPane", new JTextPane());
         playerOneGameBoardPane.setBackground(Color.BLACK);
         playerOneGameBoardPane.setEditable(false);
-        CompoundBorder border = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 10),
-                BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
-        playerOneGameBoardPane.setBorder(border);
 
         playerOneNextBlockPane = initAndSetName("playerOneNextBlockPane", new JTextPane());
         playerOneNextBlockPane.setEditable(false);
         playerOneNextBlockPane.setBackground(Color.BLACK);
-        playerOneNextBlockPane.setBorder(border);
         playerOneNextBlockPane.setFocusable(false);
 
         playerOneAttackLinePane = initAndSetName("playerOneAttackLinePane", new JTextPane());
         playerOneAttackLinePane.setEditable(false);
         playerOneAttackLinePane.setBackground(Color.BLACK);
-        playerOneAttackLinePane.setBorder(border);
         playerOneAttackLinePane.setFocusable(false);
 
         playerOneScoreLabel = new JLabel("0");
         playerOneScoreLabel.setFocusable(false);
-        playerOneScoreLabel.setBackground(BASIC_BACKGROUND_COLOR);
-        playerOneScoreLabel.setForeground(BASIC_FONT_COLOR);
 
         playerTwoGameBoardPane = new JTextPane();
         playerTwoGameBoardPane.setBackground(Color.BLACK);
         playerTwoGameBoardPane.setEditable(false);
-        playerTwoGameBoardPane.setBorder(border);
 
         playerTwoScoreLabel = new JLabel("0");
         playerTwoScoreLabel.setFocusable(false);
-        playerTwoScoreLabel.setBackground(BASIC_BACKGROUND_COLOR);
-        playerTwoScoreLabel.setForeground(BASIC_FONT_COLOR);
 
         playerTwoNextBlockPane = new JTextPane();
         playerTwoNextBlockPane.setEditable(false);
         playerTwoNextBlockPane.setBackground(Color.BLACK);
-        playerTwoNextBlockPane.setBorder(border);
         playerTwoNextBlockPane.setFocusable(false);
 
         playerTwoAttackLinePane = new JTextPane();
         playerTwoAttackLinePane.setEditable(false);
         playerTwoAttackLinePane.setBackground(Color.BLACK);
-        playerTwoAttackLinePane.setBorder(border);
         playerTwoAttackLinePane.setFocusable(false);
 
-        timeLabel = new JLabel("");
-        timeLabel.setFocusable(false);
+        multiGameDisplayPanel = new JPanel();
+
+        multiGameDisplayTimeLabel = new JLabel(STOP_WATCH_STRING);
+        multiGameDisplayTimeLabel.setHorizontalAlignment(JLabel.RIGHT);
+
+        multiGameTimeLabel = new JLabel("");
+        multiGameTimeLabel.setHorizontalAlignment(JLabel.LEFT);
+        multiGameTimeLabel.setFocusable(false);
+        multiGameTimeLabel.setForeground(Color.orange);
+
+        mulitiGameModeLabel = new JLabel("게임모드");
+        singleGameModeLabel = new JLabel("게임모드");
+        gameDiffLabel = new JLabel("난이도");
+
+        gameOverLabel = new JLabel("Game Over");
+        victoryLabel = new JLabel("WIN!");
+        depeatLabel = new JLabel("Loose...");
 
         buttonArrayList = new ArrayList<>();
     }
 
-    private void initGameDisplayPanel() {
-
-    }
-
     private void initSingleGameDisplayPanel() {
-        singleGameDisplayPanel = initAndSetName("singleGameDisplayPanel", new JPanel());
         GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 1.0, 0.5, 0.5, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 0.1, 0.1, Double.MIN_VALUE, 0.5, 0.5, 0.5, 0.5, Double.MIN_VALUE };
         singleGameDisplayPanel.setLayout(gridBagLayout);
 
-        JPanel scorePane = new JPanel();
-        scorePane.setLayout(new GridLayout(2, 1, 0, 0));
-        scorePane.setFocusable(true);
-        scorePane.add(new JLabel("Score"));
-        scorePane.add(playerOneScoreLabel);
+        singleGameDisplayPanel.add(singleGameModeLabel, addGridBagComponents(0, 0, 4, 1));
+        singleGameDisplayPanel.add(gameDiffLabel, addGridBagComponents(0, 1, 4, 1));
 
-        JPanel timePane = new JPanel();
-        timePane.setLayout(new GridLayout(2, 1, 0, 0));
-        timePane.setFocusable(false);
-        timePane.add(new JLabel("Time"));
-        timePane.add(timeLabel);
-
-        singleGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 0, 1, 3));
-        singleGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 0, 2, 1));
-        // singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        // singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-        // singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2,
-        // 1, 1, 2));
-        singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        singleGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
-        singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 2, 2, 2));
+        singleGameDisplayPanel.add(singlePlayerGameBoardPane, addGridBagComponents(0, 2, 2, 5));
+        singleGameDisplayPanel.add(singlePlayerNextBlockPane, addGridBagComponents(2, 2, 2, 1));
+        singleGameDisplayPanel.add(singleGameDisplayTimeLabel, addGridBagComponents(2, 3, 1, 1));
+        singleGameDisplayPanel.add(singleGameTimeLabel, addGridBagComponents(2, 4, 1, 1));
+        singleGameDisplayPanel.add(new JLabel("Score"), addGridBagComponents(3, 3, 1, 1));
+        singleGameDisplayPanel.add(singleScoreLabel, addGridBagComponents(3, 4, 1, 1));
+        singleGameDisplayPanel.add(new JLabel("deleteLines"), addGridBagComponents(2, 5, 1, 1));
+        singleGameDisplayPanel.add(singleLinesLabel, addGridBagComponents(2, 6, 1, 1));
         singleGameDisplayPanel.setFocusable(false);
     }
 
     private void initMultiGameDisplayPane() {
-        multiGameDisplayPanel = new JPanel();
-        multiGameDisplayPanel.setLayout(new GridLayout(1, 2, 0, 0));
 
-        playerTwoGameDisplayPanel = new JPanel();
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0 };
-        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0 };
-        gridBagLayout.columnWeights = new double[] { 1.0, 0.5, 0.5, Double.MIN_VALUE };
-        gridBagLayout.rowWeights = new double[] { 1.0, 1.0, 1.0, Double.MIN_VALUE };
-        playerTwoGameDisplayPanel.setLayout(gridBagLayout);
+        GridBagLayout gbl_multiGameDisplayPanel = new GridBagLayout();
+        gbl_multiGameDisplayPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+        gbl_multiGameDisplayPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        gbl_multiGameDisplayPanel.columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        gbl_multiGameDisplayPanel.rowWeights = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4,
+                Double.MIN_VALUE };
+        multiGameDisplayPanel.setLayout(gbl_multiGameDisplayPanel);
 
-        JPanel scorePane = new JPanel();
-        scorePane.setLayout(new GridLayout(2, 1, 0, 0));
-        scorePane.setFocusable(false);
-        scorePane.add(new JLabel("Score"));
-        scorePane.add(playerTwoScoreLabel);
+        multiGameDisplayPanel.add(mulitiGameModeLabel, addGridBagComponents(0, 0, 4, 1));
+        multiGameDisplayPanel.add(multiGameDisplayTimeLabel, addGridBagComponents(1, 1, 1, 1));
+        multiGameDisplayPanel.add(multiGameTimeLabel, addGridBagComponents(2, 1, 1, 1));
+        multiGameDisplayPanel.add(new JLabel("Player 1"), addGridBagComponents(0, 2, 2, 1));
+        multiGameDisplayPanel.add(new JLabel("Player 2"), addGridBagComponents(2, 2, 2, 1));
 
-        JPanel timePane = new JPanel();
-        timePane.setLayout(new GridLayout(2, 1, 0, 0));
-        timePane.setFocusable(false);
-        timePane.add(new JLabel("Time"));
-        timePane.add(timeLabel);
+        multiGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 3, 1, 4));
+        multiGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 3, 1, 1));
+        multiGameDisplayPanel.add(new JLabel("Score"), addGridBagComponents(1, 4, 1, 1));
+        multiGameDisplayPanel.add(playerOneScoreLabel, addGridBagComponents(1, 5, 1, 1));
+        multiGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 6, 1, 1));
 
-        playerTwoGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(0, 0, 1, 3));
-        playerTwoGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(1, 0, 2, 1));
-        // playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        // playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-        // playerTwoGameDisplayPanel.add(playerTwoAttackLinePane,
-        // addGridBagComponents(2, 1, 1, 2));
-        playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-        playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
-        playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(1, 2, 2, 1));
-
-        multiGameDisplayPanel.add(singleGameDisplayPanel);
-        multiGameDisplayPanel.add(playerTwoGameDisplayPanel);
+        multiGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(2, 3, 1, 4));
+        multiGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(3, 3, 1, 1));
+        multiGameDisplayPanel.add(new JLabel("Score"), addGridBagComponents(3, 4, 1, 1));
+        multiGameDisplayPanel.add(playerTwoScoreLabel, addGridBagComponents(3, 5, 1, 1));
+        multiGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(3, 6, 1, 1));
     }
 
     private void initGameOverPanel() {
@@ -244,6 +261,7 @@ public class GameView extends MasterView {
         gameOverTextArea.setAlignmentX(CENTER_ALIGNMENT);
         gameOverTextArea.setAlignmentY(CENTER_ALIGNMENT);
         gameOverTextArea.setForeground(Color.RED);
+        gameOverTextArea.setBackground(Color.BLACK);
     }
 
     private void initSelectGamePane() {
@@ -343,6 +361,37 @@ public class GameView extends MasterView {
         buttonArrayList.add(diffReturnBtn);
     }
 
+    public void setGameOver() {
+        singleGameDisplayPanel.remove(singlePlayerGameBoardPane);
+        singleGameDisplayPanel.add(gameOverLabel, addGridBagComponents(0, 2, 2, 5));
+    }
+
+    public void resetSingleGameDisplayPane() {
+        singleGameDisplayPanel.remove(gameOverLabel);
+        singleGameDisplayPanel.add(singlePlayerGameBoardPane, addGridBagComponents(0, 2, 2, 5));
+    }
+
+    public void setPlayerOneWin() {
+        multiGameDisplayPanel.remove(playerOneGameBoardPane);
+        multiGameDisplayPanel.remove(playerTwoGameBoardPane);
+        multiGameDisplayPanel.add(victoryLabel, addGridBagComponents(0, 3, 1, 4));
+        multiGameDisplayPanel.add(depeatLabel, addGridBagComponents(2, 3, 1, 4));
+    }
+
+    public void setPlayerTwoWin() {
+        multiGameDisplayPanel.remove(playerOneGameBoardPane);
+        multiGameDisplayPanel.remove(playerTwoGameBoardPane);
+        multiGameDisplayPanel.add(depeatLabel, addGridBagComponents(0, 3, 1, 4));
+        multiGameDisplayPanel.add(victoryLabel, addGridBagComponents(2, 3, 1, 4));
+    }
+
+    public void resetMultiGameDisplayPane() {
+        multiGameDisplayPanel.remove(depeatLabel);
+        multiGameDisplayPanel.remove(victoryLabel);
+        multiGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 3, 1, 4));
+        multiGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(2, 3, 1, 4));
+    }
+
     public JPanel getSingleGameDisplayPane() {
         return this.singleGameDisplayPanel;
     }
@@ -361,6 +410,26 @@ public class GameView extends MasterView {
 
     public JPanel getSelectMultiGamePanel() {
         return this.selectMultiGamePanel;
+    }
+
+    public JTextPane getSinglePlayerGameBoardPane() {
+        return this.singlePlayerGameBoardPane;
+    }
+
+    public JTextPane getSinglePlayerOneNextBlockPane() {
+        return this.singlePlayerNextBlockPane;
+    }
+
+    public JLabel getSingleScoreLabel() {
+        return this.singleScoreLabel;
+    }
+
+    public JLabel getSingleGameDisplayTimeLabel() {
+        return this.singleGameDisplayTimeLabel;
+    }
+
+    public JLabel getSingleGameTimeLabel() {
+        return this.singleGameTimeLabel;
     }
 
     public JTextPane getPlayerOneGameBoardPane() {
@@ -395,8 +464,12 @@ public class GameView extends MasterView {
         return this.playerTwoScoreLabel;
     }
 
-    public JLabel getTimeLabel() {
-        return this.timeLabel;
+    public JLabel getMultiGameDisplayTimeLabel() {
+        return this.multiGameDisplayTimeLabel;
+    }
+
+    public JLabel getMultiGameTimeLabel() {
+        return this.multiGameTimeLabel;
     }
 
     public JButton getSingleGameBtn() {
@@ -475,7 +548,47 @@ public class GameView extends MasterView {
         return buttonArrayList;
     }
 
+    public JLabel getMultiGameModeLabel() {
+        return this.mulitiGameModeLabel;
+    }
+
+    public JLabel getGameDiffLabel() {
+        return this.gameDiffLabel;
+    }
+
     public JTextArea getGameOverTextArea() {
         return this.gameOverTextArea;
+    }
+
+    public JLabel getSingleGameModeLabel() {
+        return this.singleGameModeLabel;
+    }
+
+    public JLabel getSingleLinesLabel() {
+        return this.singleLinesLabel;
+    }
+
+    public JLabel getGameOverLabel() {
+        return this.gameOverLabel;
+    }
+
+    public JLabel getVictoryLabel() {
+        return this.victoryLabel;
+    }
+
+    public JLabel getDepeatLabel() {
+        return this.depeatLabel;
+    }
+
+    public JLabel getDialogMsg() {
+        return this.dialogMsg;
+    }
+
+    public JButton getDialogYesBtn() {
+        return this.dialogYesBtn;
+    }
+
+    public JButton getDialogNoBtn() {
+        return this.dialogNoBtn;
     }
 }
