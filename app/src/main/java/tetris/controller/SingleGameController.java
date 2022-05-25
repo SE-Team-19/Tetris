@@ -55,7 +55,6 @@ public class SingleGameController {
                 }
             }
         };
-
     }
 
     protected void startSingleGame(Setting setting) {

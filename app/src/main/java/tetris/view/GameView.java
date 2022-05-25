@@ -1,6 +1,7 @@
 package tetris.view;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -26,6 +27,7 @@ public class GameView extends MasterView {
     private JTextPane playerTwoNextBlockPane;
     private JTextPane playerTwoAttackLinePane;
     private JLabel playerTwoScoreLabel;
+    private JTextArea gameOverTextArea;
 
     private JPanel gameDisplayPanel;
     private JPanel singleGameDisplayPanel;
@@ -63,6 +65,7 @@ public class GameView extends MasterView {
         initSelectModePane();
         initSelectDiffPane();
         initGameOverPanel();
+        initGameOverTextArea();
         initView();
     }
 
@@ -178,9 +181,10 @@ public class GameView extends MasterView {
 
         singleGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 0, 1, 3));
         singleGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 0, 2, 1));
-//        singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-//        singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-//        singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2, 1, 1, 2));
+        // singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
+        // singleGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
+        // singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(2,
+        // 1, 1, 2));
         singleGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
         singleGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
         singleGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 2, 2, 2));
@@ -213,9 +217,10 @@ public class GameView extends MasterView {
 
         playerTwoGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(0, 0, 1, 3));
         playerTwoGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(1, 0, 2, 1));
-//        playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
-//        playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
-//        playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(2, 1, 1, 2));
+        // playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
+        // playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(1, 2, 1, 1));
+        // playerTwoGameDisplayPanel.add(playerTwoAttackLinePane,
+        // addGridBagComponents(2, 1, 1, 2));
         playerTwoGameDisplayPanel.add(scorePane, addGridBagComponents(1, 1, 1, 1));
         playerTwoGameDisplayPanel.add(timePane, addGridBagComponents(2, 1, 1, 1));
         playerTwoGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(1, 2, 2, 1));
@@ -232,6 +237,13 @@ public class GameView extends MasterView {
         inputName.setBackground(BASIC_BACKGROUND_COLOR);
         inputName.setForeground(BASIC_FONT_COLOR);
         gameOverPanel.add(inputName);
+    }
+
+    private void initGameOverTextArea() {
+        gameOverTextArea = new JTextArea("");
+        gameOverTextArea.setAlignmentX(CENTER_ALIGNMENT);
+        gameOverTextArea.setAlignmentY(CENTER_ALIGNMENT);
+        gameOverTextArea.setForeground(Color.RED);
     }
 
     private void initSelectGamePane() {
@@ -463,4 +475,7 @@ public class GameView extends MasterView {
         return buttonArrayList;
     }
 
+    public JTextArea getGameOverTextArea() {
+        return this.gameOverTextArea;
+    }
 }

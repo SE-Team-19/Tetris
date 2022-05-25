@@ -135,6 +135,15 @@ public class MasterView extends JPanel {
         }
     }
 
+    public class JTextArea extends javax.swing.JTextArea {
+        public JTextArea(String text) {
+            super.setText(text);
+            super.setBackground(BASIC_BACKGROUND_COLOR);
+            super.setForeground(BASIC_FONT_COLOR);
+            super.setFont(new Font(BASIC_FONT_FAMILY, Font.BOLD, 70));
+        }
+    }
+
     public class JPanel extends javax.swing.JPanel {
         public JPanel() {
             super();

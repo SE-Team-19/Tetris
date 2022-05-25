@@ -108,16 +108,15 @@ public class ViewController extends JFrame {
                 gj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
             }
 
-            for (JButton sj: settingView.getButtonArrayList()) {
+            for (JButton sj : settingView.getButtonArrayList()) {
                 sj.setFont(new Font("맑은 고딕", Font.BOLD, 20));
             }
-            for (JLabel sl: settingView.getLabelArrayList()) {
+            for (JLabel sl : settingView.getLabelArrayList()) {
                 sl.setFont(new Font("맑은 고딕", Font.BOLD, 20));
             }
             for (JToggleButton st : settingView.getToggleButtonArrayList()) {
                 st.setFont(new Font("맑은 고딕", Font.BOLD, 20));
             }
-
 
         } else if (screenWidthNum == 1) {
             for (JButton mj : mainView.getButtonList()) {
@@ -130,16 +129,15 @@ public class ViewController extends JFrame {
                 gj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
             }
 
-            for (JButton sj: settingView.getButtonArrayList()) {
+            for (JButton sj : settingView.getButtonArrayList()) {
                 sj.setFont(new Font("맑은 고딕", Font.BOLD, 28));
             }
-            for (JLabel sl: settingView.getLabelArrayList()) {
+            for (JLabel sl : settingView.getLabelArrayList()) {
                 sl.setFont(new Font("맑은 고딕", Font.BOLD, 28));
             }
             for (JToggleButton st : settingView.getToggleButtonArrayList()) {
                 st.setFont(new Font("맑은 고딕", Font.BOLD, 28));
             }
-
 
         } else if (screenWidthNum == 2) {
             for (JButton mj : mainView.getButtonList()) {
@@ -152,10 +150,10 @@ public class ViewController extends JFrame {
                 gj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
             }
 
-            for (JButton sj: settingView.getButtonArrayList()) {
+            for (JButton sj : settingView.getButtonArrayList()) {
                 sj.setFont(new Font("맑은 고딕", Font.BOLD, 25));
             }
-            for (JLabel sl: settingView.getLabelArrayList()) {
+            for (JLabel sl : settingView.getLabelArrayList()) {
                 sl.setFont(new Font("맑은 고딕", Font.BOLD, 25));
             }
             for (JToggleButton st : settingView.getToggleButtonArrayList()) {
@@ -275,6 +273,15 @@ public class ViewController extends JFrame {
             comp.addKeyListener(gameKeyListener);
         gameView.getPlayerOneGameBoardPane().addKeyListener(new StopKeyListener());
         gameView.getPlayerTwoGameBoardPane().addKeyListener(new StopKeyListener());
+
+        JTextArea gameOverTextArea = gameView.getGameOverTextArea();
+        gameOverTextArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                gameView.resetGameView();
+                transitView(contentPane, mainView, gameView);
+            }
+        });
     }
 
     public class StopKeyListener extends KeyAdapter {

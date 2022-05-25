@@ -55,14 +55,14 @@ public abstract class GameController implements GameMethod {
     protected Deque<Integer> blockDeque;
     protected Deque<Integer> opponentBlockDeque;
     private Deque<int[]> attackLinesDeque;
-  
+
     private StringBuilder boardStringBuilder;
     private StringBuilder nextBlockStringBuilder;
     private StringBuilder attackLineStringBuilder;
     int x;
     int y;
     int ghostY;
-  
+
     protected int score; // game 점수와 관련된 변수
     protected int attackLines;
     private int deleteLines;
@@ -137,9 +137,9 @@ public abstract class GameController implements GameMethod {
         nextBoardAttributeSet = new SimpleAttributeSet();
         attackBoardAttributeSet = new SimpleAttributeSet();
 
-//        setAttributeSet(boardAttributeSet);
-//        setAttributeSet(nextBoardAttributeSet);
-//        setAttributeSet(attackBoardAttributeSet);
+        // setAttributeSet(boardAttributeSet);
+        // setAttributeSet(nextBoardAttributeSet);
+        // setAttributeSet(attackBoardAttributeSet);
     }
 
     public void setOpponentPlayer(GameController opponent) {
@@ -1183,12 +1183,17 @@ public abstract class GameController implements GameMethod {
     }
 
     public void stopGame() {
+        x = START_X;
+        y = START_Y;
         stopGameDelayTimer();
         initZeroBoard(board);
         initZeroBoard(visualBoard);
         initZeroBoard(boardBuffer);
         isBottomFlag = false;
         blockDeque.clear();
+        blockBuffer = null;
+        currentBlock = null;
+        nextBlock = null;
     }
 
     public static void showCurrent(int[][] board, Block block, int x, int y) {
