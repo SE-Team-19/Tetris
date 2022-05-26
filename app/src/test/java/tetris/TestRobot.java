@@ -5,6 +5,9 @@ import java.awt.Robot;
 import java.awt.*;
 import java.awt.event.*;
 
+import tetris.controller.RobotController;
+import tetris.TestAllView;
+
 public class TestRobot extends Robot {
 
     public int delay;
@@ -36,4 +39,5 @@ public class TestRobot extends Robot {
         for (int i = 0; i < count; i++)
             Click(comp);
     }
+
 }

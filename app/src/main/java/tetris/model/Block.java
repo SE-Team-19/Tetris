@@ -38,6 +38,7 @@ public abstract class Block {
     public static final int ONELINEBLOCK_IDENTIFY_NUMBER = 10;
     public static final int BOMBBLOCK_IDENTIFY_NUMBER = 11;
     public static final int ATTACK_BLOCK_IDENTIFY_NUMBER = 12;
+    public static final int STUFF_BLOCK_IDENTIFY_NUMBER = 13;
 
     protected Block() {
         shape = new int[][] { { 1, 1 }, { 1, 1 } };
@@ -129,7 +130,7 @@ public abstract class Block {
     }
 
     public void makeItemBlock() {
-        int randomNumber = rnd.nextInt(3);
+        int randomNumber = rnd.nextInt(4);
         switch (randomNumber) {
             case 0:
                 copyBlock(new WeightBlock());
@@ -139,6 +140,9 @@ public abstract class Block {
                 return;
             case 2:
                 attachItem(ONELINEBLOCK_IDENTIFY_NUMBER);
+                return;
+            case 3:
+                attachItem(STUFF_BLOCK_IDENTIFY_NUMBER);
                 return;
             default:
                 copyBlock(new WeightBlock());

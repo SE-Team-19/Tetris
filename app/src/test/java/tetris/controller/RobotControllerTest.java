@@ -1,15 +1,31 @@
 package tetris.controller;
 
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import static org.assertj.core.api.Assertions.*;
+import static java.awt.event.KeyEvent.*;
 
-public class AIControllerTest {
-    AIController aiController = new AIController(new MultiGameController(new PlayerController()));
+import javax.swing.*;
+import java.awt.AWTException;
+import tetris.TestAllView;
+import tetris.TestRobot;
+
+public class RobotControllerTest {
+    ViewController frame;
+    RobotController robotController;
+    TestAllView testAllView;
+    TestRobot testRobot;
 
     @BeforeEach
     public void setUp() {
-
+        frame = new ViewController();
+        testAllView = new TestAllView();
+        try {
+            testRobot = new TestRobot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+        robotController = new RobotController(null);
+        assertThat(frame).isInstanceOf(JFrame.class);
     }
 
     @Test
@@ -39,7 +55,11 @@ public class AIControllerTest {
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                 { 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, };
-        aiController.calculateScore(board);
+        robotController.calculateScore(board);
+        assertThat(robotController.aggHeight).isEqualTo(48);
+        assertThat(robotController.completeLines).isEqualTo(0);
+        assertThat(robotController.bumpiness).isEqualTo(6);
+        assertThat(robotController.holes).isEqualTo(2);
 
         int[][] board2 = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -67,11 +87,16 @@ public class AIControllerTest {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
 
-        aiController.calculateScore(board2);
+        robotController.calculateScore(board2);
+        assertThat(robotController.aggHeight).isEqualTo(0);
+        assertThat(robotController.completeLines).isEqualTo(0);
+        assertThat(robotController.bumpiness).isEqualTo(0);
+        assertThat(robotController.holes).isEqualTo(0);
     }
 
-    @Test
-    void testMakeMatrixs() {
-
+    @AfterEach
+    public void tearDown() {
+        testAllView.removeAllEventListeners();
+        frame.dispose();
     }
 }

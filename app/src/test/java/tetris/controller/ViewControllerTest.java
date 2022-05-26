@@ -39,6 +39,7 @@ public class ViewControllerTest {
         testRobot.pressAndReleaseKeys(new int[] { VK_DOWN, VK_DOWN, VK_DOWN, VK_DOWN, VK_UP, VK_UP, VK_UP, VK_UP });
         testRobot.Click(frame.getFocusOwner());
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getSingleGameBtn());
+        testRobot.pressAndReleaseKeys(new int[] { VK_DOWN, VK_SPACE });
     }
 
     @Test
@@ -67,6 +68,8 @@ public class ViewControllerTest {
         testRobot.pressAndReleaseKeys(VK_DOWN);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getDiffReturnBtn());
         testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_DOWN, VK_SPACE, VK_LEFT, VK_SPACE });
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getGeneralModeBtn());
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE });
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getRobotGameBtn());
         testRobot.pressAndReleaseKeys(VK_RIGHT);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getLocalGameBtn());
@@ -74,6 +77,7 @@ public class ViewControllerTest {
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getOnlineGameBtn());
         testRobot.pressAndReleaseKeys(VK_DOWN);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getMultiGameReturnBtn());
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE });
     }
 
     @Test
@@ -101,6 +105,7 @@ public class ViewControllerTest {
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
+        testAllView.getGameView().resetGameView();
         frame.dispose();
     }
 

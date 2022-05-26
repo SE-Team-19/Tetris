@@ -14,11 +14,10 @@ import tetris.model.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GameControllerTest {
-
-    SingleGameController gameController = new SingleGameController(new PlayerController());
     ViewController frame;
     TestAllView testAllView;
     TestRobot testRobot;
+    MultiGameController gameController = new MultiGameController(new PlayerController(), frame);
     Deque<Integer> queue;
 
     @BeforeAll
@@ -30,12 +29,12 @@ public class GameControllerTest {
     public void setUp() {
         frame = new ViewController();
         testAllView = new TestAllView();
+        assertThat(frame).isInstanceOf(JFrame.class);
         try {
             testRobot = new TestRobot();
         } catch (AWTException e) {
             e.printStackTrace();
         }
-        assertThat(frame).isInstanceOf(JFrame.class);
     }
 
     @Test
@@ -49,10 +48,7 @@ public class GameControllerTest {
         int OBlockCount = 0;
         for (int i = 0; i < 100000; i++) {
             gameController.generateBlockRandomizer(GameController.EASY_MODE);
-            // System.out.println("현재크기" + gameController.randomBlockList.size());
             for (int j = 0; j < gameController.randomBlockList.size(); j++) {
-                // System.out.println("현재값 randomBlockList.get(" + j + "): " +
-                // gameController.randomBlockList.get(j));
                 switch (gameController.randomBlockList.get(j)) {
                     case Block.IBLOCK_IDENTIFY_NUMBER:
                         IBlockCount++;
@@ -141,26 +137,65 @@ public class GameControllerTest {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     public void testGameController() {
-        int keyInput[] = { VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE, VK_UP, VK_UP, VK_UP,
-                VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE };
-        testRobot.pressAndReleaseKeys(keyInput);
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE });
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("easy");
+        testRobot.pressAndReleaseKeys(new int[] { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE });
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_SPACE });
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_DOWN, VK_SPACE });
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE });
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
+    }
+
+    @Test
+    @Order(1)
+    public void testGameDiffMode() {
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE });
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("easy");
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE });
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_SPACE, VK_SPACE, VK_RIGHT, VK_SPACE });
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("normal");
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE });
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
+        testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_SPACE, VK_SPACE, VK_RIGHT, VK_RIGHT, VK_SPACE });
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("hard");
+        testRobot.pressAndReleaseKeys(new int[] { VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE });
+        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
+    }
+
+    @Test
+    @Order(3)
+    public void testAfterSingleGame() {
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE);
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("easy");
+        testRobot.pressAndReleaseKeys(
+                VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN,
+                VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN,
+                VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN);
+        testRobot.delay(5000);
+        testRobot.pressAndReleaseKeys(VK_SPACE);
+        testRobot.pressAndReleaseKeys(VK_T, VK_E, VK_S, VK_T, VK_ENTER);
         testRobot.pressAndReleaseKeys(VK_SPACE);
     }
 
     @Test
-    @Order(2)
-    public void testGameController2() {
-        int keyInput[] = { VK_SPACE, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_UP, VK_UP };
-        testRobot.pressAndReleaseKeys(keyInput);
+    @Order(4)
+    public void testTimeAttack() {
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE);
+        assertThat(testAllView.getGameView().getSingleGameDisplayTimeLabel().getText()).isEqualTo("남은 시간");
+        testRobot.delay(100000);
+        testRobot.delay(6000);
+        testRobot.pressAndReleaseKeys(VK_SPACE);
+        testRobot.pressAndReleaseKeys(VK_T, VK_E, VK_S, VK_T, VK_ENTER);
         testRobot.pressAndReleaseKeys(VK_SPACE);
     }
 
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
-        testAllView.getGameView().getPlayerOneGameBoardPane().setText("");
+        testAllView.getGameView().resetGameView();
         frame.dispose();
     }
 

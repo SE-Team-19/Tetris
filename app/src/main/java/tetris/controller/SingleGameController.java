@@ -12,6 +12,8 @@ import tetris.view.*;
 
 public class SingleGameController {
 
+    protected static final int GAME_TIME = 100;
+
     protected GameView gameView;
     protected ScoreView scoreView;
     protected MainView mainView;
@@ -28,6 +30,7 @@ public class SingleGameController {
     protected PlayerController playerController;
     protected ViewController viewController;
 
+    protected boolean isSingleGameModeFlag;
     protected int diffMode;
     protected int gameMode;
     protected int gameTime;
@@ -55,7 +58,12 @@ public class SingleGameController {
                 gamePlayer.endGame();
                 gameTimer.stop();
                 gameView.setGameOver();
-                gameView.getGameOverLabel().requestFocus();
+                Timer timer = new Timer(5000, e -> {
+                    gameView.getGameOverLabel().requestFocus();
+                });
+                timer.setRepeats(false);
+                timer.start();
+
             }
 
             @Override
@@ -78,7 +86,7 @@ public class SingleGameController {
 
     protected void startSingleGame(Setting setting) {
         this.setting = setting;
-
+        isSingleGameModeFlag = true;
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
 
@@ -166,7 +174,7 @@ public class SingleGameController {
 
     protected void startTimer(JLabel timeDescribtion, JLabel timeLabel) {
         if (gameMode == GameController.TIME_ATTACK_MODE) {
-            gameTime = 100;
+            gameTime = GAME_TIME;
             showTime(timeLabel);
             timeDescribtion.setText(GameView.TIME_ATTACK_STRING);
             startTimeAttack(timeLabel);
@@ -195,10 +203,14 @@ public class SingleGameController {
             gameTime--;
             showTime(timeLabel);
             if (gameTime == 0) {
-                gamePlayer.doAfterGameOver();
+                doAfterTimeAttack();
             }
         });
         gameTimer.start();
+    }
+
+    protected void doAfterTimeAttack() {
+        gamePlayer.doAfterGameOver();
     }
 
     protected void showTime(JLabel timeLabel) {

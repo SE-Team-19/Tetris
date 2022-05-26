@@ -25,6 +25,9 @@ public class TestAllView {
 
     public void removeAllEventListeners() {
         removeKeyListner(mainView, gameView, scoreView, settingView);
+        removeKeyListner(gameView.getSelectDiffPane(), gameView.getSelectGamePanel(), gameView.getSelectModePane(),
+                gameView.getSelectMultiGamePanel(), gameView.getSingleGameDisplayPane(),
+                gameView.getMulitiGameDisplayPane());
         removeActionListner(mainView, gameView, scoreView, settingView);
     }
 

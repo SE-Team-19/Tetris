@@ -15,8 +15,8 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetDisplayModeComboBox() {
-        assertThat(settingViewTest.getDisplayModeComboBox()).isInstanceOf(JComboBox.class);
+    void testGetDisplayComboBox() {
+        assertThat(settingViewTest.getDisplayComboBox()).isInstanceOf(JComboBox.class);
     }
 
     @Test
@@ -29,32 +29,34 @@ public class SettingViewTest {
         assertThat(settingViewTest.getInitKeyBtn()).isInstanceOf(JButton.class);
     }
 
-    void testGetExitKeyMenuBtn() {
-        assertThat(settingViewTest.getExitKeyMenuBtn()).isInstanceOf(JButton.class);
+    @Test
+    void testGetInitKeyGridReturnBtn() {
+        assertThat(settingViewTest.getInitKeyGridReturnBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
-    void testGetEnterResetMenuBtn() {
-        assertThat(settingViewTest.getEnterResetMenuBtn()).isInstanceOf(JButton.class);
+    void testGetInitMenuBtn() {
+        assertThat(settingViewTest.getInitMenuBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
-    void testGetExitResetMenuBtn() {
-        assertThat(settingViewTest.getExitResetMenuBtn()).isInstanceOf(JButton.class);
+    void testGetInitReturnBtn() {
+        assertThat(settingViewTest.getInitReturnBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
-    void testGetResetScoreBtn() {
-        assertThat(settingViewTest.getResetScoreBtn()).isInstanceOf(JButton.class);
+    void testGetInitScoreBtn() {
+        assertThat(settingViewTest.getInitScoreBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
-    void testGetResetSettingBtn() {
-        assertThat(settingViewTest.getResetSettingBtn()).isInstanceOf(JButton.class);
+    void testGetInitSettingBtn() {
+        assertThat(settingViewTest.getInitSettingBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
     void testGetIsColorBlindBtn() {
+        assertThat(settingViewTest.getIsColorBlindBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
@@ -68,8 +70,8 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetExitBtn() {
-        assertThat(settingViewTest.getExitBtn()).isInstanceOf(JButton.class);
+    void testGetReturnSettingToMainBtn() {
+        assertThat(settingViewTest.getReturnSettingToMainBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
@@ -78,33 +80,33 @@ public class SettingViewTest {
     }
 
     @Test
-    void testGetEnterDisplayMenuBtn() {
-        assertThat(settingViewTest.getEnterDisplayMenuBtn()).isInstanceOf(JButton.class);
+    void testGetSetDisplayBtn() {
+        assertThat(settingViewTest.getSetDisplayBtn()).isInstanceOf(JButton.class);
     }
 
     @Test
-    void testGetDownKeyBtn() {
-        assertThat(settingViewTest.getDownKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetDownKeyBtn() {
+        assertThat(settingViewTest.getSetDownKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
-    void testGetLeftKeyBtn() {
-        assertThat(settingViewTest.getLeftKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetLeftKeyBtn() {
+        assertThat(settingViewTest.getSetLeftKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
-    void testGetRightKeyBtn() {
-        assertThat(settingViewTest.getRightKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetRightKeyBtn() {
+        assertThat(settingViewTest.getSetRightKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
-    void testGetStackKeyBtn() {
-        assertThat(settingViewTest.getStackKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetStackKeyBtn() {
+        assertThat(settingViewTest.getSetStackKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test
-    void testGetUpKeyBtn() {
-        assertThat(settingViewTest.getUpKeyBtn()).isInstanceOf(JToggleButton.class);
+    void testGetSetUpKeyBtn() {
+        assertThat(settingViewTest.getSetUpKeyBtn()).isInstanceOf(JToggleButton.class);
     }
 
     @Test

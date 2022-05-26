@@ -45,6 +45,11 @@
     "difficulty": "easy"
   },
   {
+    "name": "test",
+    "score": 233,
+    "difficulty": "easy"
+  },
+  {
     "name": "sdfsdf",
     "score": 148,
     "difficulty": "easy"
@@ -143,6 +148,21 @@
     "name": "sdfsdfsdd",
     "score": 106,
     "difficulty": "easy"
+  },
+  {
+    "name": "sdfas",
+    "score": 23,
+    "difficulty": "normal"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 23,
+    "difficulty": "normal"
+  },
+  {
+    "name": "sdfsdf",
+    "score": 23,
+    "difficulty": "normal"
   },
   {
     "name": " sdfsdf",

@@ -12,6 +12,7 @@ public class GameView extends MasterView {
     public static final char BLOCK_CHAR = 'O';
     public static final char NULL_CHAR = ' ';
     public static final char BOMB_CHAR = 'T';
+    public static final char STUFF_CHAR = 'F';
     public static final char ONELINE_CHAR = 'L';
     public static final char GHOST_CHAR = 'G';
     public static final String RETURN_STRING = "Return";
@@ -94,8 +95,6 @@ public class GameView extends MasterView {
         playerOneGameBoardPane.setText(null);
         playerTwoGameBoardPane.setText(null);
 
-        singleGameDisplayPanel.remove(gameOverLabel);
-        singleGameDisplayPanel.add(singlePlayerGameBoardPane, addGridBagComponents(0, 2, 2, 5));
         super.add(selectGamePanel);
     }
 
@@ -447,6 +446,8 @@ public class GameView extends MasterView {
     public void resetMultiGameDisplayPane() {
         multiGameDisplayPanel.remove(depeatLabel);
         multiGameDisplayPanel.remove(victoryLabel);
+        victoryLabel.setText("WIN!");
+        depeatLabel.setText("Loose...");
         multiGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 3, 1, 4));
         multiGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(2, 3, 1, 4));
     }

@@ -32,12 +32,7 @@ public class MultiGameController extends SingleGameController {
         gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, multiGameFocusing) {
             @Override
             public void doAfterGameOver() {
-                gamePlayer1.endGame();
-                gamePlayer2.endGame();
-                gameRobot.endGame();
-                gameTimer.stop();
-                gameView.setPlayerTwoWin();
-                gameView.getVictoryLabel().requestFocus();
+                playerTwoWin();
             }
 
             @Override
@@ -56,12 +51,7 @@ public class MultiGameController extends SingleGameController {
         gamePlayer2 = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, multiGameFocusing) {
             @Override
             public void doAfterGameOver() {
-                gamePlayer1.endGame();
-                gamePlayer2.endGame();
-                gameRobot.endGame();
-                gameTimer.stop();
-                gameView.setPlayerOneWin();
-                gameView.getVictoryLabel().requestFocus();
+                playerOneWin();
             }
 
             @Override
@@ -86,12 +76,7 @@ public class MultiGameController extends SingleGameController {
 
             @Override
             public void doAfterGameOver() {
-                gamePlayer1.endGame();
-                gamePlayer2.endGame();
-                gameRobot.endGame();
-                gameTimer.stop();
-                gameView.setPlayerOneWin();
-                gameView.getVictoryLabel().requestFocus();
+                playerOneWin();
             }
 
             @Override
@@ -129,6 +114,7 @@ public class MultiGameController extends SingleGameController {
     public void startLocalGame(Setting setting) {
         this.setting = setting;
         multiMode = 0;
+        isSingleGameModeFlag = false;
         gamePlayer1.setOpponentPlayer(gamePlayer2);
         gamePlayer2.setOpponentPlayer(gamePlayer1);
         generateBlockRandomizer(GameController.NORMAL_MODE);
@@ -150,6 +136,7 @@ public class MultiGameController extends SingleGameController {
     public void startRobotGame(Setting setting) {
         this.setting = setting;
         multiMode = 1;
+        isSingleGameModeFlag = false;
         gamePlayer1.setOpponentPlayer(gameRobot);
         gameRobot.setOpponentPlayer(gamePlayer1);
         generateBlockRandomizer(GameController.NORMAL_MODE);
@@ -187,6 +174,50 @@ public class MultiGameController extends SingleGameController {
         else
             startRobotGame(setting);
         multiGameFocusing.requestFocus();
+    }
+
+    protected void playerOneWin() {
+        gamePlayer1.endGame();
+        gamePlayer2.endGame();
+        gameRobot.endGame();
+        gameTimer.stop();
+        gameView.setPlayerOneWin();
+        Timer timer = new Timer(5000, e -> {
+            gameView.getVictoryLabel().requestFocus();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    protected void playerTwoWin() {
+        gamePlayer1.endGame();
+        gamePlayer2.endGame();
+        gameRobot.endGame();
+        gameTimer.stop();
+        gameView.setPlayerTwoWin();
+        Timer timer = new Timer(5000, e -> {
+            gameView.getVictoryLabel().requestFocus();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    @Override
+    protected void doAfterTimeAttack() {
+        if (isSingleGameModeFlag)
+            super.doAfterTimeAttack();
+        else {
+            if (gamePlayer1.score > gamePlayer2.score) {
+                playerOneWin();
+            } else if (gamePlayer1.score < gamePlayer2.score) {
+                playerTwoWin();
+            } else {
+                gameView.getVictoryLabel().setText("Draw");
+                gameView.getDepeatLabel().setText("Draw");
+                playerOneWin();
+            }
+        }
+
     }
 
 }

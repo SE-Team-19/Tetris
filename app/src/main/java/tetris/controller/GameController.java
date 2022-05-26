@@ -26,6 +26,7 @@ public abstract class GameController implements GameMethod {
     static final int START_X = 3;
     static final int START_Y = BOARD_START_HEIGHT - 1;
     private static final int BOMB_RANGE = 5; // 홀수만 가능
+    private static final int STUFF_RANGE = 3; // 홀수만 가능
     private static final int MAX_BLOCK_HEIGHT = 4;
     private static final int NEXT_BLOCK_WIDTH = 6;
     private static final int UNFIXED_BLOCK_NUMBER = 1;
@@ -46,9 +47,9 @@ public abstract class GameController implements GameMethod {
     private int delay;
     private int diffMode; // 난이도 설정
     private int gameMode; // 게임모드 설정
-    Block currentBlock;
-    Block nextBlock;
-    Block blockBuffer;
+    protected Block currentBlock;
+    protected Block nextBlock;
+    protected Block blockBuffer;
 
     protected int[][] visualBoard;
     protected int[][] board; // gamePane 의 'X' size를 결정하기 위한 변수
@@ -229,6 +230,7 @@ public abstract class GameController implements GameMethod {
         blockCharMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, GameView.ONELINE_CHAR);
         blockCharMap.put(Block.NULL_IDENTIFY_NUMBER, GameView.NULL_CHAR);
         blockCharMap.put(Block.ATTACK_BLOCK_IDENTIFY_NUMBER, GameView.BLOCK_CHAR);
+        blockCharMap.put(Block.STUFF_BLOCK_IDENTIFY_NUMBER, GameView.STUFF_CHAR);
     }
 
     private void initColorMap() {
@@ -238,6 +240,7 @@ public abstract class GameController implements GameMethod {
         colorMap.put(Block.GHOST_IDENTIFIY_NUMBER, new Color(200, 200, 200));
         colorMap.put(Block.BOMBBLOCK_IDENTIFY_NUMBER, Color.RED);
         colorMap.put(Block.ATTACK_BLOCK_IDENTIFY_NUMBER, Color.GRAY);
+        colorMap.put(Block.STUFF_BLOCK_IDENTIFY_NUMBER, Color.PINK);
         if (isColorBlindMode) {
             colorMap.put(Block.IBLOCK_IDENTIFY_NUMBER, new IBlock().getBlindColor());
             colorMap.put(Block.JBLOCK_IDENTIFY_NUMBER, new JBlock().getBlindColor());
@@ -441,7 +444,7 @@ public abstract class GameController implements GameMethod {
                     offset,
                     GameView.BLOCK_CHAR);
         });
-        if (nextBlock.getAttachItemID() > 0) {
+        if (isItemFlag) {
             int[] itemCoordinate = nextBlock.getItemCoordinate();
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
                     + itemCoordinate[0] + 1;
@@ -460,7 +463,7 @@ public abstract class GameController implements GameMethod {
                     blockAttributeSet,
                     false);
         }
-        if (nextBlock.getAttachItemID() > 0) {
+        if (isItemFlag) {
             int[] itemCoordinate = nextBlock.getItemCoordinate();
             StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getAttachItemID()));
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
@@ -501,7 +504,7 @@ public abstract class GameController implements GameMethod {
                     StyleConstants.setForeground(blockAttributeSet, colorMap.get(visualBoard[i][j]));
                     gamePaneDoc.setCharacterAttributes(
                             (BOARD_WIDTH + 4) + (i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + j, 1,
-                            blockAttributeSet, false);
+                            blockAttributeSet, true);
                 }
             }
         }
@@ -532,6 +535,15 @@ public abstract class GameController implements GameMethod {
                                 (BOARD_WIDTH + 4) + (y + e[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + e[0],
                                 blockCharMap.get(block.getIdentifynumber()));
                 });
+        if (currentBlock.getAttachItemID() > 0) {
+            int[] itemCoordinate = currentBlock.getItemCoordinate();
+            int offset = (BOARD_WIDTH + 4) + (y + itemCoordinate[1] - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x
+                    + itemCoordinate[0];
+            if (offset >= (BOARD_WIDTH + 4))
+                boardStringBuilder.setCharAt(
+                        offset,
+                        blockCharMap.get(currentBlock.getAttachItemID()));
+        }
         boardStringBuilder.replace(0, 12, "XXXXXXXXXXXX");
         gamePane.setText(boardStringBuilder.toString());
         paintBlock();
@@ -767,7 +779,7 @@ public abstract class GameController implements GameMethod {
     // 게임오버플래그 설정
     private boolean isGameOver() {
         for (int i = 0; i < BOARD_WIDTH; i++) {
-            if (board[BOARD_START_HEIGHT - 1][i] > 0)
+            if (board[BOARD_START_HEIGHT][i] > 0)
                 return true;
         }
         return false;
@@ -874,7 +886,6 @@ public abstract class GameController implements GameMethod {
         copyBoard(visualBoard, boardBuffer);
         copyBoard(attackLineBoard, visualBoard, BOARD_END_HEIGHT - 1);
         copyBoard(boardBuffer, visualBoard, BOARD_END_HEIGHT - attackLines - 1);
-        showCurrent(visualBoard, currentBlock, x, y);
         attackLines = 0;
         attackLinesDeque.clear();
         initZeroBoard(attackLineBoard);
@@ -890,13 +901,17 @@ public abstract class GameController implements GameMethod {
         boolean existFullyLine = false;
         int fullyLines = 0;
         int startindex = -1;
-        for (int i = 0; i < BOARD_END_HEIGHT; i++) {
-            int sum = Arrays.stream(board[i]).sum();
-            if (sum > 19) {
+        int blockNums = 0;
+        for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++)
+                if (board[i][j] > 1)
+                    blockNums += board[i][j];
+            if (blockNums >= 20) {
                 startindex = i;
                 fullyLines++;
                 existFullyLine = true;
             }
+            blockNums = 0;
         }
         if (fullyLines > 0) {
             startindex = startindex - fullyLines + 1;
@@ -915,7 +930,9 @@ public abstract class GameController implements GameMethod {
     // 줄삭제 애니메이션
     private void launchDeleteLineAnimation(int index, int lines) {
         stopGameDelayTimer();
-        gamePane.removeKeyListener(gameKeyListener);
+        System.out.println("삭제전");
+        showCurrent(board, currentBlock, x, y);
+        focusing.removeKeyListener(gameKeyListener);
         Timer aniTimer;
         int count = 0;
         int aniDelay = ANIMATION_INTERVAL;
@@ -933,8 +950,10 @@ public abstract class GameController implements GameMethod {
         aniTimer = new Timer(totaldelay, e -> {
             overWriteLines(index, lines);
             showDeleteLines();
+            System.out.println("삭제후");
+            showCurrent(board, currentBlock, x, y);
             takeOutNextBlock();
-            gamePane.addKeyListener(gameKeyListener);
+            focusing.addKeyListener(gameKeyListener);
         });
         aniTimer.setRepeats(false);
         aniTimer.start();
@@ -962,7 +981,7 @@ public abstract class GameController implements GameMethod {
         int aniDelay = ANIMATION_INTERVAL;
         int xbuffer = currentBlock.getItemCoordinate()[0] + x;
         int ybuffer = currentBlock.getItemCoordinate()[1] + y;
-        placeSquare(xbuffer, ybuffer);
+        placeBombSquare(xbuffer, ybuffer);
         for (count = 0; count < 10; count++) {
             if (count % 2 == 0)
                 aniTimer = new Timer(count * aniDelay,
@@ -979,7 +998,7 @@ public abstract class GameController implements GameMethod {
             fixBoard();
             takeOutNextBlock();
             isBottomFlag = checkBlockCollision(x, y);
-            gamePane.addKeyListener(gameKeyListener);
+            focusing.addKeyListener(gameKeyListener);
         });
         aniTimer.setRepeats(false);
         aniTimer.start();
@@ -1005,7 +1024,7 @@ public abstract class GameController implements GameMethod {
         }
     }
 
-    private void placeSquare(int x, int y) {
+    private void placeBombSquare(int x, int y) {
         x -= ((BOMB_RANGE - 1) / 2);
         y -= ((BOMB_RANGE - 1) / 2);
         for (int i = 0; i < BOMB_RANGE; i++) {
@@ -1013,6 +1032,28 @@ public abstract class GameController implements GameMethod {
                 for (int j = 0; j < BOMB_RANGE; j++) {
                     if (x + j > -1 && x + j < BOARD_WIDTH) {
                         visualBoard[y + i][x + j] = Block.BOMBBLOCK_IDENTIFY_NUMBER;
+                        int offset = (BOARD_WIDTH + 4) + (y + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + j;
+                        boardStringBuilder.setCharAt(offset, blockCharMap.get(Block.BOMBBLOCK_IDENTIFY_NUMBER));
+                        gamePane.setText(boardStringBuilder.toString());
+                        paintBlock();
+                    }
+                }
+        }
+    }
+
+    private void placeSquare(int x, int y) {
+        x -= ((STUFF_RANGE - 1) / 2);
+        y -= ((STUFF_RANGE - 1) / 2);
+        for (int i = 0; i < STUFF_RANGE; i++) {
+            if (y + i < BOARD_END_HEIGHT)
+                for (int j = 0; j < STUFF_RANGE; j++) {
+                    if (x + j > -1 && x + j < BOARD_WIDTH) {
+                        visualBoard[y + i][x + j] = Block.STUFF_BLOCK_IDENTIFY_NUMBER;
+                        board[y + i][x + j] = FIXED_BLOCK_NUMBER;
+                        int offset = (BOARD_WIDTH + 4) + (y + i - BOARD_START_HEIGHT) * (BOARD_WIDTH + 3) + x + j;
+                        boardStringBuilder.setCharAt(offset, blockCharMap.get(Block.STUFF_BLOCK_IDENTIFY_NUMBER));
+                        gamePane.setText(boardStringBuilder.toString());
+                        paintBlock();
                     }
                 }
         }
@@ -1046,6 +1087,9 @@ public abstract class GameController implements GameMethod {
                 launchExplosionAnimation();
                 isItemFlag = false;
                 return;
+            } else if (currentBlock.getAttachItemID() == Block.STUFF_BLOCK_IDENTIFY_NUMBER) {
+                ifIsStuffBlock(board, visualBoard, currentBlock);
+                isItemFlag = false;
             }
         }
         copyBoard(board, boardBuffer);
@@ -1101,6 +1145,14 @@ public abstract class GameController implements GameMethod {
             }
         }
         placeBlock(board, visualBoard, block, x, yTemp);
+    }
+
+    // 채우기 블록
+    private void ifIsStuffBlock(int[][] board, int[][] visualBoard, Block block) {
+        int xbuffer = currentBlock.getItemCoordinate()[0] + x;
+        int ybuffer = currentBlock.getItemCoordinate()[1] + y;
+        placeSquare(xbuffer, ybuffer);
+
     }
 
     // 게임 중단 상태에서 다시 실행하는 경우
@@ -1293,7 +1345,7 @@ public abstract class GameController implements GameMethod {
     public static void showCurrent(int[][] board, Block block, int x, int y) {
         String msg = "\n블록현황 x:" + x + " y:" + y + " width:" + block.getWidth() + " height:"
                 + block.getHeight() + " rotateCount: " + block.getRotateCount();
-        log.info(msg);
+        System.out.println(msg);
         StringBuilder sb = new StringBuilder();
         sb.append('\n');
         for (int i = 0; i < board.length; i++) {
@@ -1303,7 +1355,7 @@ public abstract class GameController implements GameMethod {
             sb.append('\n');
         }
         msg = sb.toString();
-        log.info(msg);
+        System.out.println(msg);
     }
 
     private void showScore() {
