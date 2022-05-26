@@ -221,4 +221,11 @@ public class RobotController {
         moveBlock();
     }
 
+    public void startTestRobot() {
+        timerFlag = true;
+
+        findMove(gameController.currentBlock);
+        moveBlock();
+    }
+
 }

@@ -48,6 +48,7 @@ public class ViewController extends JFrame {
         initViewAndController();
         initView();
         addEventListener();
+        setMainKeyLabel();
         resizeViewFont();
     }
 
@@ -84,6 +85,7 @@ public class ViewController extends JFrame {
         allComponents.forEach(e -> e.setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize)));
         settingView.getIsColorBlindLabel().setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize));
         mainView.getAppNameLabel().setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize * 3));
+        mainView.getAllKeyLabel().setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize / 2));
     }
 
     private void initView() {
@@ -1000,11 +1002,37 @@ public class ViewController extends JFrame {
                         setKeymap.get(x).setText(KeyEvent.getKeyText(pressedKey));
                         setKeymap.get(x).setForeground(MasterView.BASIC_FONT_COLOR);
                         x.setSelected(false);
+                        setMainKeyLabel();
                         settingFlag = false;
                     }
                 });
             } else if (settingViewKeyMap.containsKey(key))
                 settingViewKeyMap.get(key).isKeyPressed();
         }
+    }
+
+    private void setMainKeyLabel() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Player1: ");
+        sb.append(KeyEvent.getKeyText(settingController.getRotateKey()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveDownKey()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveLeftKey()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveRightKey()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getStackKey()));
+        sb.append(" Player2: ");
+        sb.append(KeyEvent.getKeyText(settingController.getRotate2Key()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveDown2Key()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveLeft2Key()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getMoveRight2Key()));
+        sb.append(", ");
+        sb.append(KeyEvent.getKeyText(settingController.getStack2Key()));
+        mainView.getAllKeyLabel().setText(sb.toString());
     }
 }

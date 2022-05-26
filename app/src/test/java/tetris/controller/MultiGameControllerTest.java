@@ -98,6 +98,21 @@ public class MultiGameControllerTest {
         testRobot.pressAndReleaseKeys(VK_SPACE);
     }
 
+    @Test
+    @Order(6)
+    public void testBlockdequeuSingleGame() {
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_RIGHT, VK_SPACE, VK_SPACE, VK_RIGHT, VK_SPACE);
+        assertThat(testAllView.getGameView().getMultiGameModeLabel().getText()).isEqualTo("일반 모드");
+        testRobot.delay(5000);
+        gameController.gamePlayer1.blockDeque.clear();
+        gameController.gamePlayer2.blockDeque.clear();
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN);
+        testRobot.pressAndReleaseKeys(VK_R, VK_S, VK_R, VK_S, VK_R, VK_S, VK_R, VK_S);
+        testRobot.delay(1000);
+        testRobot.pressAndReleaseKeys(VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE);
+        testRobot.delay(1000);
+    }
+
     @AfterEach
     public void tearDown() {
         testAllView.removeAllEventListeners();
