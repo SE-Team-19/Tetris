@@ -70,6 +70,7 @@ public abstract class GameController implements GameMethod {
     protected int score; // game 점수와 관련된 변수
     protected int attackLines;
     private int itemLines;
+    private int itemFreqency;
     int deleteLines;
 
     private GameController opponent;
@@ -115,6 +116,7 @@ public abstract class GameController implements GameMethod {
     private void initGameController() {
         diffMode = 0;
         gameMode = 0;
+        itemFreqency = 10;
         isColorBlindMode = false;
         board = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
         boardBuffer = new int[BOARD_END_HEIGHT][BOARD_WIDTH];
@@ -122,6 +124,7 @@ public abstract class GameController implements GameMethod {
         attackLineBoard = new int[BOARD_HEIGHT][BOARD_WIDTH];
         attackLinesDeque = new ArrayDeque<>();
         blockDeque = new ArrayDeque<>();
+        colorMap = new HashMap<>();
         x = START_X;
         y = START_Y;
 
@@ -213,6 +216,7 @@ public abstract class GameController implements GameMethod {
 
     public void loadSetting(Setting setting) {
         isColorBlindMode = setting.isColorBlindMode();
+        initColorMap();
     }
 
     private void initBlockCharMap() {
@@ -234,7 +238,7 @@ public abstract class GameController implements GameMethod {
     }
 
     private void initColorMap() {
-        colorMap = new HashMap<>();
+        colorMap.clear();
         colorMap.put(Block.ONELINEBLOCK_IDENTIFY_NUMBER, Color.WHITE);
         colorMap.put(Block.NULL_IDENTIFY_NUMBER, Color.WHITE);
         colorMap.put(Block.GHOST_IDENTIFIY_NUMBER, new Color(200, 200, 200));
@@ -394,7 +398,7 @@ public abstract class GameController implements GameMethod {
         for (int i = BOARD_START_HEIGHT; i < BOARD_END_HEIGHT; i++) {
             attackLinesStringBuilder.append(GameView.BORDER_CHAR);
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                attackLinesStringBuilder.append(' ');
+                attackLinesStringBuilder.append(GameView.NULL_CHAR);
             }
             attackLinesStringBuilder.append(GameView.BORDER_CHAR);
             attackLinesStringBuilder.append("\n");
@@ -418,7 +422,7 @@ public abstract class GameController implements GameMethod {
         for (int i = 0; i < NEXT_BLOCK_WIDTH; i++) {
             nextBlockStringBuilder.append(GameView.BORDER_CHAR);
             for (int j = 0; j < NEXT_BLOCK_WIDTH; j++) {
-                nextBlockStringBuilder.append(' ');
+                nextBlockStringBuilder.append(GameView.NULL_CHAR);
             }
             nextBlockStringBuilder.append(GameView.BORDER_CHAR);
             nextBlockStringBuilder.append("\n");
@@ -931,7 +935,6 @@ public abstract class GameController implements GameMethod {
     private void launchDeleteLineAnimation(int index, int lines) {
         stopGameDelayTimer();
         System.out.println("삭제전");
-        showCurrent(board, currentBlock, x, y);
         focusing.removeKeyListener(gameKeyListener);
         Timer aniTimer;
         int count = 0;
@@ -950,8 +953,6 @@ public abstract class GameController implements GameMethod {
         aniTimer = new Timer(totaldelay, e -> {
             overWriteLines(index, lines);
             showDeleteLines();
-            System.out.println("삭제후");
-            showCurrent(board, currentBlock, x, y);
             takeOutNextBlock();
             focusing.addKeyListener(gameKeyListener);
         });
@@ -1112,7 +1113,7 @@ public abstract class GameController implements GameMethod {
         currentBlock.copyBlock(nextBlock);
         blockBuffer.copyBlock(currentBlock);
         nextBlock = getBlock(blockDeque.removeFirst());
-        if (gameMode == ITEM_GAME_MODE && itemLines >= 10) {
+        if (gameMode == ITEM_GAME_MODE && itemLines >= itemFreqency) {
             nextBlock.makeItemBlock();
             itemLines = 0;
             isItemFlag = true;
@@ -1373,5 +1374,9 @@ public abstract class GameController implements GameMethod {
 
     public void restartGameDelayTimer() {
         gameDelayTimer.restart();
+    }
+
+    public void setItemFreqency(int itemFreqency) {
+        this.itemFreqency = itemFreqency;
     }
 }

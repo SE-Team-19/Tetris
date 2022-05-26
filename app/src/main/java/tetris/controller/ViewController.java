@@ -361,6 +361,8 @@ public class ViewController extends JFrame {
                     () -> gameView.getLocalGameBtn().requestFocus(true));
             for (Component comp : gameView.getStopMenu().getComponents())
                 gameViewKeyMap.put(new KeyPair(upKey, comp), comp::transferFocusBackward);
+            gameViewKeyMap.put(new KeyPair(upKey, gameView.getContinueBtn()),
+                    () -> gameView.getExitGameBtn().requestFocus(true));
         }
 
         private void initDownKey() {
@@ -391,6 +393,8 @@ public class ViewController extends JFrame {
                     () -> gameView.getGameReturnBtn().requestFocus(true));
             for (Component comp : gameView.getStopMenu().getComponents())
                 gameViewKeyMap.put(new KeyPair(downKey, comp), comp::transferFocus);
+            gameViewKeyMap.put(new KeyPair(downKey, gameView.getExitGameBtn()),
+                    () -> gameView.getContinueBtn().requestFocus(true));
 
         }
 
@@ -399,16 +403,22 @@ public class ViewController extends JFrame {
                 gameViewKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
             gameViewKeyMap.put(new KeyPair(leftKey, gameView.getEasyBtn()),
                     () -> gameView.getHardBtn().requestFocus(true));
+            gameViewKeyMap.put(new KeyPair(leftKey, gameView.getDiffReturnBtn()),
+                    () -> gameView.getEasyBtn().requestFocus(true));
 
             for (Component comp : gameView.getSelectModePane().getComponents())
                 gameViewKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
             gameViewKeyMap.put(new KeyPair(leftKey, gameView.getGeneralModeBtn()),
                     () -> gameView.getTimeAttackBtn().requestFocus(true));
+            gameViewKeyMap.put(new KeyPair(leftKey, gameView.getModeReturnBtn()),
+                    () -> gameView.getGeneralModeBtn().requestFocus(true));
 
             for (Component comp : gameView.getSelectMultiGamePanel().getComponents())
                 gameViewKeyMap.put(new KeyPair(leftKey, comp), comp::transferFocusBackward);
             gameViewKeyMap.put(new KeyPair(leftKey, gameView.getRobotGameBtn()),
                     () -> gameView.getOnlineGameBtn().requestFocus(true));
+            gameViewKeyMap.put(new KeyPair(leftKey, gameView.getMultiGameReturnBtn()),
+                    () -> gameView.getRobotGameBtn().requestFocus(true));
 
             gameViewKeyMap.put(new KeyPair(leftKey, gameView.getSingleGameBtn()),
                     () -> gameView.getMulitiGameBtn().requestFocus(true));
@@ -421,10 +431,18 @@ public class ViewController extends JFrame {
                 gameViewKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
             gameViewKeyMap.put(new KeyPair(rightKey, gameView.getHardBtn()),
                     () -> gameView.getEasyBtn().requestFocus(true));
+            gameViewKeyMap.put(new KeyPair(rightKey, gameView.getDiffReturnBtn()),
+                    () -> gameView.getHardBtn().requestFocus(true));
+
             for (Component comp : gameView.getSelectModePane().getComponents())
                 gameViewKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
+            gameViewKeyMap.put(new KeyPair(rightKey, gameView.getModeReturnBtn()),
+                    () -> gameView.getTimeAttackBtn().requestFocus(true));
+
             for (Component comp : gameView.getSelectMultiGamePanel().getComponents())
                 gameViewKeyMap.put(new KeyPair(rightKey, comp), comp::transferFocus);
+            gameViewKeyMap.put(new KeyPair(rightKey, gameView.getMultiGameReturnBtn()),
+                    () -> gameView.getOnlineGameBtn().requestFocus(true));
             gameViewKeyMap.put(new KeyPair(rightKey, gameView.getOnlineGameBtn()),
                     () -> gameView.getRobotGameBtn().requestFocus(true));
             gameViewKeyMap.put(new KeyPair(rightKey, gameView.getTimeAttackBtn()),

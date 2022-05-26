@@ -2,7 +2,6 @@ package tetris.controller;
 
 import org.junit.jupiter.api.*;
 import static org.assertj.core.api.Assertions.*;
-import static java.awt.event.KeyEvent.*;
 
 import javax.swing.*;
 import java.awt.AWTException;

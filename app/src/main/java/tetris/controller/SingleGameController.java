@@ -87,6 +87,7 @@ public class SingleGameController {
     protected void startSingleGame(Setting setting) {
         this.setting = setting;
         isSingleGameModeFlag = true;
+        gamePlayer.loadSetting(setting);
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
 
