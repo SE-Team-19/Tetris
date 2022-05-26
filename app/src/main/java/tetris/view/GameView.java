@@ -24,6 +24,8 @@ public class GameView extends MasterView {
     private JLabel singleLinesLabel;
     private JLabel singleGameDisplayTimeLabel;
     private JLabel singleGameTimeLabel;
+    private JLabel scoreLabel1;
+    private JLabel scoreLabel2;
     private JLabel gameOverLabel;
     private JLabel victoryLabel;
     private JLabel depeatLabel;
@@ -42,7 +44,11 @@ public class GameView extends MasterView {
     private JLabel mulitiGameModeLabel;
     private JLabel gameDiffLabel;
 
-    private JTextArea gameOverTextArea;
+    private JPanel StopMenu;
+    private JButton continueBtn;
+    private JButton restartBtn;
+    private JButton returnMainBtn;
+    private JButton exitGameBtn;
 
     private JPanel singleGameDisplayPanel;
     private JPanel multiGameDisplayPanel;
@@ -69,10 +75,6 @@ public class GameView extends MasterView {
     private JButton mulitiGameBtn;
     private ArrayList<JButton> buttonArrayList;
 
-    private JLabel dialogMsg;
-    private JButton dialogYesBtn;
-    private JButton dialogNoBtn;
-
     private GameView() {
         initGameDisplayComponents();
         initSingleGameDisplayPanel();
@@ -82,7 +84,7 @@ public class GameView extends MasterView {
         initSelectModePane();
         initSelectDiffPane();
         initGameOverPanel();
-        initGameOverTextArea();
+        initStopMenu();
         initView();
     }
 
@@ -192,6 +194,15 @@ public class GameView extends MasterView {
         victoryLabel = new JLabel("WIN!");
         depeatLabel = new JLabel("Loose...");
 
+        StopMenu = initAndSetName("StopMenu", new JPanel());
+        continueBtn = initAndSetName("continueBtn", new JButton("이어서"));
+        restartBtn = initAndSetName("restartBtn", new JButton("게임 재시작"));
+        returnMainBtn = initAndSetName("returnMainBtn", new JButton("메인메뉴로"));
+        exitGameBtn = initAndSetName("exitGameBtn", new JButton("게임종료"));
+
+        scoreLabel1 = initAndSetName("scoreLabel1", new JLabel("SCORE"));
+        scoreLabel2 = initAndSetName("scoreLabel2", new JLabel("SCORE"));
+
         buttonArrayList = new ArrayList<>();
     }
 
@@ -218,7 +229,6 @@ public class GameView extends MasterView {
     }
 
     private void initMultiGameDisplayPane() {
-
         GridBagLayout gbl_multiGameDisplayPanel = new GridBagLayout();
         gbl_multiGameDisplayPanel.columnWidths = new int[] { 0, 0, 0, 0, 0 };
         gbl_multiGameDisplayPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -235,13 +245,13 @@ public class GameView extends MasterView {
 
         multiGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 3, 1, 4));
         multiGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 3, 1, 1));
-        multiGameDisplayPanel.add(new JLabel("Score"), addGridBagComponents(1, 4, 1, 1));
+        multiGameDisplayPanel.add(scoreLabel1, addGridBagComponents(1, 4, 1, 1));
         multiGameDisplayPanel.add(playerOneScoreLabel, addGridBagComponents(1, 5, 1, 1));
         multiGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 6, 1, 1));
 
         multiGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(2, 3, 1, 4));
         multiGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(3, 3, 1, 1));
-        multiGameDisplayPanel.add(new JLabel("Score"), addGridBagComponents(3, 4, 1, 1));
+        multiGameDisplayPanel.add(scoreLabel2, addGridBagComponents(3, 4, 1, 1));
         multiGameDisplayPanel.add(playerTwoScoreLabel, addGridBagComponents(3, 5, 1, 1));
         multiGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(3, 6, 1, 1));
     }
@@ -256,12 +266,20 @@ public class GameView extends MasterView {
         gameOverPanel.add(inputName);
     }
 
-    private void initGameOverTextArea() {
-        gameOverTextArea = new JTextArea("");
-        gameOverTextArea.setAlignmentX(CENTER_ALIGNMENT);
-        gameOverTextArea.setAlignmentY(CENTER_ALIGNMENT);
-        gameOverTextArea.setForeground(Color.RED);
-        gameOverTextArea.setBackground(Color.BLACK);
+    private void initStopMenu() {
+        GridBagLayout gridBagLayout = new GridBagLayout();
+        gridBagLayout.columnWidths = new int[] { 0, 0 };
+        gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+        gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+        gridBagLayout.rowWeights = new double[] { 0.5, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+        StopMenu.setLayout(gridBagLayout);
+
+        StopMenu.add(new JLabel("게임 중단중"), addGridBagComponents(0, 0));
+        StopMenu.add(continueBtn, addGridBagComponents(0, 1));
+        StopMenu.add(restartBtn, addGridBagComponents(0, 2));
+        StopMenu.add(returnMainBtn, addGridBagComponents(0, 3));
+        StopMenu.add(exitGameBtn, addGridBagComponents(0, 4));
+
     }
 
     private void initSelectGamePane() {
@@ -364,6 +382,47 @@ public class GameView extends MasterView {
     public void setGameOver() {
         singleGameDisplayPanel.remove(singlePlayerGameBoardPane);
         singleGameDisplayPanel.add(gameOverLabel, addGridBagComponents(0, 2, 2, 5));
+    }
+
+    public void setSingleStopPanel() {
+        singleGameDisplayPanel.remove(singlePlayerGameBoardPane);
+        singleGameDisplayPanel.add(StopMenu, addGridBagComponents(0, 2, 2, 5));
+    }
+
+    public void resetSingleStopPanel() {
+        singleGameDisplayPanel.remove(StopMenu);
+        singleGameDisplayPanel.add(singlePlayerGameBoardPane, addGridBagComponents(0, 2, 2, 5));
+    }
+
+    public void setMultiStopPanel() {
+        multiGameDisplayPanel.remove(playerOneGameBoardPane);
+        multiGameDisplayPanel.remove(playerOneNextBlockPane);
+        multiGameDisplayPanel.remove(scoreLabel1);
+        multiGameDisplayPanel.remove(playerOneScoreLabel);
+        multiGameDisplayPanel.remove(playerOneAttackLinePane);
+
+        multiGameDisplayPanel.remove(playerTwoGameBoardPane);
+        multiGameDisplayPanel.remove(playerTwoNextBlockPane);
+        multiGameDisplayPanel.remove(scoreLabel2);
+        multiGameDisplayPanel.remove(playerTwoScoreLabel);
+        multiGameDisplayPanel.remove(playerTwoAttackLinePane);
+        multiGameDisplayPanel.add(StopMenu, addGridBagComponents(0, 3, 4, 4));
+    }
+
+    public void resetMultiStopPanel() {
+        multiGameDisplayPanel.remove(StopMenu);
+
+        multiGameDisplayPanel.add(playerOneGameBoardPane, addGridBagComponents(0, 3, 1, 4));
+        multiGameDisplayPanel.add(playerOneNextBlockPane, addGridBagComponents(1, 3, 1, 1));
+        multiGameDisplayPanel.add(scoreLabel1, addGridBagComponents(1, 4, 1, 1));
+        multiGameDisplayPanel.add(playerOneScoreLabel, addGridBagComponents(1, 5, 1, 1));
+        multiGameDisplayPanel.add(playerOneAttackLinePane, addGridBagComponents(1, 6, 1, 1));
+
+        multiGameDisplayPanel.add(playerTwoGameBoardPane, addGridBagComponents(2, 3, 1, 4));
+        multiGameDisplayPanel.add(playerTwoNextBlockPane, addGridBagComponents(3, 3, 1, 1));
+        multiGameDisplayPanel.add(scoreLabel2, addGridBagComponents(3, 4, 1, 1));
+        multiGameDisplayPanel.add(playerTwoScoreLabel, addGridBagComponents(3, 5, 1, 1));
+        multiGameDisplayPanel.add(playerTwoAttackLinePane, addGridBagComponents(3, 6, 1, 1));
     }
 
     public void resetSingleGameDisplayPane() {
@@ -556,10 +615,6 @@ public class GameView extends MasterView {
         return this.gameDiffLabel;
     }
 
-    public JTextArea getGameOverTextArea() {
-        return this.gameOverTextArea;
-    }
-
     public JLabel getSingleGameModeLabel() {
         return this.singleGameModeLabel;
     }
@@ -580,15 +635,23 @@ public class GameView extends MasterView {
         return this.depeatLabel;
     }
 
-    public JLabel getDialogMsg() {
-        return this.dialogMsg;
+    public JPanel getStopMenu() {
+        return this.StopMenu;
     }
 
-    public JButton getDialogYesBtn() {
-        return this.dialogYesBtn;
+    public JButton getRestartBtn() {
+        return this.restartBtn;
     }
 
-    public JButton getDialogNoBtn() {
-        return this.dialogNoBtn;
+    public JButton getContinueBtn() {
+        return this.continueBtn;
+    }
+
+    public JButton getReturnMainBtn() {
+        return this.returnMainBtn;
+    }
+
+    public JButton getExitGameBtn() {
+        return this.exitGameBtn;
     }
 }

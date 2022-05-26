@@ -17,6 +17,7 @@ public class RobotController {
     Timer moveRotateTimer;
     Timer moveLeftTimer;
     Timer moveRightTimer;
+    boolean timerFlag;
 
     Block block;
     int[][] board;
@@ -44,14 +45,16 @@ public class RobotController {
         this.gameController = gameController;
         this.board = new int[GameController.BOARD_END_HEIGHT][GameController.BOARD_WIDTH];
         this.block = new JBlock();
+        caculator.currentBlock = caculator.getBlock(0);
+        caculator.blockBuffer = new JBlock();
+        this.timerFlag = true;
     }
 
     void findMove(Block block) {
         double currnetScore;
         double maxScore = Double.MIN_EXPONENT;
         caculator.copyBoard(gameController.board, caculator.board);
-        caculator.currentBlock = caculator.getBlock(0);
-        caculator.blockBuffer = new JBlock();
+        this.block.copyBlock(block);
         caculator.currentBlock.copyBlock(block);
         caculator.blockBuffer.copyBlock(block);
         for (int j = 0; j < 4; j++) {
@@ -91,7 +94,10 @@ public class RobotController {
             startMoveRightTimer(DELAY * count);
             count++;
         }
-        Timer stackTimer = new Timer(DELAY * count + DELAY, e -> gameController.dropDown());
+        Timer stackTimer = new Timer(DELAY * count + DELAY, e -> {
+            if (timerFlag)
+                gameController.dropDown();
+        });
         stackTimer.setRepeats(false);
         stackTimer.start();
     }
@@ -114,19 +120,28 @@ public class RobotController {
     }
 
     private void startMoveRotateTimer(int delay) {
-        moveRotateTimer = new Timer(delay, e -> gameController.moveRotate());
+        moveRotateTimer = new Timer(delay, e -> {
+            if (timerFlag)
+                gameController.moveRotate();
+        });
         moveRotateTimer.setRepeats(false);
         moveRotateTimer.start();
     }
 
     private void startMoveLeftTimer(int delay) {
-        moveLeftTimer = new Timer(delay, e -> gameController.moveLeft());
+        moveLeftTimer = new Timer(delay, e -> {
+            if (timerFlag)
+                gameController.moveLeft();
+        });
         moveLeftTimer.setRepeats(false);
         moveLeftTimer.start();
     }
 
     private void startMoveRightTimer(int delay) {
-        moveRightTimer = new Timer(delay, e -> gameController.moveRight());
+        moveRightTimer = new Timer(delay, e -> {
+            if (timerFlag)
+                gameController.moveRight();
+        });
         moveRightTimer.setRepeats(false);
         moveRightTimer.start();
     }
@@ -193,6 +208,16 @@ public class RobotController {
             blockNums = 0;
         }
         return completeLines;
+    }
+
+    public void stopRobot() {
+        timerFlag = false;
+    }
+
+    public void startRobot() {
+        timerFlag = true;
+        findMove(block);
+        moveBlock();
     }
 
 }

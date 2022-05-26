@@ -355,10 +355,6 @@ public abstract class GameController implements GameMethod {
         StyleConstants.setSpaceAbove(attributeSet, -3.5f);
     }
 
-    private void setFontAttributeSet(SimpleAttributeSet attributeSet, int resoultion) {
-        StyleConstants.setFontSize(attributeSet, 45);
-    }
-
     public void initGameBoard() {
         boardStringBuilder.setLength(0);
         for (int t = 0; t < BOARD_WIDTH + 2; t++) {
@@ -1265,14 +1261,13 @@ public abstract class GameController implements GameMethod {
 
     public void endGame() {
         Timer endGameTimer = new Timer(50, e -> {
-            stopGame();
-
+            resetGame();
         });
         endGameTimer.setRepeats(false);
         endGameTimer.start();
     }
 
-    public void stopGame() {
+    public void resetGame() {
         delayFlag = false;
         stopGameDelayTimer();
         initZeroBoard(board);
@@ -1283,6 +1278,16 @@ public abstract class GameController implements GameMethod {
         x = START_X;
         y = START_Y;
         boardStringBuilder.setLength(0);
+    }
+
+    public void stopGame() {
+        delayFlag = false;
+        stopGameDelayTimer();
+    }
+
+    public void continuGame() {
+        delayFlag = true;
+        startGameDelayTimer(delay);
     }
 
     public static void showCurrent(int[][] board, Block block, int x, int y) {

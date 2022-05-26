@@ -18,7 +18,6 @@ public class ViewController extends JFrame {
     public static final int REFRESH_RATE = 17; // 60FPS
     static final String OVERLAP_KEY_MSG = "키 중복!";
 
-    private boolean isSingleGameModeFlag;
     private int currentResoultion;
 
     Container contentPane;
@@ -61,7 +60,6 @@ public class ViewController extends JFrame {
         playerController = new PlayerController();
         multiGameController = new MultiGameController(playerController, this);
         allComponents = new LinkedList<>();
-        isSingleGameModeFlag = true;
     }
 
     private void initJFrame() {
@@ -83,10 +81,9 @@ public class ViewController extends JFrame {
     // ScreenSize 변경 이후, 각 View 들의 Font 크기를 조정한다.
     private void resizeViewFont() {
         int fontSize = currentResoultion / 23040;
-        allComponents.forEach(e -> e.setFont(new Font("맑은 고딕", Font.BOLD, fontSize)));
-        settingView.getIsColorBlindLabel().setFont(new Font("맑은 고딕", Font.BOLD, fontSize));
-        mainView.getAppNameLabel().setFont(new Font("맑은 고딕", Font.BOLD, fontSize * 3));
-        System.out.println("현재폰트사이즈: " + fontSize);
+        allComponents.forEach(e -> e.setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize)));
+        settingView.getIsColorBlindLabel().setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize));
+        mainView.getAppNameLabel().setFont(new Font(GameView.BASIC_FONT_FAMILY, Font.BOLD, fontSize * 3));
     }
 
     private void initView() {
@@ -211,43 +208,12 @@ public class ViewController extends JFrame {
             comp.addKeyListener(gameKeyListener);
             allComponents.add(comp);
         }
-        gameView.getSinglePlayerGameBoardPane().addKeyListener(new StopKeyListener());
-        gameView.getPlayerTwoGameBoardPane().addKeyListener(new StopKeyListener());
-        JTextArea gameOverTextArea = gameView.getGameOverTextArea();
-        gameOverTextArea.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                gameView.resetGameView();
-                transitView(contentPane, mainView, gameView);
-            }
-        });
-    }
-
-    public class StopKeyListener extends KeyAdapter {
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                int inputValue = JOptionPane.showConfirmDialog(gameView, "Do you want to end the game?",
-                        "Option", JOptionPane.YES_NO_OPTION);
-
-                if (inputValue == JOptionPane.YES_OPTION) {
-                    multiGameController.gamePlayer.endGame();
-                    multiGameController.gamePlayer1.endGame();
-                    multiGameController.gamePlayer2.endGame();
-                    multiGameController.gameRobot.endGame();
-                    multiGameController.stopTimer();
-
-                    gameView.resetGameView();
-                    transitView(contentPane, mainView, gameView);
-                    // 이 부분을 게임이 종료되는 것으로 할지, 혹은 메인 화면으로 돌아가게 할지 정할 필요가 있음
-                } else if (inputValue == -1) {
-                    multiGameController.gamePlayer.restart();
-                    // 팝업을 종료하는 경우(X키 누르는 경우, 게임을 처음부터 재시작 ## 게임마다 요구하는 조건이 달라 하나의 메소드로 구현하기 힘들것 같음)
-                }
-                // 그 외에는 중단된 상태에서 재시작
-            }
+        for (Component comp : gameView.getStopMenu().getComponents()) {
+            comp.addKeyListener(gameKeyListener);
+            allComponents.add(comp);
         }
+        multiGameController.singleGameFocusing.addKeyListener(gameKeyListener);
+        multiGameController.multiGameFocusing.addKeyListener(gameKeyListener);
     }
 
     private void addSettingViewEventListener() {
@@ -393,6 +359,8 @@ public class ViewController extends JFrame {
                     () -> gameView.getItemModeBtn().requestFocus(true));
             gameViewKeyMap.put(new KeyPair(upKey, gameView.getMultiGameReturnBtn()),
                     () -> gameView.getLocalGameBtn().requestFocus(true));
+            for (Component comp : gameView.getStopMenu().getComponents())
+                gameViewKeyMap.put(new KeyPair(upKey, comp), comp::transferFocusBackward);
         }
 
         private void initDownKey() {
@@ -421,6 +389,9 @@ public class ViewController extends JFrame {
                     () -> gameView.getGameReturnBtn().requestFocus(true));
             gameViewKeyMap.put(new KeyPair(downKey, gameView.getMulitiGameBtn()),
                     () -> gameView.getGameReturnBtn().requestFocus(true));
+            for (Component comp : gameView.getStopMenu().getComponents())
+                gameViewKeyMap.put(new KeyPair(downKey, comp), comp::transferFocus);
+
         }
 
         private void initLeftKey() {
@@ -531,6 +502,38 @@ public class ViewController extends JFrame {
                     () -> transitView(contentPane, mainView, gameView));
             gameViewKeyMap.put(new KeyPair(stackKey, gameView.getMultiGameReturnBtn()),
                     () -> transitView(gameView, gameView.getSelectModePane(), gameView.getSelectMultiGamePanel()));
+
+            gameViewKeyMap.put(new KeyPair(stackKey, gameView.getContinueBtn()),
+                    () -> {
+                        if (isSingleGameModeFlag)
+                            multiGameController.continueSingleGame();
+                        else
+                            multiGameController.continueMultiGame();
+                    });
+            gameViewKeyMap.put(new KeyPair(stackKey, gameView.getRestartBtn()),
+                    () -> {
+                        if (isSingleGameModeFlag)
+                            multiGameController.restartSingleGame();
+                        else
+                            multiGameController.restartMultiGame();
+                    });
+            gameViewKeyMap.put(new KeyPair(stackKey, gameView.getReturnMainBtn()),
+                    () -> {
+                        if (isSingleGameModeFlag)
+                            gameView.resetSingleStopPanel();
+                        else
+                            gameView.resetMultiStopPanel();
+                        multiGameController.gamePlayer.endGame();
+                        multiGameController.gamePlayer1.endGame();
+                        multiGameController.gamePlayer2.endGame();
+                        multiGameController.gameRobot.endGame();
+                        multiGameController.stopTimer();
+
+                        gameView.resetGameView();
+                        transitView(contentPane, mainView, gameView);
+                    });
+            gameViewKeyMap.put(new KeyPair(stackKey, gameView.getExitGameBtn()),
+                    () -> System.exit(0));
         }
 
         private void initOtherKeys() {
@@ -540,6 +543,24 @@ public class ViewController extends JFrame {
                         transitView(contentPane, scoreView, gameView);
                         gameView.getInputName().setText("");
                         gameView.resetGameView();
+                    });
+            gameViewKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, multiGameController.singleGameFocusing),
+                    () -> {
+                        multiGameController.gamePlayer.stopGame();
+                        multiGameController.gameTimer.stop();
+                        gameView.setSingleStopPanel();
+                        gameView.getContinueBtn().requestFocus();
+
+                    });
+            gameViewKeyMap.put(new KeyPair(KeyEvent.VK_ESCAPE, multiGameController.multiGameFocusing),
+                    () -> {
+                        multiGameController.gamePlayer1.stopGame();
+                        multiGameController.gamePlayer2.stopGame();
+                        multiGameController.gameRobot.stopGame();
+                        multiGameController.robotController.stopRobot();
+                        multiGameController.gameTimer.stop();
+                        gameView.setMultiStopPanel();
+                        gameView.getContinueBtn().requestFocus();
                     });
         }
     }

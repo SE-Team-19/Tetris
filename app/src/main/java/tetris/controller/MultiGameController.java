@@ -1,6 +1,5 @@
 package tetris.controller;
 
-import java.awt.Dimension;
 import javax.swing.*;
 import java.awt.event.*;
 import tetris.model.*;
@@ -12,10 +11,14 @@ public class MultiGameController extends SingleGameController {
     GameController gameRobot;
     RobotController robotController;
 
+    int multiMode;
+
     JLabel multiGameTimeLabel;
+    JTextPane multiGameFocusing;
 
     public MultiGameController(PlayerController playerController, ViewController viewController) {
         super(playerController, viewController);
+        multiMode = 0;
         multiGameTimeLabel = gameView.getMultiGameTimeLabel();
         JTextPane gamepane1 = gameView.getPlayerOneGameBoardPane();
         JTextPane nextBlockPane1 = gameView.getPlayerOneNextBlockPane();
@@ -25,8 +28,8 @@ public class MultiGameController extends SingleGameController {
         JTextPane nextBlockPane2 = gameView.getPlayerTwoNextBlockPane();
         JTextPane attackLinePane2 = gameView.getPlayerTwoAttackLinePane();
         JLabel scoreLabel2 = gameView.getPlayerTwoScoreLabel();
-        JTextArea gameOverTextArea = gameView.getGameOverTextArea();
-        gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, gamepane2) {
+        multiGameFocusing = gamepane2;
+        gamePlayer1 = new GameController(gamepane1, nextBlockPane1, attackLinePane1, scoreLabel1, multiGameFocusing) {
             @Override
             public void doAfterGameOver() {
                 gamePlayer1.endGame();
@@ -50,7 +53,7 @@ public class MultiGameController extends SingleGameController {
             }
         };
 
-        gamePlayer2 = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, gamepane2) {
+        gamePlayer2 = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, multiGameFocusing) {
             @Override
             public void doAfterGameOver() {
                 gamePlayer1.endGame();
@@ -87,7 +90,7 @@ public class MultiGameController extends SingleGameController {
                 gamePlayer2.endGame();
                 gameRobot.endGame();
                 gameTimer.stop();
-                gameView.setPlayerTwoWin();
+                gameView.setPlayerOneWin();
                 gameView.getVictoryLabel().requestFocus();
             }
 
@@ -124,6 +127,8 @@ public class MultiGameController extends SingleGameController {
     }
 
     public void startLocalGame(Setting setting) {
+        this.setting = setting;
+        multiMode = 0;
         gamePlayer1.setOpponentPlayer(gamePlayer2);
         gamePlayer2.setOpponentPlayer(gamePlayer1);
         generateBlockRandomizer(GameController.NORMAL_MODE);
@@ -143,7 +148,8 @@ public class MultiGameController extends SingleGameController {
     }
 
     public void startRobotGame(Setting setting) {
-
+        this.setting = setting;
+        multiMode = 1;
         gamePlayer1.setOpponentPlayer(gameRobot);
         gameRobot.setOpponentPlayer(gamePlayer1);
         generateBlockRandomizer(GameController.NORMAL_MODE);
@@ -155,9 +161,32 @@ public class MultiGameController extends SingleGameController {
         gamePlayer1.startGame(GameController.NORMAL_MODE, gameMode, randomBlockList, currentResoultion);
         gameRobot.startGame(GameController.NORMAL_MODE, gameMode, randomBlockList, currentResoultion);
         gameTime = 0;
+        robotController.startRobot();
         showTime(multiGameTimeLabel);
         showMode();
         startTimer(gameView.getMultiGameDisplayTimeLabel(), multiGameTimeLabel);
+    }
+
+    protected void continueMultiGame() {
+        gameView.resetMultiStopPanel();
+        gamePlayer1.continuGame();
+        gamePlayer2.continuGame();
+        gameRobot.continuGame();
+        robotController.startRobot();
+        gameTimer.restart();
+        multiGameFocusing.requestFocus();
+    }
+
+    protected void restartMultiGame() {
+        gamePlayer1.resetGame();
+        gamePlayer2.resetGame();
+        gameRobot.resetGame();
+        gameView.resetMultiStopPanel();
+        if (multiMode == 0)
+            startLocalGame(setting);
+        else
+            startRobotGame(setting);
+        multiGameFocusing.requestFocus();
     }
 
 }

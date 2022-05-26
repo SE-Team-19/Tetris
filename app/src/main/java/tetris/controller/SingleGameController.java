@@ -5,6 +5,7 @@ import javax.swing.Timer;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+import java.awt.*;
 
 import tetris.model.*;
 import tetris.view.*;
@@ -15,7 +16,11 @@ public class SingleGameController {
     protected ScoreView scoreView;
     protected MainView mainView;
 
-    JTextPane gamepane;
+    protected int resoultion;
+    protected Setting setting;
+
+    JTextPane singleGameFocusing;
+    JTextPane gamePane;
     protected Timer gameTimer;
     protected JLabel singleTimeLabel;
 
@@ -37,13 +42,14 @@ public class SingleGameController {
         this.gameView = GameView.getInstance();
         scoreView = ScoreView.getInstance();
         mainView = MainView.getInstance();
-        gamepane = gameView.getSinglePlayerGameBoardPane();
+        gamePane = gameView.getSinglePlayerGameBoardPane();
+        singleGameFocusing = gamePane;
         singleTimeLabel = gameView.getSingleGameTimeLabel();
         JTextPane nextBlockPane = gameView.getSinglePlayerOneNextBlockPane();
         JLabel scoreLabel = gameView.getSingleScoreLabel();
         gameTime = 0;
-        gamePlayer = new GameController(gamepane, nextBlockPane, new JTextPane(), scoreLabel,
-                gamepane) {
+        gamePlayer = new GameController(gamePane, nextBlockPane, new JTextPane(), scoreLabel,
+                singleGameFocusing) {
             @Override
             public void doAfterGameOver() {
                 gamePlayer.endGame();
@@ -71,15 +77,17 @@ public class SingleGameController {
     }
 
     protected void startSingleGame(Setting setting) {
+        this.setting = setting;
 
         gamePlayer.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
 
         generateBlockRandomizer(diffMode);
-        int currentResoultion = gameView.getWidth() * gameView.getHeight();
-        System.out.println(currentResoultion);
-        gamePlayer.startGame(diffMode, gameMode, randomBlockList, currentResoultion);
-        gamepane.requestFocus(true);
+        resoultion = gameView.getWidth() * gameView.getHeight();
+        gameView.getGameOverLabel().setPreferredSize(new Dimension(gameView.getWidth(), gameView.getHeight()));
+        System.out.println(resoultion);
+        gamePlayer.startGame(diffMode, gameMode, randomBlockList, resoultion);
+        gamePane.requestFocus(true);
         gamePlayer.setDeleteLines(gameView.getSingleLinesLabel());
         gamePlayer.showDeleteLines();
         showMode();
@@ -211,6 +219,20 @@ public class SingleGameController {
         gameView.getGameDiffLabel().setText(difficulty);
         gameView.getMultiGameModeLabel().setText(mode);
         gameView.getSingleGameModeLabel().setText(mode);
+    }
+
+    protected void continueSingleGame() {
+        gameView.resetSingleStopPanel();
+        gamePlayer.continuGame();
+        gameTimer.restart();
+        singleGameFocusing.requestFocus();
+    }
+
+    protected void restartSingleGame() {
+        gamePlayer.resetGame();
+        gameView.resetSingleStopPanel();
+        startSingleGame(setting);
+        singleGameFocusing.requestFocus();
     }
 
 }
