@@ -440,7 +440,7 @@ public abstract class GameController implements GameMethod {
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((e[1] + 2) * (NEXT_BLOCK_WIDTH + 3) + e[0] + 1);
             nextBlockStringBuilder.setCharAt(
                     offset,
-                    ' ');
+                    GameView.NULL_CHAR);
         });
         nextBlock.getCoordiList().forEach(e -> {
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((e[1] + 2) * (NEXT_BLOCK_WIDTH + 3) + e[0] + 1);
@@ -448,13 +448,14 @@ public abstract class GameController implements GameMethod {
                     offset,
                     GameView.BLOCK_CHAR);
         });
-        if (isItemFlag) {
+        if (nextBlock.getAttachItemID() > 0) {
             int[] itemCoordinate = nextBlock.getItemCoordinate();
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
                     + itemCoordinate[0] + 1;
             nextBlockStringBuilder.setCharAt(
                     offset,
                     blockCharMap.get(nextBlock.getAttachItemID()));
+
         }
 
         nextBlockPane.setText(nextBlockStringBuilder.toString());
@@ -467,7 +468,7 @@ public abstract class GameController implements GameMethod {
                     blockAttributeSet,
                     false);
         }
-        if (isItemFlag) {
+        if (nextBlock.getAttachItemID() > 0) {
             int[] itemCoordinate = nextBlock.getItemCoordinate();
             StyleConstants.setForeground(blockAttributeSet, colorMap.get(nextBlock.getAttachItemID()));
             int offset = (NEXT_BLOCK_WIDTH + 4) + ((itemCoordinate[1] + 2) * (NEXT_BLOCK_WIDTH + 3))
@@ -783,7 +784,7 @@ public abstract class GameController implements GameMethod {
     // 게임오버플래그 설정
     private boolean isGameOver() {
         for (int i = 0; i < BOARD_WIDTH; i++) {
-            if (board[BOARD_START_HEIGHT][i] > 0)
+            if (board[BOARD_START_HEIGHT - 1][i] > 0)
                 return true;
         }
         return false;
