@@ -20,7 +20,7 @@
       "height": 540
     }
   ],
-  "colorBlindMode": true,
+  "colorBlindMode": false,
   "moveLeftKey": 37,
   "moveRightKey": 39,
   "moveDownKey": 40,

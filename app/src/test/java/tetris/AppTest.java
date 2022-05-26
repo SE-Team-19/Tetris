@@ -9,8 +9,6 @@ import tetris.controller.*;
 public class AppTest {
     @Test
     void testMain() {
-        TestAllView testAllView = new TestAllView();
-        ViewController frame = new ViewController();
-        assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getMainView().getStartBtn());
+        new App();
     }
 }

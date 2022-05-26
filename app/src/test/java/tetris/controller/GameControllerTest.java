@@ -181,6 +181,19 @@ public class GameControllerTest {
     }
 
     @Test
+    @Order(6)
+    public void testBlockdequeuSingleGame() {
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE);
+        assertThat(testAllView.getGameView().getGameDiffLabel().getText()).isEqualTo("easy");
+        testRobot.delay(5000);
+        gameController.gamePlayer.blockDeque.clear();
+        testRobot.pressAndReleaseKeys(VK_SPACE, VK_DOWN, VK_SPACE, VK_DOWN);
+        testRobot.delay(1000);
+        testRobot.pressAndReleaseKeys(VK_ESCAPE, VK_DOWN, VK_DOWN, VK_SPACE);
+        testRobot.delay(1000);
+    }
+
+    @Test
     @Order(4)
     public void testTimeAttack() {
         testRobot.pressAndReleaseKeys(VK_SPACE, VK_SPACE, VK_SPACE, VK_SPACE);
