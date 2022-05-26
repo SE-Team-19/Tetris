@@ -188,6 +188,7 @@ public class MultiGameController extends SingleGameController {
         gamePlayer1.endGame();
         gamePlayer2.endGame();
         gameRobot.endGame();
+        robotController.stopRobot();
         gameTimer.stop();
         gameView.setPlayerOneWin();
         Timer timer = new Timer(5000, e -> {
@@ -201,6 +202,7 @@ public class MultiGameController extends SingleGameController {
         gamePlayer1.endGame();
         gamePlayer2.endGame();
         gameRobot.endGame();
+        robotController.stopRobot();
         gameTimer.stop();
         gameView.setPlayerTwoWin();
         Timer timer = new Timer(5000, e -> {
