@@ -5,9 +5,15 @@ import java.awt.Color;
 public class TBlock extends Block {
 
     public TBlock() {
+        initTBlock();
+    }
+
+    private void initTBlock() {
         shape = new int[][] { { 0, 1, 0 }, { 1, 1, 1 } };
         color = Color.CYAN;
         blindColor = Color.CYAN;
-        indentifynumber = 7;
+        identifynumber = TBLOCK_IDENTIFY_NUMBER;
+        rotateCount = FIRST_ROTATE_STATE;
+        initVisualShapeAndXYList(identifynumber);
     }
 }

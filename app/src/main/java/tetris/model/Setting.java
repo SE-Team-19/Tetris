@@ -1,8 +1,8 @@
 package tetris.model;
 
 import java.awt.Rectangle;
-import java.util.List;
-
+import java.awt.event.KeyEvent;
+import java.util.*;
 
 public class Setting {
 
@@ -14,16 +14,28 @@ public class Setting {
     private int moveDownKey;
     private int rotateKey;
     private int stackKey;
+    private int moveLeft2Key;
+    private int moveRight2Key;
+    private int moveDown2Key;
+    private int rotate2Key;
+    private int stack2Key;
 
-    public Setting(int displayMode, boolean colorBlindMode, int moveLeftKey, int moveRightKey,
-            int moveDownKey, int rotateKey, int stackKey) {
-        this.displayMode = displayMode;
-        this.colorBlindMode = colorBlindMode;
-        this.moveLeftKey = moveLeftKey;
-        this.moveRightKey = moveRightKey;
-        this.moveDownKey = moveDownKey;
-        this.rotateKey = rotateKey;
-        this.stackKey = stackKey;
+    public Setting() {
+        displayMode = 0;
+        displayList = Arrays.asList(new Rectangle(0, 0, 1280, 720),
+                new Rectangle(0, 0, 1120, 630),
+                new Rectangle(0, 0, 960, 540));
+        colorBlindMode = false;
+        moveLeftKey = KeyEvent.VK_LEFT;
+        moveRightKey = KeyEvent.VK_RIGHT;
+        moveDownKey = KeyEvent.VK_DOWN;
+        rotateKey = KeyEvent.VK_UP;
+        stackKey = KeyEvent.VK_SPACE;
+        moveLeft2Key = KeyEvent.VK_A;
+        moveRight2Key = KeyEvent.VK_D;
+        moveDown2Key = KeyEvent.VK_S;
+        rotate2Key = KeyEvent.VK_W;
+        stack2Key = KeyEvent.VK_R;
     }
 
     public int getDisplayMode() {
@@ -88,5 +100,45 @@ public class Setting {
 
     public void setStackKey(int stackKey) {
         this.stackKey = stackKey;
+    }
+
+    public int getMoveLeft2Key() {
+        return this.moveLeft2Key;
+    }
+
+    public void setMoveLeft2Key(int moveLeft2Key) {
+        this.moveLeft2Key = moveLeft2Key;
+    }
+
+    public int getMoveRight2Key() {
+        return this.moveRight2Key;
+    }
+
+    public void setMoveRight2Key(int moveRight2Key) {
+        this.moveRight2Key = moveRight2Key;
+    }
+
+    public int getMoveDown2Key() {
+        return this.moveDown2Key;
+    }
+
+    public void setMoveDown2Key(int moveDown2Key) {
+        this.moveDown2Key = moveDown2Key;
+    }
+
+    public int getRotate2Key() {
+        return this.rotate2Key;
+    }
+
+    public void setRotate2Key(int rotate2Key) {
+        this.rotate2Key = rotate2Key;
+    }
+
+    public int getStack2Key() {
+        return this.stack2Key;
+    }
+
+    public void setStack2Key(int stack2Key) {
+        this.stack2Key = stack2Key;
     }
 }
