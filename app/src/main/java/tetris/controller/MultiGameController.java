@@ -67,7 +67,7 @@ public class MultiGameController extends SingleGameController {
             }
         };
 
-        gameRobot = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, gamepane2) {
+        gameRobot = new GameController(gamepane2, nextBlockPane2, attackLinePane2, scoreLabel2, multiGameFocusing) {
             @Override
             public void doWhenGameStart() {
                 robotController.findMove(currentBlock);
@@ -115,6 +115,8 @@ public class MultiGameController extends SingleGameController {
         this.setting = setting;
         multiMode = 0;
         isSingleGameModeFlag = false;
+        gamePlayer1.loadSetting(setting);
+        gamePlayer2.loadSetting(setting);
         gamePlayer1.setOpponentPlayer(gamePlayer2);
         gamePlayer2.setOpponentPlayer(gamePlayer1);
         generateBlockRandomizer(GameController.NORMAL_MODE);
@@ -143,6 +145,8 @@ public class MultiGameController extends SingleGameController {
 
         gamePlayer1.setPlayerKeys(setting.getRotateKey(), setting.getMoveDownKey(), setting.getMoveLeftKey(),
                 setting.getMoveRightKey(), setting.getStackKey());
+        gamePlayer1.loadSetting(setting);
+        gameRobot.loadSetting(setting);
 
         int currentResoultion = gameView.getWidth() * gameView.getHeight();
         gamePlayer1.startGame(GameController.NORMAL_MODE, gameMode, randomBlockList, currentResoultion);
@@ -156,10 +160,14 @@ public class MultiGameController extends SingleGameController {
 
     protected void continueMultiGame() {
         gameView.resetMultiStopPanel();
-        gamePlayer1.continuGame();
-        gamePlayer2.continuGame();
-        gameRobot.continuGame();
-        robotController.startRobot();
+        if (multiMode == 0) {
+            gamePlayer1.continuGame();
+            gamePlayer2.continuGame();
+        } else if (multiMode == 1) {
+            gameRobot.continuGame();
+            robotController.startRobot();
+        }
+
         gameTimer.restart();
         multiGameFocusing.requestFocus();
     }
@@ -217,7 +225,10 @@ public class MultiGameController extends SingleGameController {
                 playerOneWin();
             }
         }
+    }
 
+    protected void setItemFreqency(int itemFreqency) {
+        gamePlayer.setItemFreqency(itemFreqency);
     }
 
 }

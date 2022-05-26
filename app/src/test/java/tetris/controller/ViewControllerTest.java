@@ -49,7 +49,7 @@ public class ViewControllerTest {
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getSingleGameBtn());
         testRobot.pressAndReleaseKeys(VK_RIGHT);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getMulitiGameBtn());
-        testRobot.pressAndReleaseKeys(VK_DOWN);
+        testRobot.pressAndReleaseKeys(VK_DOWN, VK_LEFT, VK_DOWN, VK_RIGHT, VK_DOWN);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getGameReturnBtn());
         testRobot.pressAndReleaseKeys(new int[] { VK_UP, VK_SPACE });
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getGeneralModeBtn());
@@ -57,7 +57,7 @@ public class ViewControllerTest {
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getItemModeBtn());
         testRobot.pressAndReleaseKeys(VK_RIGHT);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getTimeAttackBtn());
-        testRobot.pressAndReleaseKeys(VK_DOWN);
+        testRobot.pressAndReleaseKeys(VK_DOWN, VK_LEFT, VK_DOWN, VK_RIGHT, VK_DOWN);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getModeReturnBtn());
         testRobot.pressAndReleaseKeys(new int[] { VK_UP, VK_SPACE });
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getEasyBtn());
@@ -65,7 +65,7 @@ public class ViewControllerTest {
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getNormalBtn());
         testRobot.pressAndReleaseKeys(VK_RIGHT);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getHardBtn());
-        testRobot.pressAndReleaseKeys(VK_DOWN);
+        testRobot.pressAndReleaseKeys(VK_DOWN, VK_LEFT, VK_DOWN, VK_RIGHT, VK_DOWN);
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getDiffReturnBtn());
         testRobot.pressAndReleaseKeys(new int[] { VK_SPACE, VK_DOWN, VK_SPACE, VK_LEFT, VK_SPACE });
         assertThat(frame.getFocusOwner()).isEqualTo(testAllView.getGameView().getGeneralModeBtn());

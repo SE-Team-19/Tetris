@@ -78,33 +78,6 @@ public class RobotController {
         }
     }
 
-    void findMove(Block block, int[][] board, int x, int y) {
-        double currnetScore;
-        double maxScore = Double.MIN_EXPONENT;
-        caculator.copyBoard(board, caculator.board);
-        caculator.currentBlock.copyBlock(block);
-        caculator.blockBuffer.copyBlock(block);
-        caculator.eraseBlock(caculator.board, caculator.currentBlock, x, y);
-        for (int j = 0; j < 4; j++) {
-            caculator.currentBlock.rotate();
-            caculator.blockBuffer.rotate();
-            for (int i = 0; i < GameController.BOARD_WIDTH - caculator.currentBlock.getWidth() + 1; i++) {
-                caculator.x = i;
-                caculator.y = GameController.BOARD_START_HEIGHT;
-                caculator.getGhostY();
-                caculator.placeBlock(caculator.board, caculator.currentBlock, i, caculator.ghostY);
-                currnetScore = calculateScore(caculator.board);
-                GameController.showCurrent(gameController.board, gameController.currentBlock, 0, 1);
-                if (currnetScore > maxScore) {
-                    maxScore = currnetScore;
-                    moveX = i;
-                    rotateCount = caculator.currentBlock.getRotateCount();
-                }
-                caculator.eraseBlock(caculator.board, caculator.currentBlock, i, caculator.ghostY);
-            }
-        }
-    }
-
     void moveBlock() {
         int currentRotateCount = gameController.currentBlock.getRotateCount();
         int currentX = gameController.x;
